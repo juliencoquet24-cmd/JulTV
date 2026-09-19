@@ -283,15 +283,20 @@ const SUFFIXES = ["hd", "fhd", "uhd", "4k", "sd", "tnt", "tv", "hd1", "1080", "7
  * chaînes sans rapport.
  */
 function numeroDe(nom, table) {
+  return rangDe(nom, table).rang;
+}
+
+/** Comme numeroDe, mais dit aussi si le nom correspondait mot pour mot. */
+function rangDe(nom, table) {
   const n = normaliser(nom);
-  if (table.has(n)) return table.get(n);
+  if (table.has(n)) return { rang: table.get(n), exact: true };
   for (const suf of SUFFIXES) {
     if (n.endsWith(suf)) {
       const base = n.slice(0, -suf.length);
-      if (base && table.has(base)) return table.get(base);
+      if (base && table.has(base)) return { rang: table.get(base), exact: false };
     }
   }
-  return null;
+  return { rang: null, exact: false };
 }
 
 /** Accepte `{ canaux: [...], priorites: [...] }` ou un tableau seul. */
@@ -494,14 +499,50 @@ async function traiterPays(code, conf, numerotation) {
    * canaux fait donc office de filtre autant que d'ordre : pour ajouter une
    * chaîne, il suffit de l'ajouter au fichier.
    */
+  // Nombre de diffusions par chaîne : départage les doublons à grille égale.
+  const volume = new Map();
+  for (const d of diffusions) volume.set(d.chaine, (volume.get(d.chaine) ?? 0) + 1);
+
+  /**
+   * Plusieurs entrées du flux désignent souvent la même chaîne : un flux
+   * principal, sa déclinaison 4K, parfois un doublon sans logo. Elles
+   * tombent toutes sur le même rang et la grille les affichait côte à côte.
+   * On ne garde donc qu'une entrée par rang, la plus complète : celle qui a
+   * un logo d'abord, puis celle dont le nom correspond mot pour mot, puis
+   * celle qui a le plus de programmes.
+   */
+  const meilleur = new Map();
+  for (const [id, c] of chaines) {
+    const canal = rangDe(c.nom, tCanaux);
+    const prio = rangDe(c.nom, tPriorites);
+    if (canal.rang === null && prio.rang === null) continue;
+
+    const cle = canal.rang !== null ? `c${canal.rang}` : `p${prio.rang}`;
+    const note =
+      (c.icone ? 100 : 0) + ((canal.exact || prio.exact) ? 10 : 0);
+    const candidat = {
+      id,
+      c,
+      num: canal.rang,
+      pri: prio.rang,
+      note,
+      vol: volume.get(id) ?? 0,
+    };
+    const actuel = meilleur.get(cle);
+    if (
+      !actuel ||
+      candidat.note > actuel.note ||
+      (candidat.note === actuel.note && candidat.vol > actuel.vol)
+    ) {
+      meilleur.set(cle, candidat);
+    }
+  }
+
   const gardees = new Map();
   const rangs = new Map();
-  for (const [id, c] of chaines) {
-    const num = numeroDe(c.nom, tCanaux);
-    const pri = numeroDe(c.nom, tPriorites);
-    if (num === null && pri === null) continue;
-    gardees.set(id, c);
-    rangs.set(id, { num, pri });
+  for (const m of meilleur.values()) {
+    gardees.set(m.id, m.c);
+    rangs.set(m.id, { num: m.num, pri: m.pri });
   }
 
   if (!gardees.size) {
@@ -510,7 +551,7 @@ async function traiterPays(code, conf, numerotation) {
     );
     return null;
   }
-  log(`${code}: ${gardees.size} chaînes retenues sur ${chaines.size} reçues`);
+  log(`${code}: ${gardees.size} chaînes retenues sur ${chaines.size} reçues (doublons fondus)`);
 
   const index = new Map([...gardees.keys()].map((id, i) => [id, i]));
   const numeros = new Map();
