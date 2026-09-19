@@ -12,8 +12,8 @@
  */
 
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
-import { createReadStream } from "node:fs";
-import { gunzipSync, unzipSync } from "node:zlib";
+import { writeFileSync, mkdirSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
 import { execFileSync } from "node:child_process";
 import { XMLParser } from "fast-xml-parser";
 import path from "node:path";
@@ -54,13 +54,31 @@ const texte = (v) => {
   return null;
 };
 
-/** Décompresse selon l'extension. .xz nécessite l'outil système xz. */
-function decompresser(buf, url) {
+/**
+ * Extrait le premier fichier .xml d'une archive .zip. Le format zip stocke
+ * une table des matières en fin de fichier : impossible à lire en flux
+ * continu, il faut un fichier réel sur disque pour que `unzip` puisse s'y
+ * déplacer. D'où l'écriture temporaire ci-dessous.
+ */
+function depuisZip(buf, nomTemp) {
+  mkdirSync(TRAVAIL, { recursive: true });
+  const zipTmp = path.join(TRAVAIL, `${nomTemp}.zip`);
+  writeFileSync(zipTmp, buf);
+
+  const listing = execFileSync("unzip", ["-Z1", zipTmp], { maxBuffer: 1 << 20 })
+    .toString("utf8")
+    .split("\n")
+    .filter(Boolean);
+  const entree = listing.find((n) => n.toLowerCase().endsWith(".xml"));
+  if (!entree) throw new Error(`aucun .xml dans l'archive (contenu : ${listing.join(", ")})`);
+
+  return execFileSync("unzip", ["-p", zipTmp, entree], { maxBuffer: 1 << 30 });
+}
+
+/** Décompresse selon l'extension. .xz et .zip nécessitent des outils système. */
+function decompresser(buf, url, nomTemp) {
   if (url.endsWith(".gz")) return gunzipSync(buf);
-  if (url.endsWith(".zip")) {
-    // unzipSync n'existe pas pour les archives multi-fichiers : on passe par unzip.
-    throw new Error("Archives .zip non gérées, préfère .gz ou .xml");
-  }
+  if (url.endsWith(".zip")) return depuisZip(buf, nomTemp);
   if (url.endsWith(".xz")) {
     return execFileSync("xz", ["-dc"], { input: buf, maxBuffer: 1 << 30 });
   }
@@ -77,7 +95,7 @@ async function viaUrl(src) {
   if (!res.ok) throw new Error(`${src.name}: HTTP ${res.status}`);
   const brut = Buffer.from(await res.arrayBuffer());
   log(`${src.name}: ${(brut.length / 1e6).toFixed(1)} Mo compressés`);
-  return decompresser(brut, src.url).toString("utf8");
+  return decompresser(brut, src.url, src.name).toString("utf8");
 }
 
 /**
