@@ -217,16 +217,54 @@ function estAdulte(nom) {
  * élément vaut 1. Sert deux fois : pour les numéros de canal, et pour les
  * chaînes mises en avant.
  */
+/** Tous les libellés d'une entrée, qu'elle soit texte, tableau ou objet. */
+function libelles(entree) {
+  if (typeof entree === "string") return [entree];
+  if (Array.isArray(entree)) return entree;
+  return [entree?.nom, ...(entree?.aussi ?? [])].filter(Boolean);
+}
+
 function tableNumeros(liste) {
   const table = new Map();
   (liste ?? []).forEach((entree, i) => {
-    const noms = Array.isArray(entree) ? entree : [entree];
-    for (const nom of noms) {
+    for (const nom of libelles(entree)) {
       const cle = normaliser(nom);
       if (cle && !table.has(cle)) table.set(cle, i + 1);
     }
   });
   return table;
+}
+
+/**
+ * Catégorie déclarée pour chaque libellé. Elle prime sur la déduction faite
+ * à partir des genres des programmes : les sources espagnoles n'en
+ * fournissent presque jamais, si bien que des sections entières se
+ * retrouvaient vides ou réduites à deux ou trois chaînes.
+ */
+function tableCategories(liste) {
+  const table = new Map();
+  for (const entree of liste ?? []) {
+    const cat = entree?.categorie;
+    if (!cat) continue;
+    for (const nom of libelles(entree)) {
+      const cle = normaliser(nom);
+      if (cle && !table.has(cle)) table.set(cle, cat);
+    }
+  }
+  return table;
+}
+
+/** Cherche la catégorie déclarée d'une chaîne, suffixes techniques compris. */
+function categorieDe(nom, table) {
+  const n = normaliser(nom);
+  if (table.has(n)) return table.get(n);
+  for (const suf of SUFFIXES) {
+    if (n.endsWith(suf)) {
+      const base = n.slice(0, -suf.length);
+      if (base && table.has(base)) return table.get(base);
+    }
+  }
+  return null;
 }
 
 /**
@@ -444,6 +482,7 @@ async function traiterPays(code, conf, numerotation) {
   const reglages = reglagesPays(numerotation?.[code]);
   const tCanaux = tableNumeros(reglages.canaux);
   const tPriorites = tableNumeros(reglages.priorites);
+  const tCategories = tableCategories(reglages.canaux);
 
   /**
    * On ne garde que les chaînes listées dans numerotation.json.
@@ -482,7 +521,16 @@ async function traiterPays(code, conf, numerotation) {
     if (pri !== null) priorites.set(i, pri);
   }
 
-  const categories = categoriser(diffusions, index, gardees);
+  // Catégorie déclarée si elle existe, sinon déduite des genres diffusés.
+  const deduites = categoriser(diffusions, index, gardees);
+  const categories = new Map();
+  let declarees = 0;
+  for (const [id, i] of index) {
+    const dec = categorieDe(gardees.get(id).nom, tCategories);
+    if (dec) declarees++;
+    categories.set(i, dec ?? deduites.get(i) ?? "Autres");
+  }
+  log(`${code}: ${declarees} catégories déclarées, ${index.size - declarees} déduites`);
   const jours = parJour(diffusions, index, conf.timezone);
   const retenus = joursUtiles(jours, conf.timezone);
 
