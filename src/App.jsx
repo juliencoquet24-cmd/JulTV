@@ -22,15 +22,24 @@ function heureDe(jour, minutes, timezone) {
     .replace(":", "h");
 }
 
-/** L'heure locale seule, en nombre, pour placer les raccourcis de navigation. */
+/**
+ * L'heure locale seule, en nombre, pour placer les raccourcis de navigation.
+ *
+ * Il faut passer par formatToParts : en français, `format` rend « 00 h »,
+ * avec une espace insécable et la lettre h. `Number("00 h")` vaut NaN, si
+ * bien qu'aucune graduation ne correspondait jamais et que les quatre
+ * boutons Matin, Après-midi, Soirée et Nuit restaient désactivés.
+ * Le modulo couvre les locales où minuit se note 24.
+ */
 function heureNombre(jour, minutes, timezone) {
   const d = new Date(Date.parse(`${jour}T00:00:00Z`) + minutes * 60000);
-  const p = new Intl.DateTimeFormat("fr-FR", {
+  const parts = new Intl.DateTimeFormat("fr-FR", {
     timeZone: timezone,
     hour: "2-digit",
     hour12: false,
-  }).format(d);
-  return Number(p);
+  }).formatToParts(d);
+  const h = parts.find((x) => x.type === "hour");
+  return h ? Number(h.value) % 24 : NaN;
 }
 
 function jourLisible(jour) {
