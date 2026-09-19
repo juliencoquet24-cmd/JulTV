@@ -13,8 +13,8 @@
       {
         "type": "url",
         "name": "xmltvfr-complet",
-        "url": "https://xmltvfr.fr/xmltv/xmltv.xml.gz",
-        "note": "~785 chaînes francophones, tous bouquets (TNT, Canal+, beIN, Ciné+, OCS, Orange, Free, SFR). URL à confirmer sur https://xmltvfr.fr/xmltv.php — voir README."
+        "url": "https://xmltvfr.fr/xmltv/xmltv.zip",
+        "note": "~785 chaînes francophones, tous bouquets (TNT, Canal+, beIN, Ciné+, OCS, Orange, Free, SFR). URL copiée depuis https://xmltvfr.fr/xmltv.php le 19/09/2026."
       }
     ]
   },
