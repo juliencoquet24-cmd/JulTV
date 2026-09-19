@@ -112,7 +112,7 @@ async function viaGrabber(src) {
       "run",
       "grab",
       "--",
-      `--site=${src.site}`,
+      `--sites=${src.site}`,
       `--days=${src.days}`,
       `--output=${cible}`,
       "--maxConnections=5",
@@ -129,6 +129,14 @@ const analyseur = new XMLParser({
   attributeNamePrefix: "@",
   isArray: (nom) =>
     ["channel", "programme", "category", "display-name", "icon"].includes(nom),
+  // Le XMLTV de xmltvfr.fr déclare plusieurs centaines d'entités DOCTYPE pour
+  // les caractères accentués : ça dépasse largement la limite anti-bombe XML
+  // par défaut de fast-xml-parser (1000). On la desserre sans la désactiver.
+  processEntities: {
+    maxTotalExpansions: 20000,
+    maxEntityCount: 5000,
+    maxExpandedLength: 2_000_000,
+  },
 });
 
 function lireXmltv(xml, chaines, diffusions) {

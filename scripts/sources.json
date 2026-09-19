@@ -39,10 +39,10 @@
       },
       {
         "type": "grab",
-        "name": "tvtoday",
-        "site": "tvtoday.es",
+        "name": "orange",
+        "site": "orangetv.orange.es",
         "days": 4,
-        "note": "Complément câble/satellite"
+        "note": "227 chaînes, bouquet Orange TV Espagne — remplace tvtoday.es qui n'existe pas dans iptv-org/epg"
       }
     ]
   }
