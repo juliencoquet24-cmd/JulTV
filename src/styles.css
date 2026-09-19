@@ -1,0 +1,229 @@
+:root {
+  --encre: #1d2126;
+  --graphite: #2b3037;
+  --graphite-clair: #363c45;
+  --craie: #e9e6e0;
+  --craie-douce: #99a0a9;
+  --ambre: #e6a444;
+  --trait: #434a54;
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: var(--encre);
+  color: var(--craie);
+  font-family: "Archivo", system-ui, sans-serif;
+  font-variation-settings: "wdth" 100;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cadre {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.entete {
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  background: var(--encre);
+  padding-top: 0.5rem;
+  z-index: 5;
+}
+
+.entete h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 800;
+  font-variation-settings: "wdth" 88;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.sur-titre {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 400;
+  font-variation-settings: "wdth" 112;
+  letter-spacing: 0.05em;
+  color: var(--craie-douce);
+  margin-bottom: 0.35rem;
+}
+
+.onglets {
+  display: flex;
+  gap: 0.4rem;
+  margin: 1.1rem 0 0.75rem;
+}
+
+.onglet {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--craie-douce);
+  border: 1px solid var(--trait);
+  border-radius: 2px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+}
+
+.onglet.actif {
+  background: var(--ambre);
+  border-color: var(--ambre);
+  color: var(--encre);
+}
+
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.barre select,
+.barre input {
+  appearance: none;
+  background: var(--graphite);
+  color: var(--craie);
+  border: 1px solid var(--trait);
+  border-radius: 2px;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.barre input {
+  flex: 1 1 11rem;
+  min-width: 0;
+}
+
+.compteur {
+  margin: 0.75rem 0 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--trait);
+  font-size: 0.78rem;
+  color: var(--craie-douce);
+}
+
+.grille { list-style: none; margin: 0; padding: 0; }
+
+.chaine {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--trait);
+}
+
+.chaine-nom {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  align-self: start;
+}
+
+.chaine-nom img {
+  object-fit: contain;
+  background: var(--graphite-clair);
+  border-radius: 3px;
+  padding: 3px;
+}
+
+.initiale {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: var(--graphite-clair);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.chaine-nom h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variation-settings: "wdth" 90;
+}
+
+.creneaux { display: grid; gap: 0.5rem; }
+
+.creneau {
+  background: var(--graphite);
+  border-left: 2px solid transparent;
+  padding: 0.75rem 0.9rem;
+}
+
+.creneau.direct {
+  border-left-color: var(--ambre);
+  background: var(--graphite-clair);
+}
+
+.heure {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--craie-douce);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.direct .heure { color: var(--ambre); }
+
+.badge {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--encre);
+  background: var(--ambre);
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+}
+
+.creneau h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sous-titre, .genre {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--craie-douce);
+}
+
+.genre { font-size: 0.75rem; }
+
+.etat {
+  font-size: 1rem;
+  color: var(--craie-douce);
+  padding: 2rem 0;
+}
+
+.pied {
+  margin-top: 2.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--trait);
+  font-size: 0.8rem;
+  color: var(--craie-douce);
+  max-width: 48ch;
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ambre);
+  outline-offset: 2px;
+}
+
+@media (max-width: 42rem) {
+  .chaine { grid-template-columns: 1fr; gap: 0.7rem; }
+  .entete { position: static; }
+}

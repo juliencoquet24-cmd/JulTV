@@ -1,0 +1,68 @@
+name: Grille TV
+
+on:
+  schedule:
+    # 4 fois par jour. Le XMLTV français est regénéré vers 02h10 heure de Paris.
+    - cron: "20 1,7,13,19 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["public/data/**"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    # Les grabbers espagnols sont lents : ils interrogent les sites page par page.
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Outils de décompression
+        run: sudo apt-get update && sudo apt-get install -y xz-utils
+
+      - name: Cloner le grabber iptv-org
+        run: |
+          mkdir -p .epg-tmp
+          git clone --depth 1 https://github.com/iptv-org/epg.git .epg-tmp/iptv-org-epg
+          cd .epg-tmp/iptv-org-epg && npm install --no-audit --no-fund
+
+      - name: Construire les données EPG
+        env:
+          # Surcharge éventuelle de l'URL du XMLTV français, si elle change.
+          XMLTV_FR_URL: ${{ vars.XMLTV_FR_URL }}
+        run: npm run build:epg
+
+      - name: Construire le site
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deployer:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,49 @@
+{
+  "_comment": [
+    "Chaque entrée décrit une source XMLTV à agréger.",
+    "type 'url'  : fichier XMLTV téléchargé tel quel (.xml, .gz, .xz, .zip).",
+    "type 'grab' : grille reconstruite par le grabber iptv-org/epg à partir d'un site.",
+    "Ajoute ou retire des entrées librement : le builder les traite toutes pareil."
+  ],
+
+  "fr": {
+    "label": "France",
+    "timezone": "Europe/Paris",
+    "sources": [
+      {
+        "type": "url",
+        "name": "xmltvfr-complet",
+        "url": "https://xmltvfr.fr/xmltv/xmltv.xml.gz",
+        "note": "~785 chaînes francophones, tous bouquets (TNT, Canal+, beIN, Ciné+, OCS, Orange, Free, SFR). URL à confirmer sur https://xmltvfr.fr/xmltv.php — voir README."
+      }
+    ]
+  },
+
+  "es": {
+    "label": "Espagne",
+    "timezone": "Europe/Madrid",
+    "sources": [
+      {
+        "type": "grab",
+        "name": "movistarplus",
+        "site": "movistarplus.es",
+        "days": 5,
+        "note": "TDT + tous les bouquets Movistar Plus+ (Vamos, LaLiga, Cine, Deportes...)"
+      },
+      {
+        "type": "grab",
+        "name": "elpais",
+        "site": "programacion-tv.elpais.com",
+        "days": 5,
+        "note": "Généralistes et autonomiques, utile en recoupement"
+      },
+      {
+        "type": "grab",
+        "name": "tvtoday",
+        "site": "tvtoday.es",
+        "days": 4,
+        "note": "Complément câble/satellite"
+      }
+    ]
+  }
+}
