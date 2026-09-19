@@ -213,8 +213,9 @@ function estAdulte(nom) {
 }
 
 /**
- * Construit une table nom normalisé → numéro de canal à partir de
- * scripts/numerotation.json. Le premier nom de la liste vaut 1.
+ * Construit une table nom normalisé → rang à partir d'une liste. Le premier
+ * élément vaut 1. Sert deux fois : pour les numéros de canal, et pour les
+ * chaînes mises en avant.
  */
 function tableNumeros(liste) {
   const table = new Map();
@@ -229,17 +230,26 @@ function tableNumeros(liste) {
 }
 
 /**
- * Cherche le numéro d'une chaîne. On tente d'abord le nom exact normalisé,
- * puis un préfixe : "france2hd" et "france2tnt" retombent sur "france2".
- * Renvoie null si la chaîne n'est pas dans la table.
+ * Cherche le rang d'une chaîne. On tente d'abord le nom exact normalisé,
+ * puis un préfixe très court : "france2hd" retombe sur "france2".
+ *
+ * La marge est volontairement de trois caractères, de quoi absorber "hd",
+ * "tnt" ou "sd" et rien de plus : à quatre, "Canal+ Foot" héritait du
+ * numéro de Canal+, ce qui est faux — c'est une autre chaîne.
  */
 function numeroDe(nom, table) {
   const n = normaliser(nom);
   if (table.has(n)) return table.get(n);
   for (const [cle, num] of table) {
-    if (n.startsWith(cle) && n.length - cle.length <= 4) return num;
+    if (n.startsWith(cle) && n.length - cle.length <= 3) return num;
   }
   return null;
+}
+
+/** Accepte `{ canaux: [...], priorites: [...] }` ou un tableau seul. */
+function reglagesPays(brut) {
+  if (Array.isArray(brut)) return { canaux: brut, priorites: [] };
+  return { canaux: brut?.canaux ?? [], priorites: brut?.priorites ?? [] };
 }
 
 // ------------------------------------------------------------ catégorisation
@@ -425,14 +435,23 @@ async function traiterPays(code, conf, numerotation) {
   const jours = parJour(diffusions, index, conf.timezone);
   const retenus = joursUtiles(jours, conf.timezone);
 
-  // Numéro de canal, quand la chaîne figure dans la table du pays.
-  const table = tableNumeros(numerotation?.[code]);
+  // Numéro de canal et rang de mise en avant, quand la chaîne est listée.
+  const reglages = reglagesPays(numerotation?.[code]);
+  const tCanaux = tableNumeros(reglages.canaux);
+  const tPriorites = tableNumeros(reglages.priorites);
+
   const numeros = new Map();
+  const priorites = new Map();
   for (const [id, i] of index) {
-    const num = numeroDe(chaines.get(id).nom, table);
+    const nom = chaines.get(id).nom;
+    const num = numeroDe(nom, tCanaux);
     if (num !== null) numeros.set(i, num);
+    const pri = numeroDe(nom, tPriorites);
+    if (pri !== null) priorites.set(i, pri);
   }
-  log(`${code}: ${numeros.size} chaînes numérotées sur ${chaines.size}`);
+  log(
+    `${code}: ${numeros.size} chaînes numérotées, ${priorites.size} mises en avant, sur ${chaines.size}`
+  );
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
@@ -457,12 +476,13 @@ async function traiterPays(code, conf, numerotation) {
     timezone: conf.timezone,
     jours: retenus,
     categories: CATEGORIES_ORDRE,
-    // [nom, icône, catégorie, numéro de canal ou null]
+    // [nom, icône, catégorie, numéro de canal, rang de mise en avant]
     chaines: [...chaines.values()].map((c, i) => [
       c.nom,
       c.icone,
       categories.get(i) ?? "Autres",
       numeros.get(i) ?? null,
+      priorites.get(i) ?? null,
     ]),
   };
 }

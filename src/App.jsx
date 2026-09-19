@@ -4,7 +4,10 @@ const BASE = `${import.meta.env.BASE_URL}data`;
 const RAFRAICHISSEMENT = 5 * 60 * 1000;
 
 /** Largeur d'une minute de programme, en pixels. 30 min ≈ 110 px. */
-const PX_PAR_MIN = 3.6;
+const PX_PAR_MIN = 2.8;
+
+/** En dessous, le bloc est trop étroit pour porter du texte lisible. */
+const LARGEUR_TEXTE = 44;
 const PAS = 30; // graduation de l'axe, en minutes
 
 /** Minutes depuis minuit UTC du jour → étiquette dans le fuseau du pays. */
@@ -156,10 +159,22 @@ export default function App() {
 
     const lignes = [...parChaine.entries()]
       .map(([i, programmes]) => {
-        const [nom, icone, cat, numero] = conf.chaines[i] ?? ["?", null, "Autres", null];
-        return { i, nom, icone, numero: numero ?? null, categorie: cat ?? "Autres", programmes };
+        const [nom, icone, cat, numero, priorite] =
+          conf.chaines[i] ?? ["?", null, "Autres", null, null];
+        return {
+          i,
+          nom,
+          icone,
+          numero: numero ?? null,
+          priorite: priorite ?? null,
+          categorie: cat ?? "Autres",
+          programmes,
+        };
       })
       .sort((a, b) => {
+        if (a.priorite && b.priorite) return a.priorite - b.priorite;
+        if (a.priorite) return -1;
+        if (b.priorite) return 1;
         if (a.numero && b.numero) return a.numero - b.numero;
         if (a.numero) return -1;
         if (b.numero) return 1;
@@ -331,7 +346,15 @@ export default function App() {
               </div>
               <div className="piste">
                 {graduations.map((m) => (
-                  <span key={m} className="graduation" style={{ left: `${xDe(m)}px` }}>
+                  <span
+                    key={m}
+                    className={
+                      heureDe(jour, m, conf.timezone).endsWith("00")
+                        ? "graduation"
+                        : "graduation demie"
+                    }
+                    style={{ left: `${xDe(m)}px` }}
+                  >
                     {heureDe(jour, m, conf.timezone)}
                   </span>
                 ))}
@@ -353,8 +376,12 @@ export default function App() {
                 )}
 
                 {g.lignes.map((l) => (
-                  <div className="ligne" key={l.i}>
-                    <div className="rail">
+                  <div
+                    className={l.priorite ? "ligne en-avant" : "ligne"}
+                    key={l.i}
+                  >
+                    <div className="rail" data-cat={l.categorie}>
+                      <span className="pastille" aria-hidden="true" />
                       {l.numero ? (
                         <span className="canal">{l.numero}</span>
                       ) : (
@@ -372,20 +399,31 @@ export default function App() {
                       {l.programmes.map((p, k) => {
                         const largeur = p.duree * PX_PAR_MIN;
                         const direct = maintenant >= p.debut && maintenant < p.debut + p.duree;
+                        const heure = heureDe(jour, p.debut, conf.timezone);
+                        const classes = ["prog"];
+                        if (direct) classes.push("direct");
+                        // Un bloc de quelques minutes ne peut pas porter de
+                        // texte : on le garde visible mais muet, plutôt que
+                        // d'aligner des tranches de lettres illisibles.
+                        if (largeur < LARGEUR_TEXTE) classes.push("muet");
                         return (
                           <article
                             key={k}
-                            className={direct ? "prog direct" : "prog"}
-                            data-cat={l.categorie}
-                            style={{ left: `${xDe(p.debut)}px`, width: `${largeur - 3}px` }}
-                            title={`${heureDe(jour, p.debut, conf.timezone)} — ${p.titre}`}
+                            className={classes.join(" ")}
+                            style={{
+                              left: `${xDe(p.debut)}px`,
+                              width: `${Math.max(largeur - 2, 3)}px`,
+                            }}
+                            title={`${heure} — ${p.titre}${p.sousTitre ? ` · ${p.sousTitre}` : ""}`}
                           >
-                            <span className="prog-heure">
-                              {heureDe(jour, p.debut, conf.timezone)}
-                            </span>
-                            <span className="prog-titre">{p.titre}</span>
-                            {p.sousTitre && largeur > 240 && (
-                              <span className="prog-sous">{p.sousTitre}</span>
+                            {largeur >= LARGEUR_TEXTE && (
+                              <>
+                                <span className="prog-heure">{heure}</span>
+                                <span className="prog-titre">{p.titre}</span>
+                                {p.sousTitre && largeur > 190 && (
+                                  <span className="prog-sous">{p.sousTitre}</span>
+                                )}
+                              </>
                             )}
                           </article>
                         );
