@@ -230,18 +230,28 @@ function tableNumeros(liste) {
 }
 
 /**
- * Cherche le rang d'une chaîne. On tente d'abord le nom exact normalisé,
- * puis un préfixe très court : "france2hd" retombe sur "france2".
+ * Suffixes techniques qu'une source colle au nom d'une chaîne sans que ce
+ * soit une autre chaîne : "TF1 HD" reste TF1.
+ */
+const SUFFIXES = ["hd", "fhd", "uhd", "4k", "sd", "tnt", "tv", "hd1", "1080", "720"];
+
+/**
+ * Cherche le rang d'une chaîne : nom exact normalisé, puis le même nom
+ * débarrassé d'un suffixe technique.
  *
- * La marge est volontairement de trois caractères, de quoi absorber "hd",
- * "tnt" ou "sd" et rien de plus : à quatre, "Canal+ Foot" héritait du
- * numéro de Canal+, ce qui est faux — c'est une autre chaîne.
+ * Surtout pas un rapprochement par préfixe libre. C'est ce qui donnait à
+ * "TF1 + 1" le numéro de TF1 et à "Canal 32", une chaîne locale auboise,
+ * celui de Canal+ : deux caractères d'écart suffisaient à confondre des
+ * chaînes sans rapport.
  */
 function numeroDe(nom, table) {
   const n = normaliser(nom);
   if (table.has(n)) return table.get(n);
-  for (const [cle, num] of table) {
-    if (n.startsWith(cle) && n.length - cle.length <= 3) return num;
+  for (const suf of SUFFIXES) {
+    if (n.endsWith(suf)) {
+      const base = n.slice(0, -suf.length);
+      if (base && table.has(base)) return table.get(base);
+    }
   }
   return null;
 }

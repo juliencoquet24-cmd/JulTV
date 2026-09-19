@@ -152,6 +152,7 @@ export default function App() {
    * fluide sans laisser de trou.
    */
   const [fenetre, setFenetre] = useState({ de: -Infinity, a: Infinity });
+  const [vue, setVue] = useState({ haut: 0, hauteur: 900 });
 
   useEffect(() => {
     const el = planning.current;
@@ -167,6 +168,7 @@ export default function App() {
           de: bornes.de + (el.scrollLeft - marge) / PX_PAR_MIN,
           a: bornes.de + (el.scrollLeft + el.clientWidth + marge) / PX_PAR_MIN,
         });
+        setVue({ haut: el.scrollTop, hauteur: el.clientHeight });
       });
     };
     maj();
@@ -228,6 +230,66 @@ export default function App() {
       .filter((c) => parCat.has(c))
       .map((c) => ({ categorie: c, lignes: parCat.get(c) }));
   }, [conf, prete, categorie, recherche]);
+
+  /**
+   * Les groupes sont aplatis en une seule liste d'éléments — bandes de
+   * catégorie et lignes de chaîne mêlées — pour pouvoir n'en poser dans le
+   * DOM que la tranche visible. Avec 774 chaînes, créer toutes les lignes
+   * d'un coup suffisait à faire tuer l'onglet par iOS, qui rechargeait la
+   * page en boucle.
+   */
+  const items = useMemo(() => {
+    const out = [];
+    for (const g of groupes) {
+      if (g.categorie) out.push({ type: "bande", cle: `b:${g.categorie}`, categorie: g.categorie });
+      for (const l of g.lignes) out.push({ type: "ligne", cle: `l:${l.i}`, ligne: l });
+    }
+    return out;
+  }, [groupes]);
+
+  // Hauteurs réelles, relevées sur le premier rendu : elles dépendent de la
+  // feuille de style et de la taille d'écran, les coder en dur dériverait.
+  const [hauteurs, setHauteurs] = useState({ ligne: 64, bande: 58 });
+
+  useEffect(() => {
+    if (!items.length) return;
+    const l = document.querySelector(".ligne");
+    const b = document.querySelector(".bande");
+    if (!l) return;
+    const mesure = {
+      ligne: Math.round(l.getBoundingClientRect().height) || 64,
+      bande: b ? Math.round(b.getBoundingClientRect().height) : 0,
+    };
+    setHauteurs((p) =>
+      p.ligne === mesure.ligne && p.bande === mesure.bande ? p : mesure
+    );
+  }, [items, vue.hauteur]);
+
+  /** Position verticale cumulée de chaque élément, et hauteur totale. */
+  const positions = useMemo(() => {
+    const p = new Array(items.length + 1);
+    p[0] = 0;
+    for (let i = 0; i < items.length; i++) {
+      p[i + 1] =
+        p[i] + (items[i].type === "bande" ? hauteurs.bande : hauteurs.ligne);
+    }
+    return p;
+  }, [items, hauteurs]);
+
+  const totalHauteur = positions[items.length] ?? 0;
+
+  /** Tranche d'éléments à rendre, avec une hauteur d'écran de marge. */
+  const tranche = useMemo(() => {
+    if (!items.length) return { debut: 0, fin: 0 };
+    const marge = Math.max(vue.hauteur, 400);
+    const haut = vue.haut - marge;
+    const bas = vue.haut + vue.hauteur + marge;
+    let debut = 0;
+    while (debut < items.length && positions[debut + 1] < haut) debut++;
+    let fin = debut;
+    while (fin < items.length && positions[fin] < bas) fin++;
+    return { debut, fin };
+  }, [items, positions, vue]);
 
   const categoriesDispo = useMemo(() => {
     if (!conf) return [];
@@ -403,74 +465,86 @@ export default function App() {
               </div>
             )}
 
-            {groupes.map((g) => (
-              <section key={g.categorie ?? "tout"} className="bloc">
-                {g.categorie && (
-                  <div className="bande" data-cat={g.categorie}>
-                    <h2 className="bande-nom">{g.categorie}</h2>
-                  </div>
-                )}
+            {/* Cale haute : elle occupe la place des lignes non rendues,
+                pour que la barre de défilement garde la bonne longueur. */}
+            <div style={{ height: `${positions[tranche.debut] ?? 0}px` }} />
 
-                {g.lignes.map((l) => (
-                  <div
-                    className={l.priorite ? "ligne en-avant" : "ligne"}
-                    key={l.i}
-                  >
-                    <div className="rail" data-cat={l.categorie}>
-                      <span className="pastille" aria-hidden="true" />
-                      {l.numero ? (
-                        <span className="canal">{l.numero}</span>
-                      ) : (
-                        <span className="canal vide" aria-hidden="true" />
-                      )}
-                      {l.icone ? (
-                        <img className="logo" src={l.icone} alt="" loading="lazy" />
-                      ) : (
-                        <span className="logo logo-texte">{l.nom.slice(0, 2)}</span>
-                      )}
-                      <span className="chaine">{l.nom}</span>
-                    </div>
-
-                    <div className="piste">
-                      {l.programmes.map((p) => {
-                        if (p.debut + p.duree <= fenetre.de || p.debut >= fenetre.a)
-                          return null;
-                        const largeur = p.duree * PX_PAR_MIN;
-                        const direct = maintenant >= p.debut && maintenant < p.debut + p.duree;
-                        const heure = heureDe(jour, p.debut, conf.timezone);
-                        const classes = ["prog"];
-                        if (direct) classes.push("direct");
-                        // Un bloc de quelques minutes ne peut pas porter de
-                        // texte : on le garde visible mais muet, plutôt que
-                        // d'aligner des tranches de lettres illisibles.
-                        if (largeur < LARGEUR_TEXTE) classes.push("muet");
-                        return (
-                          <article
-                            key={p.debut}
-                            className={classes.join(" ")}
-                            style={{
-                              left: `${xDe(p.debut)}px`,
-                              width: `${Math.max(largeur - 2, 3)}px`,
-                            }}
-                            title={`${heure} — ${p.titre}${p.sousTitre ? ` · ${p.sousTitre}` : ""}`}
-                          >
-                            {largeur >= LARGEUR_TEXTE && (
-                              <>
-                                <span className="prog-heure">{heure}</span>
-                                <span className="prog-titre">{p.titre}</span>
-                                {p.sousTitre && largeur > 190 && (
-                                  <span className="prog-sous">{p.sousTitre}</span>
-                                )}
-                              </>
-                            )}
-                          </article>
-                        );
-                      })}
-                    </div>
+            {items.slice(tranche.debut, tranche.fin).map((it) => {
+              if (it.type === "bande") {
+                return (
+                  <div className="bande" data-cat={it.categorie} key={it.cle}>
+                    <h2 className="bande-nom">{it.categorie}</h2>
                   </div>
-                ))}
-              </section>
-            ))}
+                );
+              }
+              const l = it.ligne;
+              return (
+                <div
+                  className={l.priorite ? "ligne en-avant" : "ligne"}
+                  key={it.cle}
+                >
+                  <div className="rail" data-cat={l.categorie}>
+                    <span className="pastille" aria-hidden="true" />
+                    {l.numero ? (
+                      <span className="canal">{l.numero}</span>
+                    ) : (
+                      <span className="canal vide" aria-hidden="true" />
+                    )}
+                    {l.icone ? (
+                      <img className="logo" src={l.icone} alt="" loading="lazy" />
+                    ) : (
+                      <span className="logo logo-texte">{l.nom.slice(0, 2)}</span>
+                    )}
+                    <span className="chaine">{l.nom}</span>
+                  </div>
+
+                  <div className="piste">
+                    {l.programmes.map((p) => {
+                      if (p.debut + p.duree <= fenetre.de || p.debut >= fenetre.a)
+                        return null;
+                      const largeur = p.duree * PX_PAR_MIN;
+                      const direct =
+                        maintenant >= p.debut && maintenant < p.debut + p.duree;
+                      const heure = heureDe(jour, p.debut, conf.timezone);
+                      const classes = ["prog"];
+                      if (direct) classes.push("direct");
+                      // Un bloc de quelques minutes ne peut pas porter de
+                      // texte : on le garde visible mais muet, plutôt que
+                      // d'aligner des tranches de lettres illisibles.
+                      if (largeur < LARGEUR_TEXTE) classes.push("muet");
+                      return (
+                        <article
+                          key={p.debut}
+                          className={classes.join(" ")}
+                          style={{
+                            left: `${xDe(p.debut)}px`,
+                            width: `${Math.max(largeur - 2, 3)}px`,
+                          }}
+                          title={`${heure} — ${p.titre}${p.sousTitre ? ` · ${p.sousTitre}` : ""}`}
+                        >
+                          {largeur >= LARGEUR_TEXTE && (
+                            <>
+                              <span className="prog-heure">{heure}</span>
+                              <span className="prog-titre">{p.titre}</span>
+                              {p.sousTitre && largeur > 190 && (
+                                <span className="prog-sous">{p.sousTitre}</span>
+                              )}
+                            </>
+                          )}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Cale basse, même rôle. */}
+            <div
+              style={{
+                height: `${Math.max(totalHauteur - (positions[tranche.fin] ?? 0), 0)}px`,
+              }}
+            />
           </div>
         </div>
       )}

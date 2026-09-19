@@ -1,21 +1,15 @@
 {
   "_comment": [
-    "Deux réglages par pays :",
-    "  canaux    — ordre naturel, celui de la télécommande. La position donne",
-    "              le numéro : le premier élément est le canal 1.",
-    "  priorites — chaînes remontées en tête de LEUR catégorie, avant le tri",
-    "              par numéro. Sert à mettre en avant les chaînes qu'on regarde",
-    "              vraiment, sans toucher à leur numéro réel.",
+    "canaux    — ordre d'affichage, repris de la structure de l'offre TV",
+    "            française et espagnole, tous bouquets confondus. La position",
+    "            donne le rang : le premier élément passe en tête.",
+    "priorites — chaînes remontées en tête de LEUR catégorie, avant ce rang.",
     "",
-    "Dans les deux listes, une entrée peut être un nom ou un tableau de noms",
-    "alternatifs. Le rapprochement se fait sur le nom normalisé (minuscules,",
-    "sans accents ni ponctuation), donc 'France 2' attrape aussi 'FRANCE2 HD'.",
-    "",
-    "À vérifier : la TNT française a été réorganisée en 2025 (arrivée de T18 et",
-    "Novo 19, départ de C8 et NRJ 12). Corrige librement, le fichier est relu",
-    "à chaque build."
+    "Une entrée peut être un nom ou un tableau de noms alternatifs. Le",
+    "rapprochement se fait sur le nom normalisé, avec les seuls suffixes",
+    "techniques tolérés (HD, SD, TNT...). Un décalage se corrige ici :",
+    "le fichier est relu à chaque build."
   ],
-
   "fr": {
     "canaux": [
       "TF1",
@@ -30,82 +24,400 @@
       "TMC",
       "TFX",
       "NRJ 12",
-      ["LCP", "LCP Assemblée nationale", "Public Sénat"],
-      "France 4",
+      [
+        "LCP",
+        "LCP Assemblée nationale",
+        "Public Sénat"
+      ],
+      [
+        "France 4",
+        "Culturebox"
+      ],
       "BFM TV",
-      "CNews",
+      [
+        "CNews",
+        "CNEWS"
+      ],
       "CStar",
       "Gulli",
-      ["TF1 Séries Films", "TF1 Series Films"],
-      ["L'Équipe", "La chaîne L'Équipe", "La chaine l'Equipe"],
+      [
+        "TF1 Séries Films",
+        "TF1 Series Films"
+      ],
+      [
+        "L'Équipe",
+        "La chaîne L'Équipe",
+        "La chaine l'Equipe"
+      ],
       "6ter",
       "RMC Story",
       "RMC Découverte",
       "Chérie 25",
-      "LCI",
-      "Franceinfo",
-      "T18",
-      "Novo 19",
-      "RMC Life"
+      [
+        "Franceinfo",
+        "France Info"
+      ],
+      "Paris Première",
+      [
+        "TV5Monde",
+        "TV5 Monde"
+      ],
+      "Canal+ Grand Écran",
+      [
+        "Canal+ Cinéma",
+        "Canal+ Cinéma(s)"
+      ],
+      "Canal+ Box Office",
+      "Canal+ Séries",
+      "Ciné+ Frisson",
+      [
+        "Ciné+ Emotion",
+        "Ciné+ Émotion"
+      ],
+      "Ciné+ Family",
+      "Ciné+ Festival",
+      "Ciné+ Classic",
+      [
+        "OCS",
+        "Ciné+ OCS"
+      ],
+      "Warner TV",
+      "Action",
+      "TCM Cinéma",
+      [
+        "Paramount Channel",
+        "Paramount Network"
+      ],
+      "TV Breizh",
+      "Téva",
+      [
+        "Série Club",
+        "SeriClub"
+      ],
+      "13ème Rue",
+      [
+        "Syfy",
+        "SciFi"
+      ],
+      "Novelas TV",
+      "Comedy Central",
+      "Canal+ Sport",
+      "Canal+ Sport 360",
+      "Canal+ Foot",
+      "Canal+ Live",
+      [
+        "beIN Sports 1",
+        "beIN SPORTS 1"
+      ],
+      [
+        "beIN Sports 2",
+        "beIN SPORTS 2"
+      ],
+      [
+        "beIN Sports 3",
+        "beIN SPORTS 3"
+      ],
+      [
+        "beIN Sports Max 4",
+        "beIN SPORTS MAX 4"
+      ],
+      "Eurosport 1",
+      "Eurosport 2",
+      "RMC Sport 1",
+      "RMC Sport 2",
+      "Golf Channel",
+      [
+        "Automoto",
+        "Automoto La Chaîne"
+      ],
+      "Equidia",
+      "National Geographic",
+      "Nat Geo Wild",
+      "Planète+",
+      "Planète+ Crime",
+      "Planète+ Aventure",
+      "Histoire TV",
+      "Ushuaïa TV",
+      "Science & Vie TV",
+      "Toute l'Histoire",
+      "Animaux",
+      "Trek",
+      "Chasse & Pêche",
+      "Museum TV",
+      "MyZen TV",
+      "Disney Channel",
+      "Disney Junior",
+      "Nickelodeon",
+      "Nickelodeon Junior",
+      "Cartoon Network",
+      "Cartoonito",
+      "Boomerang",
+      "Mangas",
+      "J-One",
+      "Canal J",
+      "TiJi",
+      "MTV",
+      "MTV Hits",
+      "MCM",
+      "CStar Hits France",
+      "NRJ Hits",
+      "Trace Urban",
+      "Trace Latina",
+      "Mezzo",
+      "Mezzo Live HD",
+      "Stingray Classica",
+      "Melody"
     ],
-
     "priorites": [
-      ["Canal+ Foot", "Canal Plus Foot"],
-      ["Canal+ Sport", "Canal Plus Sport"],
-      ["Canal+ Sport 360", "Canal Plus Sport 360"],
-      ["Ligue 1+", "Ligue 1 Plus", "Ligue1+"],
-      ["DAZN", "DAZN 1", "DAZN 2", "DAZN Ligue 1"],
-      ["beIN Sports 1", "beIN SPORTS 1"],
-      ["beIN Sports 2", "beIN SPORTS 2"],
-      ["beIN Sports 3", "beIN SPORTS 3"],
-      ["beIN Sports Max 4", "beIN SPORTS MAX 4"],
-      ["beIN Sports Max 5", "beIN SPORTS MAX 5"],
-      ["L'Équipe", "La chaîne L'Équipe", "La chaine l'Equipe"],
-      ["RMC Sport 1", "RMC Sport"],
-      ["RMC Sport 2"],
-      ["Eurosport 1"],
-      ["Eurosport 2"]
+      [
+        "Canal+ Foot"
+      ],
+      [
+        "Canal+ Sport"
+      ],
+      [
+        "Canal+ Sport 360"
+      ],
+      [
+        "Canal+ Live"
+      ],
+      [
+        "Ligue 1+",
+        "Ligue 1 Plus"
+      ],
+      [
+        "DAZN",
+        "DAZN 1",
+        "DAZN 2"
+      ],
+      [
+        "beIN Sports 1",
+        "beIN SPORTS 1"
+      ],
+      [
+        "beIN Sports 2",
+        "beIN SPORTS 2"
+      ],
+      [
+        "beIN Sports 3",
+        "beIN SPORTS 3"
+      ],
+      [
+        "beIN Sports Max 4",
+        "beIN SPORTS MAX 4"
+      ],
+      [
+        "L'Équipe",
+        "La chaîne L'Équipe",
+        "La chaine l'Equipe"
+      ],
+      [
+        "RMC Sport 1"
+      ],
+      [
+        "RMC Sport 2"
+      ],
+      [
+        "Eurosport 1"
+      ],
+      [
+        "Eurosport 2"
+      ]
     ]
   },
-
   "es": {
     "canaux": [
-      ["La 1", "TVE 1", "La Uno"],
-      ["La 2", "TVE 2"],
+      [
+        "La 1",
+        "TVE 1",
+        "La Uno"
+      ],
+      [
+        "La 2",
+        "TVE 2"
+      ],
       "Antena 3",
       "Cuatro",
       "Telecinco",
-      "laSexta",
-      ["Canal 24 Horas", "24h"],
-      "Clan",
-      "Teledeporte",
+      [
+        "laSexta",
+        "La Sexta"
+      ],
       "Neox",
       "Nova",
       "Mega",
       "Atreseries",
-      ["Factoría de Ficción", "FDF"],
-      "Energy",
+      [
+        "Factoría de Ficción",
+        "FDF"
+      ],
       "Divinity",
-      "Be Mad",
+      "Energy",
+      [
+        "Be Mad",
+        "BeMad TV"
+      ],
+      [
+        "Canal 24 Horas",
+        "24 Horas",
+        "24h"
+      ],
+      [
+        "Teledeporte",
+        "TDP"
+      ],
+      "DMAX",
+      "DKISS",
+      "TEN",
+      "TRECE",
+      [
+        "Movistar Plus+",
+        "Movistar Plus"
+      ],
+      "Movistar Cine",
+      "Movistar Series",
+      "Movistar Action",
+      "Movistar Drama",
+      "Movistar Comedia",
+      "Movistar Clásicos",
+      [
+        "Star Channel",
+        "Star Channel España"
+      ],
+      [
+        "Warner TV España",
+        "Warner TV"
+      ],
+      "AXN",
+      "AXN Movies",
+      "Calle 13",
+      "Cosmo",
+      "Comedy Central España",
+      [
+        "Syfy España",
+        "Syfy"
+      ],
+      [
+        "TCM España",
+        "TCM"
+      ],
+      "Canal Hollywood",
+      "Dark",
+      "SundanceTV",
+      [
+        "Movistar LALIGA",
+        "Movistar LaLiga TV"
+      ],
+      [
+        "Movistar Liga de Campeones",
+        "Movistar Champions"
+      ],
+      "Movistar Deportes",
+      "Movistar Golf",
+      [
+        "DAZN LaLiga",
+        "DAZN La Liga"
+      ],
+      "DAZN 1",
+      "DAZN 2",
+      "DAZN F1",
+      [
+        "Eurosport 1",
+        "Eurosport 1 España"
+      ],
+      [
+        "Eurosport 2",
+        "Eurosport 2 España"
+      ],
+      "Real Madrid TV",
+      "Caza y Pesca",
+      "Golf TV",
+      [
+        "National Geographic",
+        "National Geographic España"
+      ],
+      "Nat Geo Wild",
+      "Historia",
+      "Odisea",
+      [
+        "Discovery Channel",
+        "Discovery Channel España"
+      ],
+      "AMC CRIME",
+      "AMC BREAK",
+      "Viajar",
+      "Escapa TV",
+      [
+        "Clan",
+        "Clan TVE"
+      ],
       "Boing",
-      "DKiss",
-      "Ten",
-      "Trece",
-      "Paramount Network"
+      [
+        "Disney Channel",
+        "Disney Channel España"
+      ],
+      [
+        "Disney Junior",
+        "Disney Junior España"
+      ],
+      [
+        "Nickelodeon",
+        "Nickelodeon España"
+      ],
+      [
+        "Nick Jr.",
+        "Nick Jr. España"
+      ],
+      "DreamWorks Channel",
+      "Baby TV",
+      [
+        "MTV España",
+        "MTV"
+      ],
+      "MTV Live",
+      "MTV 00s",
+      "Sol Música",
+      [
+        "Mezzo",
+        "Mezzo España"
+      ]
     ],
-
     "priorites": [
-      ["Movistar Plus+", "Movistar Plus"],
-      ["Movistar Liga de Campeones", "Movistar Champions"],
-      ["DAZN LaLiga", "DAZN La Liga"],
-      ["DAZN 1"],
-      ["DAZN 2"],
-      ["Movistar Deportes", "Movistar Deportes 1"],
-      ["Movistar Vamos", "Vamos"],
-      ["Gol Play", "GOL"],
-      ["Eurosport 1"],
-      ["Teledeporte"],
-      ["Real Madrid TV"]
+      [
+        "Movistar LALIGA",
+        "Movistar LaLiga TV"
+      ],
+      [
+        "Movistar Liga de Campeones",
+        "Movistar Champions"
+      ],
+      [
+        "Movistar Deportes"
+      ],
+      [
+        "DAZN LaLiga",
+        "DAZN La Liga"
+      ],
+      [
+        "DAZN 1"
+      ],
+      [
+        "DAZN 2"
+      ],
+      [
+        "DAZN F1"
+      ],
+      [
+        "Eurosport 1",
+        "Eurosport 1 España"
+      ],
+      [
+        "Teledeporte",
+        "TDP"
+      ],
+      [
+        "Real Madrid TV"
+      ]
     ]
   }
 }
