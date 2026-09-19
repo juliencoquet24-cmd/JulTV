@@ -144,12 +144,30 @@ body {
   font-weight: 700;
 }
 
-.chaine-nom h2 {
+.chaine-nom .nom-chaine {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
   font-variation-settings: "wdth" 90;
 }
+
+.groupe-categorie + .groupe-categorie { margin-top: 0.5rem; }
+
+.titre-categorie {
+  margin: 2rem 0 0.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--ambre);
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variation-settings: "wdth" 88;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--craie);
+}
+
+.groupe-categorie:first-child .titre-categorie { margin-top: 0; }
+
+.chaines-du-groupe { list-style: none; margin: 0; padding: 0; }
 
 .creneaux { display: grid; gap: 0.5rem; }
 
@@ -187,7 +205,7 @@ body {
   border-radius: 2px;
 }
 
-.creneau h3 {
+.titre-programme {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;

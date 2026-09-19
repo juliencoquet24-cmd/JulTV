@@ -43,6 +43,7 @@ export default function App() {
   const [jour, setJour] = useState(null);
   const [grille, setGrille] = useState(null);
   const [tranche, setTranche] = useState("soiree");
+  const [categorie, setCategorie] = useState("toutes");
   const [recherche, setRecherche] = useState("");
   const [erreur, setErreur] = useState(null);
   const [tic, setTic] = useState(() => Date.now());
@@ -118,7 +119,8 @@ export default function App() {
       const fin = duree ? debut + duree : debut + 60;
       if (fin <= de || debut >= a) continue;
 
-      const nom = conf.chaines[i]?.[0] ?? "?";
+      const [nom, , cat] = conf.chaines[i] ?? ["?", null, "Autres"];
+      if (categorie !== "toutes" && cat !== categorie) continue;
       if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q))
         continue;
 
@@ -131,10 +133,32 @@ export default function App() {
         i,
         nom: conf.chaines[i][0],
         icone: conf.chaines[i][1],
+        categorie: conf.chaines[i][2] ?? "Autres",
         programmes: programmes.slice(0, tranche === "tout" ? 200 : 12),
       }))
       .sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
-  }, [conf, grille, jour, tranche, recherche, tic]);
+  }, [conf, grille, jour, tranche, categorie, recherche, tic]);
+
+  // En mode "toutes catégories", les chaînes sont regroupées sous un
+  // intertitre par catégorie plutôt qu'en une seule liste plate de 700 noms.
+  const groupes = useMemo(() => {
+    if (categorie !== "toutes") return [{ categorie: null, chaines }];
+    const parCat = new Map();
+    for (const c of chaines) {
+      if (!parCat.has(c.categorie)) parCat.set(c.categorie, []);
+      parCat.get(c.categorie).push(c);
+    }
+    const ordre = conf?.categories ?? [];
+    return ordre
+      .filter((cat) => parCat.has(cat))
+      .map((cat) => ({ categorie: cat, chaines: parCat.get(cat) }));
+  }, [chaines, categorie, conf]);
+
+  const categoriesDisponibles = useMemo(() => {
+    if (!conf) return [];
+    const presentes = new Set(conf.chaines.map((c) => c[2] ?? "Autres"));
+    return (conf.categories ?? []).filter((cat) => presentes.has(cat));
+  }, [conf]);
 
   if (erreur && !index) return <Cadre><p className="etat">{erreur}</p></Cadre>;
   if (!index || !conf) return <Cadre><p className="etat">Chargement de la grille…</p></Cadre>;
@@ -178,6 +202,13 @@ export default function App() {
             ))}
           </select>
 
+          <select value={categorie} onChange={(e) => setCategorie(e.target.value)} aria-label="Catégorie">
+            <option value="toutes">Toutes catégories</option>
+            {categoriesDisponibles.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+
           <input
             type="search"
             value={recherche}
@@ -203,33 +234,40 @@ export default function App() {
       )}
 
       <ol className="grille">
-        {chaines.map((c) => (
-          <li key={c.i} className="chaine">
-            <div className="chaine-nom">
-              {c.icone ? (
-                <img src={c.icone} alt="" loading="lazy" width="32" height="32" />
-              ) : (
-                <span className="initiale">{c.nom.slice(0, 2)}</span>
-              )}
-              <h2>{c.nom}</h2>
-            </div>
+        {groupes.map((g) => (
+          <li key={g.categorie ?? "flat"} className="groupe-categorie">
+            {g.categorie && <h2 className="titre-categorie">{g.categorie}</h2>}
+            <ol className="chaines-du-groupe">
+              {g.chaines.map((c) => (
+                <li key={c.i} className="chaine">
+                  <div className="chaine-nom">
+                    {c.icone ? (
+                      <img src={c.icone} alt="" loading="lazy" width="32" height="32" />
+                    ) : (
+                      <span className="initiale">{c.nom.slice(0, 2)}</span>
+                    )}
+                    <h3 className="nom-chaine">{c.nom}</h3>
+                  </div>
 
-            <div className="creneaux">
-              {c.programmes.map((p, k) => {
-                const direct = maintenant >= p.debut && maintenant < p.fin;
-                return (
-                  <article key={k} className={direct ? "creneau direct" : "creneau"}>
-                    <p className="heure">
-                      {heureDe(jour, p.debut, conf.timezone)}
-                      {direct && <span className="badge">en cours</span>}
-                    </p>
-                    <h3>{p.titre}</h3>
-                    {p.sousTitre && <p className="sous-titre">{p.sousTitre}</p>}
-                    {p.genre && <p className="genre">{p.genre}</p>}
-                  </article>
-                );
-              })}
-            </div>
+                  <div className="creneaux">
+                    {c.programmes.map((p, k) => {
+                      const direct = maintenant >= p.debut && maintenant < p.fin;
+                      return (
+                        <article key={k} className={direct ? "creneau direct" : "creneau"}>
+                          <p className="heure">
+                            {heureDe(jour, p.debut, conf.timezone)}
+                            {direct && <span className="badge">en cours</span>}
+                          </p>
+                          <h4 className="titre-programme">{p.titre}</h4>
+                          {p.sousTitre && <p className="sous-titre">{p.sousTitre}</p>}
+                          {p.genre && <p className="genre">{p.genre}</p>}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </li>
+              ))}
+            </ol>
           </li>
         ))}
       </ol>

@@ -169,10 +169,110 @@ function lireXmltv(xml, chaines, diffusions) {
   }
 }
 
+// ------------------------------------------------------------ catégorisation
+
+/**
+ * Aucune source XMLTV ne dit "cette chaîne est une chaîne de sport" : seuls
+ * les programmes portent un genre. On en déduit la catégorie de la chaîne en
+ * regardant ce qu'elle diffuse le plus souvent. Une chaîne où un genre domine
+ * nettement (ex. 80 % de sport) prend cette catégorie ; une chaîne dont la
+ * grille est mélangée (JT, séries, jeux, films...) reste "Généralistes" —
+ * exactement ce qu'est TF1 ou France 2 dans la vraie vie.
+ */
+const CATEGORIES_ORDRE = [
+  "Généralistes",
+  "Information",
+  "Cinéma",
+  "Séries",
+  "Sport",
+  "Jeunesse",
+  "Documentaire",
+  "Musique & Culture",
+  "Divertissement",
+  "Autres",
+];
+
+// Mots-clés en français et en espagnol, cherchés dans le genre brut du
+// programme (en minuscules, accents conservés car ils diffèrent peu ici).
+const MOTS_CLES = {
+  Information: ["info", "actualit", "journal", "news", "noticias", "meteo", "tiempo"],
+  Cinéma: ["film", "cinema", "cinéma", "cine", "movie", "largometraje", "long métrage"],
+  Séries: ["serie", "série", "soap", "telenovela", "novela", "feuilleton"],
+  Sport: [
+    "sport", "deporte", "football", "fútbol", "futbol", "baloncesto", "basket",
+    "tennis", "rugby", "cyclisme", "ciclismo", "golf", "boxe", "boxeo",
+    "formule 1", "f1", "moto", "nascar", "mma", "ufc", "hípica", "hipica",
+  ],
+  Jeunesse: ["jeunesse", "infantil", "enfant", "kids", "dessin anime", "dibujos", "animacion infantil"],
+  Documentaire: ["documentaire", "documental", "decouverte", "reportage", "reportaje"],
+  "Musique & Culture": [
+    "musique", "musica", "música", "concert", "clip", "culture", "cultura",
+    "spectacle", "theatre", "théâtre", "teatro", "opera", "opéra", "danse",
+  ],
+  Divertissement: [
+    "divertissement", "entretenimiento", "emission", "émission", "magazine",
+    "variedades", "talk", "jeu", "concours", "reality", "telerealite",
+  ],
+};
+
+function genreVersCategorie(genreBrut) {
+  if (!genreBrut) return null;
+  const g = genreBrut.toLowerCase();
+  for (const cat of CATEGORIES_ORDRE) {
+    const mots = MOTS_CLES[cat];
+    if (mots && mots.some((m) => g.includes(m))) return cat;
+  }
+  return null;
+}
+
+/** Repli quand une chaîne n'a aucun programme genré ce jour-là (rare). */
+function nomVersCategorie(nom) {
+  const n = nom.toLowerCase();
+  for (const cat of CATEGORIES_ORDRE) {
+    const mots = MOTS_CLES[cat];
+    if (mots && mots.some((m) => n.includes(m))) return cat;
+  }
+  return "Autres";
+}
+
+/**
+ * @returns Map(indexChaine → catégorie), sur l'ensemble des diffusions
+ * connues (tous jours confondus) pour que l'étiquette d'une chaîne ne
+ * change pas d'un jour à l'autre selon ce qui est diffusé ce jour-là.
+ */
+function categoriser(diffusions, index, chaines) {
+  const comptes = new Map(); // i → Map(catégorie → n)
+
+  for (const d of diffusions) {
+    const i = index.get(d.chaine);
+    const cat = genreVersCategorie(d.genre);
+    if (i === undefined || !cat) continue;
+    if (!comptes.has(i)) comptes.set(i, new Map());
+    const m = comptes.get(i);
+    m.set(cat, (m.get(cat) ?? 0) + 1);
+  }
+
+  const resultat = new Map();
+  for (const [i, m] of comptes) {
+    let total = 0, meilleure = null, max = 0;
+    for (const [cat, n] of m) {
+      total += n;
+      if (n > max) { max = n; meilleure = cat; }
+    }
+    // Sous 45 %, aucun genre ne domine vraiment : chaîne généraliste.
+    resultat.set(i, max / total >= 0.45 ? meilleure : "Généralistes");
+  }
+
+  for (const [id, i] of index) {
+    if (!resultat.has(i)) resultat.set(i, nomVersCategorie(chaines.get(id).nom));
+  }
+  return resultat;
+}
+
 // ---------------------------------------------------------------- compactage
 
 /** Découpe les diffusions par journée locale et les encode en tuples. */
-function parJour(diffusions, chaines, timezone) {
+function parJour(diffusions, index, timezone) {
   const jourDe = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
@@ -180,7 +280,6 @@ function parJour(diffusions, chaines, timezone) {
     day: "2-digit",
   });
 
-  const index = new Map([...chaines.keys()].map((id, i) => [id, i]));
   const jours = new Map();
 
   for (const d of diffusions) {
@@ -245,7 +344,9 @@ async function traiterPays(code, conf) {
     return null;
   }
 
-  const jours = parJour(diffusions, chaines, conf.timezone);
+  const index = new Map([...chaines.keys()].map((id, i) => [id, i]));
+  const categories = categoriser(diffusions, index, chaines);
+  const jours = parJour(diffusions, index, conf.timezone);
   const retenus = joursUtiles(jours, conf.timezone);
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
@@ -270,7 +371,8 @@ async function traiterPays(code, conf) {
     label: conf.label,
     timezone: conf.timezone,
     jours: retenus,
-    chaines: [...chaines.values()].map((c) => [c.nom, c.icone]),
+    categories: CATEGORIES_ORDRE,
+    chaines: [...chaines.values()].map((c, i) => [c.nom, c.icone, categories.get(i) ?? "Autres"]),
   };
 }
 
