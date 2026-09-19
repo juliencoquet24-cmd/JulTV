@@ -1,39 +1,43 @@
 /* ==========================================================================
-   JulTV — charte « Signal »
+   JulTV — charte « Papier »
 
-   La grille est une frise temporelle : le temps court de gauche à droite,
-   les chaînes s'empilent. Deux dispositifs portent toute l'information —
-   une teinte par catégorie qui sert d'arête à chaque bloc, et la ligne
-   rouge « à l'antenne », empruntée aux voyants de plateau télé, qui
-   traverse la grille à l'heure qu'il est. Tout le reste se tait.
+   Le modèle n'est pas une application mais une page de magazine télé :
+   du papier blanc, des filets qui découpent la grille, et de l'encre.
+   Deux couleurs seulement, et chacune a un rôle strict —
+     bleu  : la structure (filets, cadres, axes, repères) ;
+     rouge : ce qui passe en ce moment, et rien d'autre.
+   Si le rouge servait à décorer, il ne voudrait plus rien dire.
    ========================================================================== */
 
 :root {
-  /* Base : ardoise bleutée, ni noire ni grise */
-  --nuit: #161a21;
-  --panneau: #1e232c;
-  --panneau-haut: #29303b;
-  --ligne: #38404c;
-  --texte: #eceae5;
-  --texte-doux: #97a0ad;
+  --papier: #ffffff;
+  --papier-creux: #f4f6fa;   /* fond d'une case vide, à peine teinté */
+  --encre: #101720;
+  --encre-douce: #5c6a7d;
 
-  /* Rouge d'antenne : le seul accent vif de l'interface */
-  --tally: #e2483d;
+  --bleu: #1247c7;
+  --bleu-filet: #c3d0ea;     /* filets fins, lisibles sans agresser */
+  --bleu-pale: #eaf0fb;
 
-  /* Teintes de catégories — informatives, jamais décoratives */
-  --c-generalistes: #8c9bb0;
-  --c-information: #5b9bd5;
-  --c-cinema: #9b7bd4;
-  --c-series: #d46fa8;
-  --c-sport: #4fb286;
-  --c-jeunesse: #e8b54a;
-  --c-documentaire: #3fa8a0;
-  --c-musique: #7f8fd4;
-  --c-divertissement: #e0864e;
-  --c-autres: #6e7784;
+  --rouge: #d8232a;
+  --rouge-pale: #fdeceb;
+
+  /* Teintes de sections : une gamme qui va du bleu au rouge, pour rester
+     dans les deux couleurs de la charte plutôt que de sortir un arc-en-ciel. */
+  --c-generalistes: #1247c7;
+  --c-information: #2f6fd0;
+  --c-cinema: #5b3fb0;
+  --c-series: #8e3a93;
+  --c-sport: #157a5c;
+  --c-jeunesse: #c26a12;
+  --c-documentaire: #1d6f8a;
+  --c-musique: #a1357a;
+  --c-divertissement: #c2472b;
+  --c-autres: #5c6a7d;
 
   --teinte: var(--c-autres);
-  --rail: 14.5rem;
+  --rail: 14rem;
+  --ligne-h: 4rem;
 
   --pas-1: 0.25rem;
   --pas-2: 0.5rem;
@@ -54,65 +58,73 @@
 [data-cat="Autres"]            { --teinte: var(--c-autres); }
 
 * { box-sizing: border-box; }
-html { color-scheme: dark; }
+
+html {
+  color-scheme: light;
+  /* iOS grossit le texte tout seul en paysage : ça casse l'alignement
+     des blocs sur la frise, qui est calculé au pixel. */
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   margin: 0;
-  background: var(--nuit);
-  color: var(--texte);
-  font-family: "Inter", system-ui, sans-serif;
-  font-size: 15px;
+  background: var(--papier);
+  color: var(--encre);
+  font-family: "Libre Franklin", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
 }
 
-.app { min-height: 100vh; }
+.app {
+  min-height: 100vh;
+  /* Encoche et barre d'accueil des iPhone récents. */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
 
 /* ------------------------------------------------------------------ entête */
 
 .tete {
   padding: var(--pas-4) var(--pas-4) var(--pas-3);
-  border-bottom: 1px solid var(--ligne);
+  padding-top: calc(var(--pas-4) + env(safe-area-inset-top));
+  border-bottom: 2px solid var(--bleu);
 }
 
 .tete-haut {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--pas-4);
+  gap: var(--pas-3);
   flex-wrap: wrap;
 }
 
-/* La marque est le seul endroit où la typo joue : largeur resserrée,
-   graisse haute, interlettrage négatif. Ailleurs, elle se fait oublier. */
 .marque {
   margin: 0;
-  font-family: "Bricolage Grotesque", system-ui, sans-serif;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-variation-settings: "wdth" 78, "opsz" 48;
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   line-height: 1;
+  color: var(--bleu);
 }
 
 .pays { display: flex; gap: var(--pas-1); }
 
+/* Toutes les cibles tactiles font au moins 44 px de haut : en dessous,
+   on rate le bouton un coup sur trois au doigt. */
 .pays-bouton {
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--texte-doux);
-  background: transparent;
-  border: 1px solid var(--ligne);
-  border-radius: 999px;
-  padding: 0.3rem 0.85rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  color: var(--bleu);
+  background: var(--papier);
+  border: 2px solid var(--bleu);
+  border-radius: 3px;
   cursor: pointer;
 }
 
-.pays-bouton.actif {
-  color: var(--nuit);
-  background: var(--texte);
-  border-color: var(--texte);
-}
+.pays-bouton.actif { color: var(--papier); background: var(--bleu); }
 
 .dates {
   display: flex;
@@ -125,105 +137,99 @@ body {
   display: flex;
   gap: var(--pas-1);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .dates-liste::-webkit-scrollbar { display: none; }
 
 .date, .fleche {
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
-  color: var(--texte-doux);
-  background: var(--panneau);
-  border: 1px solid transparent;
-  border-radius: 4px;
-  padding: 0.35rem 0.7rem;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  color: var(--encre);
+  background: var(--papier);
+  border: 1px solid var(--bleu-filet);
+  border-radius: 3px;
   cursor: pointer;
 }
 
 .date.actif {
-  color: var(--texte);
-  background: var(--panneau-haut);
-  border-color: var(--ligne);
-  font-weight: 600;
+  color: var(--bleu);
+  background: var(--bleu-pale);
+  border-color: var(--bleu);
+  font-weight: 700;
 }
 
-.fleche { padding: 0.35rem 0.6rem; font-size: 1rem; line-height: 1; }
+.fleche { padding: 0 0.7rem; font-size: 1.15rem; line-height: 1; color: var(--bleu); }
 .fleche:disabled { opacity: 0.3; cursor: default; }
 
 .outils {
   display: flex;
   align-items: center;
   gap: var(--pas-2);
-  margin-top: var(--pas-3);
+  margin-top: var(--pas-2);
   flex-wrap: wrap;
 }
 
+/* Seul élément rouge de la barre d'outils : il mène à l'instant présent. */
 .tally-bouton {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--texte);
-  background: color-mix(in srgb, var(--tally) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--tally) 55%, transparent);
-  border-radius: 4px;
-  padding: 0.35rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  color: var(--rouge);
+  background: var(--rouge-pale);
+  border: 2px solid var(--rouge);
+  border-radius: 3px;
   cursor: pointer;
 }
 
 .point {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--tally);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--tally) 70%, transparent);
+  background: var(--rouge);
   animation: antenne 2.4s ease-out infinite;
 }
 
-/* L'unique mouvement non déclenché de la page : le voyant d'antenne.
-   Il signale que la grille est vivante, rien d'autre ne bouge. */
+/* L'unique mouvement non déclenché de la page. */
 @keyframes antenne {
-  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tally) 65%, transparent); }
-  70%  { box-shadow: 0 0 0 7px transparent; }
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rouge) 45%, transparent); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-.repere {
+.repere, .champ {
   font: inherit;
-  font-size: 0.82rem;
-  color: var(--texte-doux);
-  background: transparent;
-  border: 1px solid var(--ligne);
-  border-radius: 4px;
-  padding: 0.35rem 0.7rem;
+  font-size: 0.9rem;
+  min-height: 44px;
+  padding: 0 0.8rem;
+  color: var(--encre);
+  background: var(--papier);
+  border: 1px solid var(--bleu-filet);
+  border-radius: 3px;
   cursor: pointer;
 }
-.repere:hover:not(:disabled) { color: var(--texte); border-color: var(--texte-doux); }
+
+.repere:hover:not(:disabled) { border-color: var(--bleu); color: var(--bleu); }
 .repere:disabled { opacity: 0.35; cursor: default; }
 
-.champ {
-  font: inherit;
-  font-size: 0.82rem;
-  color: var(--texte);
-  background: var(--panneau);
-  border: 1px solid var(--ligne);
-  border-radius: 4px;
-  padding: 0.35rem 0.6rem;
-  appearance: none;
-}
-
-.recherche { flex: 1 1 14rem; min-width: 0; }
-.recherche::placeholder { color: var(--texte-doux); }
+.champ { appearance: none; cursor: default; }
+.recherche { flex: 1 1 15rem; min-width: 0; }
+.recherche::placeholder { color: var(--encre-douce); }
 
 /* ---------------------------------------------------------------- planning */
 
 .planning {
   overflow-x: auto;
-  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
 }
 
@@ -233,101 +239,99 @@ body {
   padding-bottom: var(--pas-6);
 }
 
-/* L'axe des heures reste visible en défilant verticalement ; le rail des
-   chaînes reste visible en défilant horizontalement. Les deux se croisent
-   dans le coin, qui doit donc passer au-dessus de tout. */
+/* Le coin haut-gauche doit passer devant l'axe et devant le rail, puisque
+   les deux s'y croisent en défilant. */
 .axe {
   display: flex;
   position: sticky;
   top: 0;
   z-index: 3;
-  height: 2.5rem;
-  background: var(--nuit);
-  border-bottom: 1px solid var(--ligne);
+  height: 2.75rem;
+  background: var(--papier);
+  border-bottom: 2px solid var(--bleu);
 }
 
-.axe-coin { z-index: 4; display: flex; align-items: center; }
+.axe-coin {
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  background: var(--papier);
+}
 
 .axe-jour {
-  font-family: "Bricolage Grotesque", system-ui, sans-serif;
-  font-variation-settings: "wdth" 82;
-  font-weight: 600;
-  font-size: 0.82rem;
-  color: var(--texte-doux);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bleu);
   padding: 0 var(--pas-2) 0 var(--pas-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.axe .piste { position: relative; }
-
-.graduation.demie { color: color-mix(in srgb, var(--texte-doux) 60%, transparent); }
+.axe .piste { position: relative; height: 2.75rem; }
 
 .graduation {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  padding-left: 0.4rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--texte-doux);
-  border-left: 1px solid var(--ligne);
-  line-height: 2.5rem;
-  height: 2.5rem;
+  top: 0;
+  height: 2.75rem;
   display: flex;
   align-items: center;
+  padding-left: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--bleu);
+  border-left: 1px solid var(--bleu-filet);
 }
 
-/* La ligne d'antenne : elle traverse toute la hauteur de la grille. */
+.graduation.demie { font-weight: 500; color: var(--encre-douce); }
+
+/* La barre d'antenne traverse toute la grille à l'heure qu'il est. */
 .tally {
   position: absolute;
-  top: 2.5rem;
+  top: 2.75rem;
   bottom: 0;
   width: 2px;
-  background: var(--tally);
+  background: var(--rouge);
   z-index: 2;
   pointer-events: none;
 }
 
 .tally-tete {
   position: absolute;
-  top: -4px;
-  left: -3px;
-  width: 8px;
-  height: 8px;
+  top: -5px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--tally);
+  background: var(--rouge);
 }
 
 .bloc { display: block; }
 
-/* Bande de catégorie : une règle colorée qui annonce la section. */
 .bande {
   position: sticky;
   left: 0;
   width: max-content;
   padding: var(--pas-6) var(--pas-4) var(--pas-2) var(--pas-3);
   z-index: 2;
+  background: var(--papier);
 }
 
 .bande-nom {
   margin: 0;
-  font-family: "Bricolage Grotesque", system-ui, sans-serif;
-  font-variation-settings: "wdth" 80;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--texte);
+  color: var(--teinte);
   padding-left: var(--pas-2);
-  border-left: 3px solid var(--teinte);
+  border-left: 4px solid var(--teinte);
 }
 
 .ligne {
   display: flex;
   align-items: stretch;
-  border-top: 1px solid color-mix(in srgb, var(--ligne) 55%, transparent);
+  border-top: 1px solid var(--bleu-filet);
 }
 
 .rail {
@@ -340,38 +344,40 @@ body {
   align-items: center;
   gap: var(--pas-2);
   padding: 0 var(--pas-3);
-  background: var(--nuit);
-  border-right: 1px solid var(--ligne);
+  background: var(--papier);
+  border-right: 2px solid var(--bleu);
 }
 
-/* Le numéro de canal est de l'information, pas une puce décorative :
-   c'est ce qu'on tape sur la télécommande. */
 .pastille {
   flex: none;
-  width: 3px;
+  width: 4px;
   align-self: stretch;
-  margin: 0.55rem 0;
+  margin: 0.6rem 0;
   border-radius: 2px;
   background: var(--teinte);
 }
 
+.ligne:not(.en-avant) .pastille { opacity: 0.35; }
+
+/* Le numéro est de l'information : c'est ce qu'on tape sur la télécommande. */
 .canal {
   flex: none;
   width: 1.5rem;
   text-align: right;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--texte-doux);
+  color: var(--bleu);
 }
 .canal.vide { visibility: hidden; }
 
 .logo {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
-  background: var(--panneau-haut);
+  background: var(--papier-creux);
+  border: 1px solid var(--bleu-filet);
   border-radius: 3px;
   padding: 2px;
 }
@@ -379,78 +385,75 @@ body {
 .logo-texte {
   display: grid;
   place-items: center;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: var(--texte-doux);
+  color: var(--encre-douce);
   padding: 0;
 }
 
 .chaine {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  color: var(--texte);
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ligne.en-avant .chaine { font-weight: 700; }
-
-/* Une chaîne mise en avant porte une pastille pleine ; les autres, une
-   pastille en retrait. La différence se lit sans écraser personne. */
-.ligne:not(.en-avant) .pastille { opacity: 0.4; }
+.ligne.en-avant .chaine { font-weight: 800; }
 
 .piste {
   position: relative;
   flex: none;
   width: var(--piste);
-  height: 3.5rem;
+  height: var(--ligne-h);
 }
 
+/* Chaque programme est un cadre. Le filet bleu dit « case de grille » ;
+   le remplissage reste blanc pour que le texte porte. */
 .prog {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
+  top: 4px;
+  bottom: 4px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1px;
-  padding: 0.3rem 0.55rem;
-  background: var(--panneau);
+  padding: 0.3rem 0.5rem;
+  background: var(--papier);
+  border: 1px solid var(--bleu-filet);
   border-radius: 3px;
-  cursor: default;
 }
 
-.prog:hover { background: var(--panneau-haut); }
+.prog:hover { border-color: var(--bleu); background: var(--bleu-pale); }
 
-/* Trop court pour du texte : le bloc reste visible comme une tranche de
-   temps occupée, le titre est dans l'infobulle. */
+/* Trop court pour porter du texte : la case reste un créneau occupé,
+   le titre passe dans l'infobulle. */
 .prog.muet {
-  background: color-mix(in srgb, var(--panneau-haut) 70%, transparent);
+  background: var(--papier-creux);
   padding: 0;
 }
 
-/* Le programme en cours : c'est la seule chose que la couleur doit crier. */
+/* Le programme en cours. C'est la seule chose que le rouge annonce. */
 .prog.direct {
-  background: var(--panneau-haut);
-  box-shadow: inset 2px 0 0 0 var(--tally);
+  background: var(--rouge-pale);
+  border: 2px solid var(--rouge);
 }
 
 .prog-heure {
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--texte-doux);
-  line-height: 1;
+  color: var(--bleu);
+  line-height: 1.1;
 }
 
-.prog.direct .prog-heure { color: var(--tally); }
+.prog.direct .prog-heure { color: var(--rouge); }
 
 .prog-titre {
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.88rem;
+  font-weight: 600;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -458,44 +461,73 @@ body {
 }
 
 .prog-sous {
-  font-size: 0.72rem;
-  color: var(--texte-doux);
+  font-size: 0.78rem;
+  color: var(--encre-douce);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* --------------------------------------------------------- états & bas de page */
+/* ----------------------------------------------------- états & bas de page */
 
 .etat {
   padding: 4rem var(--pas-4);
-  color: var(--texte-doux);
-  font-size: 0.95rem;
+  color: var(--encre-douce);
+  font-size: 1rem;
   max-width: 34rem;
 }
 
 .pied {
-  padding: var(--pas-6) var(--pas-4) 3rem;
-  border-top: 1px solid var(--ligne);
-  color: var(--texte-doux);
-  font-size: 0.78rem;
+  padding: var(--pas-6) var(--pas-4);
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--bleu);
+  color: var(--encre-douce);
+  font-size: 0.82rem;
   line-height: 1.6;
 }
 
 .pied p { margin: 0; }
-.pied-source { margin-top: 0.3rem; opacity: 0.75; }
+.pied-source { margin-top: 0.3rem; }
 
 :focus-visible {
-  outline: 2px solid var(--tally);
+  outline: 3px solid var(--rouge);
   outline-offset: 2px;
 }
 
-@media (max-width: 48rem) {
-  :root { --rail: 10rem; }
-  body { font-size: 14px; }
-  .chaine { font-size: 0.76rem; }
-  .logo { width: 22px; height: 22px; }
-  .canal { width: 1.15rem; font-size: 0.72rem; }
+/* ------------------------------------------------------------- iPad, iPhone */
+
+@media (max-width: 64rem) {
+  :root { --rail: 12rem; }
+}
+
+@media (max-width: 46rem) {
+  :root {
+    --rail: 9.5rem;
+    --ligne-h: 3.75rem;
+  }
+  body { font-size: 15px; }
+  .tete { padding: var(--pas-3); padding-top: calc(var(--pas-3) + env(safe-area-inset-top)); }
+  .chaine { font-size: 0.8rem; }
+  .logo { width: 24px; height: 24px; }
+  .canal { width: 1.2rem; font-size: 0.78rem; }
+  .pastille { width: 3px; }
+  .prog-titre { font-size: 0.82rem; }
+  .prog-sous { display: none; }
+
+  /* Sur un téléphone, la barre d'outils se repliait sur cinq lignes et
+     ne laissait voir que trois chaînes. Elle défile désormais à
+     l'horizontale, comme les dates juste au-dessus : une seule ligne,
+     et tout reste atteignable au pouce. */
+  .outils {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .outils::-webkit-scrollbar { display: none; }
+  .outils > * { flex: none; }
+  .recherche { flex: none; width: 13rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

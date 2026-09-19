@@ -4,10 +4,10 @@ const BASE = `${import.meta.env.BASE_URL}data`;
 const RAFRAICHISSEMENT = 5 * 60 * 1000;
 
 /** Largeur d'une minute de programme, en pixels. 30 min ≈ 110 px. */
-const PX_PAR_MIN = 2.8;
+const PX_PAR_MIN = 3.1;
 
 /** En dessous, le bloc est trop étroit pour porter du texte lisible. */
-const LARGEUR_TEXTE = 44;
+const LARGEUR_TEXTE = 52;
 const PAS = 30; // graduation de l'axe, en minutes
 
 /** Minutes depuis minuit UTC du jour → étiquette dans le fuseau du pays. */
