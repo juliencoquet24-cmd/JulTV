@@ -143,6 +143,42 @@ export default function App() {
   const largeurPiste = (bornes.a - bornes.de) * PX_PAR_MIN;
   const xDe = (min) => (min - bornes.de) * PX_PAR_MIN;
 
+  /**
+   * Plage de temps réellement posée dans le DOM. Sur 700 chaînes et 24 h,
+   * tout afficher d'un coup représente des dizaines de milliers d'éléments :
+   * un ordinateur encaisse, un téléphone se fait tuer par le système en
+   * cours de défilement. On ne rend que la fenêtre visible, plus une
+   * largeur d'écran de marge de chaque côté pour que le défilement reste
+   * fluide sans laisser de trou.
+   */
+  const [fenetre, setFenetre] = useState({ de: -Infinity, a: Infinity });
+
+  useEffect(() => {
+    const el = planning.current;
+    if (!el) return;
+    let raf = 0;
+    const maj = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        // Marge proportionnelle à l'écran : 600 px fixes, c'était une
+        // largeur et demie de téléphone posée inutilement de chaque côté.
+        const marge = Math.max(el.clientWidth * 0.7, 260);
+        setFenetre({
+          de: bornes.de + (el.scrollLeft - marge) / PX_PAR_MIN,
+          a: bornes.de + (el.scrollLeft + el.clientWidth + marge) / PX_PAR_MIN,
+        });
+      });
+    };
+    maj();
+    el.addEventListener("scroll", maj, { passive: true });
+    window.addEventListener("resize", maj);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("scroll", maj);
+      window.removeEventListener("resize", maj);
+    };
+  }, [bornes, prete]);
+
   const groupes = useMemo(() => {
     if (!conf || !prete) return [];
 
@@ -396,7 +432,9 @@ export default function App() {
                     </div>
 
                     <div className="piste">
-                      {l.programmes.map((p, k) => {
+                      {l.programmes.map((p) => {
+                        if (p.debut + p.duree <= fenetre.de || p.debut >= fenetre.a)
+                          return null;
                         const largeur = p.duree * PX_PAR_MIN;
                         const direct = maintenant >= p.debut && maintenant < p.debut + p.duree;
                         const heure = heureDe(jour, p.debut, conf.timezone);
@@ -408,7 +446,7 @@ export default function App() {
                         if (largeur < LARGEUR_TEXTE) classes.push("muet");
                         return (
                           <article
-                            key={k}
+                            key={p.debut}
                             className={classes.join(" ")}
                             style={{
                               left: `${xDe(p.debut)}px`,

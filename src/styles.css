@@ -76,8 +76,12 @@ body {
 }
 
 .app {
-  min-height: 100vh;
-  /* Encoche et barre d'accueil des iPhone récents. */
+  display: flex;
+  flex-direction: column;
+  /* dvh plutôt que vh : sur iPhone, la barre d'adresse se rétracte et vh
+     laisse alors dépasser le bas de la grille sous l'écran. */
+  height: 100dvh;
+  /* Encoche et bords arrondis des iPhone récents. */
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
@@ -85,6 +89,7 @@ body {
 /* ------------------------------------------------------------------ entête */
 
 .tete {
+  flex: none;
   padding: var(--pas-4) var(--pas-4) var(--pas-3);
   padding-top: calc(var(--pas-4) + env(safe-area-inset-top));
   border-bottom: 2px solid var(--bleu);
@@ -228,9 +233,11 @@ body {
 /* ---------------------------------------------------------------- planning */
 
 .planning {
-  overflow-x: auto;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
+  overscroll-behavior: contain;
 }
 
 .planning-corps {
@@ -332,6 +339,10 @@ body {
   display: flex;
   align-items: stretch;
   border-top: 1px solid var(--bleu-filet);
+  /* Le navigateur ignore le rendu des lignes sorties de l'écran ; la taille
+     annoncée évite que la barre de défilement saute pendant le parcours. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--ligne-h);
 }
 
 .rail {
@@ -471,6 +482,7 @@ body {
 /* ----------------------------------------------------- états & bas de page */
 
 .etat {
+  flex: 1;
   padding: 4rem var(--pas-4);
   color: var(--encre-douce);
   font-size: 1rem;
@@ -478,8 +490,9 @@ body {
 }
 
 .pied {
-  padding: var(--pas-6) var(--pas-4);
-  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+  flex: none;
+  padding: var(--pas-2) var(--pas-4);
+  padding-bottom: calc(var(--pas-2) + env(safe-area-inset-bottom));
   border-top: 2px solid var(--bleu);
   color: var(--encre-douce);
   font-size: 0.82rem;
@@ -487,7 +500,20 @@ body {
 }
 
 .pied p { margin: 0; }
-.pied-source { margin-top: 0.3rem; }
+/* Le bas de page tient sur une ligne : il rogne sinon sur la grille,
+   qui est ce qu'on vient voir. */
+.pied-source { display: none; }
+.pied p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 46rem) {
+  .pied { padding: var(--pas-3) var(--pas-4); }
+  .pied-source { display: block; margin-top: 0.2rem; }
+  .pied p { white-space: normal; }
+}
 
 :focus-visible {
   outline: 3px solid var(--rouge);
@@ -527,7 +553,14 @@ body {
   }
   .outils::-webkit-scrollbar { display: none; }
   .outils > * { flex: none; }
-  .recherche { flex: none; width: 13rem; }
+  .recherche { flex: none; width: 13rem; order: 3; }
+
+  /* Ordre au pouce : l'instant présent, puis le filtre par catégorie,
+     puis la recherche. Les raccourcis d'horaire viennent en dernier :
+     on peut aussi les atteindre en faisant glisser la grille. */
+  .tally-bouton { order: 1; }
+  .champ:not(.recherche) { order: 2; font-weight: 600; color: var(--bleu); border-color: var(--bleu); }
+  .repere { order: 4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
