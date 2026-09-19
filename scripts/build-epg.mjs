@@ -440,28 +440,51 @@ async function traiterPays(code, conf, numerotation) {
     return null;
   }
 
-  const index = new Map([...chaines.keys()].map((id, i) => [id, i]));
-  const categories = categoriser(diffusions, index, chaines);
-  const jours = parJour(diffusions, index, conf.timezone);
-  const retenus = joursUtiles(jours, conf.timezone);
-
-  // Numéro de canal et rang de mise en avant, quand la chaîne est listée.
+  // Numéro de canal et rang de mise en avant, d'après numerotation.json.
   const reglages = reglagesPays(numerotation?.[code]);
   const tCanaux = tableNumeros(reglages.canaux);
   const tPriorites = tableNumeros(reglages.priorites);
 
+  /**
+   * On ne garde que les chaînes listées dans numerotation.json.
+   *
+   * Les sources XMLTV ratissent large : le flux français livre près de 800
+   * entrées, chaînes belges, suisses, néerlandaises et déclinaisons
+   * régionales comprises. Les publier toutes donnait une grille illisible
+   * et une page que le téléphone n'arrivait plus à charger. La liste des
+   * canaux fait donc office de filtre autant que d'ordre : pour ajouter une
+   * chaîne, il suffit de l'ajouter au fichier.
+   */
+  const gardees = new Map();
+  const rangs = new Map();
+  for (const [id, c] of chaines) {
+    const num = numeroDe(c.nom, tCanaux);
+    const pri = numeroDe(c.nom, tPriorites);
+    if (num === null && pri === null) continue;
+    gardees.set(id, c);
+    rangs.set(id, { num, pri });
+  }
+
+  if (!gardees.size) {
+    console.error(
+      `[epg] ${code}: aucune chaîne de numerotation.json retrouvée dans la source, pays ignoré`
+    );
+    return null;
+  }
+  log(`${code}: ${gardees.size} chaînes retenues sur ${chaines.size} reçues`);
+
+  const index = new Map([...gardees.keys()].map((id, i) => [id, i]));
   const numeros = new Map();
   const priorites = new Map();
   for (const [id, i] of index) {
-    const nom = chaines.get(id).nom;
-    const num = numeroDe(nom, tCanaux);
+    const { num, pri } = rangs.get(id);
     if (num !== null) numeros.set(i, num);
-    const pri = numeroDe(nom, tPriorites);
     if (pri !== null) priorites.set(i, pri);
   }
-  log(
-    `${code}: ${numeros.size} chaînes numérotées, ${priorites.size} mises en avant, sur ${chaines.size}`
-  );
+
+  const categories = categoriser(diffusions, index, gardees);
+  const jours = parJour(diffusions, index, conf.timezone);
+  const retenus = joursUtiles(jours, conf.timezone);
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
@@ -480,14 +503,14 @@ async function traiterPays(code, conf, numerotation) {
     }
   }
 
-  log(`${code}: ${chaines.size} chaînes, ${retenus.length} jours écrits`);
+  log(`${code}: ${gardees.size} chaînes, ${retenus.length} jours écrits`);
   return {
     label: conf.label,
     timezone: conf.timezone,
     jours: retenus,
     categories: CATEGORIES_ORDRE,
     // [nom, icône, catégorie, numéro de canal, rang de mise en avant]
-    chaines: [...chaines.values()].map((c, i) => [
+    chaines: [...gardees.values()].map((c, i) => [
       c.nom,
       c.icone,
       categories.get(i) ?? "Autres",
