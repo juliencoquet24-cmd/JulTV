@@ -1,14 +1,16 @@
 {
   "_comment": [
-    "canaux    — ordre d'affichage, repris de la structure de l'offre TV",
-    "            française et espagnole, tous bouquets confondus. La position",
-    "            donne le rang : le premier élément passe en tête.",
-    "priorites — chaînes remontées en tête de LEUR catégorie, avant ce rang.",
+    "canaux    — ordre d'affichage ET filtre : une chaîne absente d'ici",
+    "            n'apparaît pas du tout dans la grille. Les sources XMLTV",
+    "            livrent près de 800 entrées, chaînes étrangères et locales",
+    "            comprises ; cette liste dit lesquelles retenir, et dans",
+    "            quel ordre. Pour ajouter une chaîne, il suffit de l'écrire.",
+    "priorites — chaînes remontées en tête de LEUR catégorie, avant le rang.",
     "",
-    "Une entrée peut être un nom ou un tableau de noms alternatifs. Le",
-    "rapprochement se fait sur le nom normalisé, avec les seuls suffixes",
-    "techniques tolérés (HD, SD, TNT...). Un décalage se corrige ici :",
-    "le fichier est relu à chaque build."
+    "Une entrée est un nom, ou un tableau de noms alternatifs quand les",
+    "sources ne l'orthographient pas pareil. Le rapprochement se fait sur",
+    "le nom normalisé ; seuls les suffixes techniques (HD, SD, TNT...) sont",
+    "ignorés. Le fichier est relu à chaque build."
   ],
   "fr": {
     "canaux": [
@@ -62,13 +64,17 @@
         "TV5Monde",
         "TV5 Monde"
       ],
-      "Canal+ Grand Écran",
+      "Canal+ Box Office",
       [
         "Canal+ Cinéma",
         "Canal+ Cinéma(s)"
       ],
-      "Canal+ Box Office",
+      "Canal+ Grand Écran",
       "Canal+ Séries",
+      [
+        "OCS",
+        "Ciné+ OCS"
+      ],
       "Ciné+ Frisson",
       [
         "Ciné+ Emotion",
@@ -78,16 +84,17 @@
       "Ciné+ Festival",
       "Ciné+ Classic",
       [
-        "OCS",
-        "Ciné+ OCS"
-      ],
-      "Warner TV",
-      "Action",
-      "TCM Cinéma",
-      [
         "Paramount Channel",
         "Paramount Network"
       ],
+      "Action",
+      "TCM Cinéma",
+      "Polar+",
+      [
+        "Drive In Movie Channel",
+        "Drive In"
+      ],
+      "Warner TV",
       "TV Breizh",
       "Téva",
       [
@@ -274,12 +281,67 @@
         "Movistar Plus+",
         "Movistar Plus"
       ],
-      "Movistar Cine",
-      "Movistar Series",
-      "Movistar Action",
-      "Movistar Drama",
-      "Movistar Comedia",
-      "Movistar Clásicos",
+      [
+        "Estrenos por M+",
+        "Movistar Estrenos"
+      ],
+      [
+        "Hits por M+",
+        "Movistar Hits"
+      ],
+      [
+        "Cine Español por M+",
+        "Movistar Cine Español"
+      ],
+      [
+        "Indie por M+",
+        "Movistar Indie"
+      ],
+      [
+        "Clásicos por M+",
+        "Movistar Clásicos"
+      ],
+      [
+        "Acción por M+",
+        "Movistar Acción"
+      ],
+      [
+        "Comedia por M+",
+        "Movistar Comedia"
+      ],
+      [
+        "Drama por M+",
+        "Movistar Drama"
+      ],
+      [
+        "Suspense por M+",
+        "Movistar Suspense"
+      ],
+      [
+        "Movistar Series por M+",
+        "Movistar Series"
+      ],
+      "Canal Hollywood",
+      "Somos",
+      "XTRM",
+      "Dark",
+      [
+        "SundanceTV",
+        "SundanceTV España"
+      ],
+      "AMC",
+      [
+        "TCM España",
+        "TCM"
+      ],
+      [
+        "Paramount Network",
+        "Paramount Channel"
+      ],
+      [
+        "A3 Cine",
+        "Atrescine"
+      ],
       [
         "Star Channel",
         "Star Channel España"
@@ -292,18 +354,14 @@
       "AXN Movies",
       "Calle 13",
       "Cosmo",
-      "Comedy Central España",
+      [
+        "Comedy Central España",
+        "Comedy Central"
+      ],
       [
         "Syfy España",
         "Syfy"
       ],
-      [
-        "TCM España",
-        "TCM"
-      ],
-      "Canal Hollywood",
-      "Dark",
-      "SundanceTV",
       [
         "Movistar LALIGA",
         "Movistar LaLiga TV"
