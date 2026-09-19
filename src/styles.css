@@ -1,247 +1,479 @@
+/* ==========================================================================
+   JulTV — charte « Signal »
+
+   La grille est une frise temporelle : le temps court de gauche à droite,
+   les chaînes s'empilent. Deux dispositifs portent toute l'information —
+   une teinte par catégorie qui sert d'arête à chaque bloc, et la ligne
+   rouge « à l'antenne », empruntée aux voyants de plateau télé, qui
+   traverse la grille à l'heure qu'il est. Tout le reste se tait.
+   ========================================================================== */
+
 :root {
-  --encre: #1d2126;
-  --graphite: #2b3037;
-  --graphite-clair: #363c45;
-  --craie: #e9e6e0;
-  --craie-douce: #99a0a9;
-  --ambre: #e6a444;
-  --trait: #434a54;
+  /* Base : ardoise bleutée, ni noire ni grise */
+  --nuit: #161a21;
+  --panneau: #1e232c;
+  --panneau-haut: #29303b;
+  --ligne: #38404c;
+  --texte: #eceae5;
+  --texte-doux: #97a0ad;
+
+  /* Rouge d'antenne : le seul accent vif de l'interface */
+  --tally: #e2483d;
+
+  /* Teintes de catégories — informatives, jamais décoratives */
+  --c-generalistes: #8c9bb0;
+  --c-information: #5b9bd5;
+  --c-cinema: #9b7bd4;
+  --c-series: #d46fa8;
+  --c-sport: #4fb286;
+  --c-jeunesse: #e8b54a;
+  --c-documentaire: #3fa8a0;
+  --c-musique: #7f8fd4;
+  --c-divertissement: #e0864e;
+  --c-autres: #6e7784;
+
+  --teinte: var(--c-autres);
+  --rail: 13.5rem;
+
+  --pas-1: 0.25rem;
+  --pas-2: 0.5rem;
+  --pas-3: 0.75rem;
+  --pas-4: 1rem;
+  --pas-6: 1.5rem;
 }
+
+[data-cat="Généralistes"]      { --teinte: var(--c-generalistes); }
+[data-cat="Information"]       { --teinte: var(--c-information); }
+[data-cat="Cinéma"]            { --teinte: var(--c-cinema); }
+[data-cat="Séries"]            { --teinte: var(--c-series); }
+[data-cat="Sport"]             { --teinte: var(--c-sport); }
+[data-cat="Jeunesse"]          { --teinte: var(--c-jeunesse); }
+[data-cat="Documentaire"]      { --teinte: var(--c-documentaire); }
+[data-cat="Musique & Culture"] { --teinte: var(--c-musique); }
+[data-cat="Divertissement"]    { --teinte: var(--c-divertissement); }
+[data-cat="Autres"]            { --teinte: var(--c-autres); }
 
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
 
 body {
   margin: 0;
-  background: var(--encre);
-  color: var(--craie);
-  font-family: "Archivo", system-ui, sans-serif;
-  font-variation-settings: "wdth" 100;
+  background: var(--nuit);
+  color: var(--texte);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
 }
 
-.cadre {
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 4rem;
+.app { min-height: 100vh; }
+
+/* ------------------------------------------------------------------ entête */
+
+.tete {
+  padding: var(--pas-4) var(--pas-4) var(--pas-3);
+  border-bottom: 1px solid var(--ligne);
 }
 
-.entete {
-  margin-bottom: 2rem;
-  position: sticky;
-  top: 0;
-  background: var(--encre);
-  padding-top: 0.5rem;
-  z-index: 5;
-}
-
-.entete h1 {
-  margin: 0;
-  font-size: clamp(1.8rem, 6vw, 3rem);
-  font-weight: 800;
-  font-variation-settings: "wdth" 88;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-}
-
-.sur-titre {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 400;
-  font-variation-settings: "wdth" 112;
-  letter-spacing: 0.05em;
-  color: var(--craie-douce);
-  margin-bottom: 0.35rem;
-}
-
-.onglets {
+.tete-haut {
   display: flex;
-  gap: 0.4rem;
-  margin: 1.1rem 0 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pas-4);
+  flex-wrap: wrap;
 }
 
-.onglet {
+/* La marque est le seul endroit où la typo joue : largeur resserrée,
+   graisse haute, interlettrage négatif. Ailleurs, elle se fait oublier. */
+.marque {
+  margin: 0;
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-variation-settings: "wdth" 78, "opsz" 48;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pays { display: flex; gap: var(--pas-1); }
+
+.pays-bouton {
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 600;
+  color: var(--texte-doux);
   background: transparent;
-  color: var(--craie-douce);
-  border: 1px solid var(--trait);
-  border-radius: 2px;
-  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--ligne);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
   cursor: pointer;
 }
 
-.onglet.actif {
-  background: var(--ambre);
-  border-color: var(--ambre);
-  color: var(--encre);
+.pays-bouton.actif {
+  color: var(--nuit);
+  background: var(--texte);
+  border-color: var(--texte);
 }
 
-.barre {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.barre select,
-.barre input {
-  appearance: none;
-  background: var(--graphite);
-  color: var(--craie);
-  border: 1px solid var(--trait);
-  border-radius: 2px;
-  padding: 0.5rem 0.7rem;
-  font: inherit;
-  font-size: 0.88rem;
-}
-
-.barre input {
-  flex: 1 1 11rem;
-  min-width: 0;
-}
-
-.compteur {
-  margin: 0.75rem 0 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--trait);
-  font-size: 0.78rem;
-  color: var(--craie-douce);
-}
-
-.grille { list-style: none; margin: 0; padding: 0; }
-
-.chaine {
-  display: grid;
-  grid-template-columns: 12rem 1fr;
-  gap: 1.25rem;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--trait);
-}
-
-.chaine-nom {
+.dates {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  align-self: start;
+  gap: var(--pas-1);
+  margin-top: var(--pas-3);
 }
 
-.chaine-nom img {
-  object-fit: contain;
-  background: var(--graphite-clair);
-  border-radius: 3px;
-  padding: 3px;
+.dates-liste {
+  display: flex;
+  gap: var(--pas-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dates-liste::-webkit-scrollbar { display: none; }
+
+.date, .fleche {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--texte-doux);
+  background: var(--panneau);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
 }
 
-.initiale {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  background: var(--graphite-clair);
-  border-radius: 3px;
+.date.actif {
+  color: var(--texte);
+  background: var(--panneau-haut);
+  border-color: var(--ligne);
+  font-weight: 600;
+}
+
+.fleche { padding: 0.35rem 0.6rem; font-size: 1rem; line-height: 1; }
+.fleche:disabled { opacity: 0.3; cursor: default; }
+
+.outils {
+  display: flex;
+  align-items: center;
+  gap: var(--pas-2);
+  margin-top: var(--pas-3);
+  flex-wrap: wrap;
+}
+
+.tally-bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--texte);
+  background: color-mix(in srgb, var(--tally) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tally) 55%, transparent);
+  border-radius: 4px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.point {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tally);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--tally) 70%, transparent);
+  animation: antenne 2.4s ease-out infinite;
+}
+
+/* L'unique mouvement non déclenché de la page : le voyant d'antenne.
+   Il signale que la grille est vivante, rien d'autre ne bouge. */
+@keyframes antenne {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tally) 65%, transparent); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.repere {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--texte-doux);
+  background: transparent;
+  border: 1px solid var(--ligne);
+  border-radius: 4px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+.repere:hover:not(:disabled) { color: var(--texte); border-color: var(--texte-doux); }
+.repere:disabled { opacity: 0.35; cursor: default; }
+
+.champ {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--texte);
+  background: var(--panneau);
+  border: 1px solid var(--ligne);
+  border-radius: 4px;
+  padding: 0.35rem 0.6rem;
+  appearance: none;
+}
+
+.recherche { flex: 1 1 14rem; min-width: 0; }
+.recherche::placeholder { color: var(--texte-doux); }
+
+/* ---------------------------------------------------------------- planning */
+
+.planning {
+  overflow-x: auto;
+  overflow-y: visible;
+  overscroll-behavior-x: contain;
+}
+
+.planning-corps {
+  position: relative;
+  width: calc(var(--rail) + var(--piste));
+  padding-bottom: var(--pas-6);
+}
+
+/* L'axe des heures reste visible en défilant verticalement ; le rail des
+   chaînes reste visible en défilant horizontalement. Les deux se croisent
+   dans le coin, qui doit donc passer au-dessus de tout. */
+.axe {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 2.5rem;
+  background: var(--nuit);
+  border-bottom: 1px solid var(--ligne);
+}
+
+.axe-coin { z-index: 4; display: flex; align-items: center; }
+
+.axe-jour {
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  font-variation-settings: "wdth" 82;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--texte-doux);
+  padding: 0 var(--pas-2) 0 var(--pas-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.axe .piste { position: relative; }
+
+.graduation {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-left: 0.4rem;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte-doux);
+  border-left: 1px solid var(--ligne);
+  line-height: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
 }
 
-.chaine-nom .nom-chaine {
+/* La ligne d'antenne : elle traverse toute la hauteur de la grille. */
+.tally {
+  position: absolute;
+  top: 2.5rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--tally);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tally-tete {
+  position: absolute;
+  top: -4px;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tally);
+}
+
+.bloc { display: block; }
+
+/* Bande de catégorie : une règle colorée qui annonce la section. */
+.bande {
+  position: sticky;
+  left: 0;
+  width: max-content;
+  padding: var(--pas-6) var(--pas-4) var(--pas-2) var(--pas-3);
+  z-index: 2;
+}
+
+.bande-nom {
   margin: 0;
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  font-variation-settings: "wdth" 80;
   font-size: 0.95rem;
   font-weight: 700;
-  font-variation-settings: "wdth" 90;
+  letter-spacing: -0.01em;
+  color: var(--texte);
+  padding-left: var(--pas-2);
+  border-left: 3px solid var(--teinte);
 }
 
-.groupe-categorie + .groupe-categorie { margin-top: 0.5rem; }
-
-.titre-categorie {
-  margin: 2rem 0 0.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--ambre);
-  font-size: 1.05rem;
-  font-weight: 800;
-  font-variation-settings: "wdth" 88;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--craie);
+.ligne {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid color-mix(in srgb, var(--ligne) 55%, transparent);
 }
 
-.groupe-categorie:first-child .titre-categorie { margin-top: 0; }
-
-.chaines-du-groupe { list-style: none; margin: 0; padding: 0; }
-
-.creneaux { display: grid; gap: 0.5rem; }
-
-.creneau {
-  background: var(--graphite);
-  border-left: 2px solid transparent;
-  padding: 0.75rem 0.9rem;
-}
-
-.creneau.direct {
-  border-left-color: var(--ambre);
-  background: var(--graphite-clair);
-}
-
-.heure {
-  margin: 0 0 0.25rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--craie-douce);
-  font-variant-numeric: tabular-nums;
+.rail {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  flex: none;
+  width: var(--rail);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--pas-2);
+  padding: 0 var(--pas-3);
+  background: var(--nuit);
+  border-right: 1px solid var(--ligne);
 }
 
-.direct .heure { color: var(--ambre); }
-
-.badge {
-  font-size: 0.66rem;
+/* Le numéro de canal est de l'information, pas une puce décorative :
+   c'est ce qu'on tape sur la télécommande. */
+.canal {
+  flex: none;
+  width: 1.5rem;
+  text-align: right;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--encre);
-  background: var(--ambre);
-  padding: 0.1rem 0.4rem;
-  border-radius: 2px;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte-doux);
+}
+.canal.vide { visibility: hidden; }
+
+.logo {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  background: var(--panneau-haut);
+  border-radius: 3px;
+  padding: 2px;
 }
 
-.titre-programme {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.3;
+.logo-texte {
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--texte-doux);
+  padding: 0;
 }
 
-.sous-titre, .genre {
-  margin: 0.2rem 0 0;
+.chaine {
   font-size: 0.82rem;
-  color: var(--craie-douce);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.genre { font-size: 0.75rem; }
+.piste {
+  position: relative;
+  flex: none;
+  width: var(--piste);
+  height: 4.25rem;
+}
+
+.prog {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0.35rem 0.55rem;
+  background: color-mix(in srgb, var(--teinte) 9%, var(--panneau));
+  border-left: 4px solid var(--teinte);
+  border-radius: 2px;
+  cursor: default;
+}
+
+.prog:hover { background: color-mix(in srgb, var(--teinte) 18%, var(--panneau)); }
+
+.prog.direct {
+  background: color-mix(in srgb, var(--teinte) 16%, var(--panneau-haut));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tally) 50%, transparent);
+}
+
+.prog-heure {
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--texte-doux);
+  line-height: 1;
+}
+
+.prog.direct .prog-heure { color: var(--tally); }
+
+.prog-titre {
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prog-sous {
+  font-size: 0.72rem;
+  color: var(--texte-doux);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------- états & bas de page */
 
 .etat {
-  font-size: 1rem;
-  color: var(--craie-douce);
-  padding: 2rem 0;
+  padding: 4rem var(--pas-4);
+  color: var(--texte-doux);
+  font-size: 0.95rem;
+  max-width: 34rem;
 }
 
 .pied {
-  margin-top: 2.5rem;
-  padding-top: 1.1rem;
-  border-top: 1px solid var(--trait);
-  font-size: 0.8rem;
-  color: var(--craie-douce);
-  max-width: 48ch;
+  padding: var(--pas-6) var(--pas-4) 3rem;
+  border-top: 1px solid var(--ligne);
+  color: var(--texte-doux);
+  font-size: 0.78rem;
   line-height: 1.6;
 }
 
+.pied p { margin: 0; }
+.pied-source { margin-top: 0.3rem; opacity: 0.75; }
+
 :focus-visible {
-  outline: 2px solid var(--ambre);
+  outline: 2px solid var(--tally);
   outline-offset: 2px;
 }
 
-@media (max-width: 42rem) {
-  .chaine { grid-template-columns: 1fr; gap: 0.7rem; }
-  .entete { position: static; }
+@media (max-width: 48rem) {
+  :root { --rail: 9.5rem; }
+  body { font-size: 14px; }
+  .chaine { font-size: 0.76rem; }
+  .logo { width: 22px; height: 22px; }
+  .canal { width: 1.15rem; font-size: 0.72rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .point { animation: none; }
+  .planning { scroll-behavior: auto; }
 }

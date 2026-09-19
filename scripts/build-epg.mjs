@@ -139,7 +139,7 @@ const analyseur = new XMLParser({
   },
 });
 
-function lireXmltv(xml, chaines, diffusions) {
+function lireXmltv(xml, chaines, diffusions, exclues) {
   const doc = analyseur.parse(xml);
   const tv = doc?.tv;
   if (!tv) return;
@@ -147,14 +147,22 @@ function lireXmltv(xml, chaines, diffusions) {
   for (const c of tv.channel ?? []) {
     const id = c["@id"];
     if (!id || chaines.has(id)) continue;
+    const nom = texte(c["display-name"]) ?? id;
+    // Écartée dès la lecture : ni la chaîne ni ses programmes n'entreront
+    // dans les données, donc rien à filtrer ensuite côté site.
+    if (estAdulte(nom) || estAdulte(id)) {
+      exclues.add(id);
+      continue;
+    }
     chaines.set(id, {
       id,
-      nom: texte(c["display-name"]) ?? id,
+      nom,
       icone: c.icon?.[0]?.["@src"] ?? c.icon?.["@src"] ?? null,
     });
   }
 
   for (const p of tv.programme ?? []) {
+    if (exclues.has(p["@channel"])) continue;
     const debut = dateXmltv(p["@start"]);
     if (!debut) continue;
     const fin = dateXmltv(p["@stop"]);
@@ -167,6 +175,71 @@ function lireXmltv(xml, chaines, diffusions) {
       genre: texte(p.category?.[0] ?? p.category),
     });
   }
+}
+
+// ------------------------------------------------------- filtrage & numéros
+
+/** Minuscules, sans accents ni ponctuation : "L'Équipe HD" → "lequipe". */
+const normaliser = (s) =>
+  (s ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+/**
+ * Chaînes pour adultes, exclues du site. On compare sur le nom normalisé,
+ * donc "XXL" ne déclenche pas "xxx" et "Passion" seul ne suffit pas.
+ * Les marques sont listées explicitement plutôt que devinées : un filtre
+ * trop large supprimerait des chaînes légitimes (Pink TV, Blues...).
+ */
+const MARQUES_ADULTES = [
+  "dorcel", "hustler", "playboy", "penthouse", "brazzers", "vivid",
+  "privatetv", "privatespice", "daringtv", "eroxxx", "xxl", "sexysat",
+  "frenchlover", "pinkx", "pinkerotic", "redlight", "sextreme",
+  "blueh", "blue hustler", "vizionplus", "satisfaction", "libido",
+  "adultchannel", "xdream", "extasy", "erotic", "erotik", "erotico",
+];
+
+/** Motifs plus génériques, cherchés en tant que mot entier normalisé. */
+const MOTIFS_ADULTES = [/(^|[^a-z])xxx([^a-z]|$)/, /^adult/, /porno?$/, /^porn/];
+
+function estAdulte(nom) {
+  const n = normaliser(nom);
+  if (MARQUES_ADULTES.some((m) => n.includes(normaliser(m)))) return true;
+  // Sur le nom d'origine espacé, pour les motifs à frontière de mot.
+  const espace = ` ${(nom ?? "").toLowerCase()} `;
+  return MOTIFS_ADULTES.some((r) => r.test(espace) || r.test(n));
+}
+
+/**
+ * Construit une table nom normalisé → numéro de canal à partir de
+ * scripts/numerotation.json. Le premier nom de la liste vaut 1.
+ */
+function tableNumeros(liste) {
+  const table = new Map();
+  (liste ?? []).forEach((entree, i) => {
+    const noms = Array.isArray(entree) ? entree : [entree];
+    for (const nom of noms) {
+      const cle = normaliser(nom);
+      if (cle && !table.has(cle)) table.set(cle, i + 1);
+    }
+  });
+  return table;
+}
+
+/**
+ * Cherche le numéro d'une chaîne. On tente d'abord le nom exact normalisé,
+ * puis un préfixe : "france2hd" et "france2tnt" retombent sur "france2".
+ * Renvoie null si la chaîne n'est pas dans la table.
+ */
+function numeroDe(nom, table) {
+  const n = normaliser(nom);
+  if (table.has(n)) return table.get(n);
+  for (const [cle, num] of table) {
+    if (n.startsWith(cle) && n.length - cle.length <= 4) return num;
+  }
+  return null;
 }
 
 // ------------------------------------------------------------ catégorisation
@@ -324,20 +397,23 @@ function joursUtiles(jours, timezone) {
 
 // ----------------------------------------------------------------------- main
 
-async function traiterPays(code, conf) {
+async function traiterPays(code, conf, numerotation) {
   const chaines = new Map();
   const diffusions = [];
+  const exclues = new Set();
 
   for (const src of conf.sources) {
     try {
       const xml = src.type === "grab" ? await viaGrabber(src) : await viaUrl(src);
-      lireXmltv(xml, chaines, diffusions);
+      lireXmltv(xml, chaines, diffusions, exclues);
       log(`${src.name}: ${chaines.size} chaînes, ${diffusions.length} diffusions cumulées`);
     } catch (e) {
       // Une source qui tombe ne doit pas faire échouer tout le build.
       console.error(`[epg] source ${src.name} en échec :`, e.message);
     }
   }
+
+  if (exclues.size) log(`${code}: ${exclues.size} chaînes adultes écartées`);
 
   if (!diffusions.length) {
     console.error(`[epg] ${code}: aucune donnée, pays ignoré`);
@@ -348,6 +424,15 @@ async function traiterPays(code, conf) {
   const categories = categoriser(diffusions, index, chaines);
   const jours = parJour(diffusions, index, conf.timezone);
   const retenus = joursUtiles(jours, conf.timezone);
+
+  // Numéro de canal, quand la chaîne figure dans la table du pays.
+  const table = tableNumeros(numerotation?.[code]);
+  const numeros = new Map();
+  for (const [id, i] of index) {
+    const num = numeroDe(chaines.get(id).nom, table);
+    if (num !== null) numeros.set(i, num);
+  }
+  log(`${code}: ${numeros.size} chaînes numérotées sur ${chaines.size}`);
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
@@ -372,7 +457,13 @@ async function traiterPays(code, conf) {
     timezone: conf.timezone,
     jours: retenus,
     categories: CATEGORIES_ORDRE,
-    chaines: [...chaines.values()].map((c, i) => [c.nom, c.icone, categories.get(i) ?? "Autres"]),
+    // [nom, icône, catégorie, numéro de canal ou null]
+    chaines: [...chaines.values()].map((c, i) => [
+      c.nom,
+      c.icone,
+      categories.get(i) ?? "Autres",
+      numeros.get(i) ?? null,
+    ]),
   };
 }
 
@@ -381,12 +472,22 @@ async function main() {
     await readFile(path.join(RACINE, "scripts", "sources.json"), "utf8")
   );
 
+  // Table optionnelle : son absence dégrade le tri, pas le build.
+  let numerotation = {};
+  try {
+    numerotation = JSON.parse(
+      await readFile(path.join(RACINE, "scripts", "numerotation.json"), "utf8")
+    );
+  } catch (e) {
+    console.error("[epg] numerotation.json illisible, tri alphabétique :", e.message);
+  }
+
   await mkdir(SORTIE, { recursive: true });
   const index = { genereLe: new Date().toISOString(), pays: {} };
 
   for (const [code, c] of Object.entries(conf)) {
     if (code.startsWith("_")) continue;
-    const res = await traiterPays(code, c);
+    const res = await traiterPays(code, c, numerotation);
     if (res) index.pays[code] = res;
   }
 
