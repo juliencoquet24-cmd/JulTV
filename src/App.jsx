@@ -69,6 +69,19 @@ const REPERES = [
   { id: "nuit", label: "Nuit", heure: 0 },
 ];
 
+/**
+ * Un programme entre-t-il dans la sélection courante ? Partagé entre le
+ * calcul des bornes et la construction de la liste, pour que la frise fasse
+ * exactement la largeur de ce qu'elle montre.
+ */
+function retenu(conf, i, titre, categorie, q) {
+  const [nom, , cat] = conf.chaines[i] ?? ["?", null, "Autres"];
+  if (categorie !== "toutes" && cat !== categorie) return false;
+  if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q))
+    return false;
+  return true;
+}
+
 export default function App() {
   const [index, setIndex] = useState(null);
   const [pays, setPays] = useState(null);
@@ -135,19 +148,29 @@ export default function App() {
   const conf = index?.pays?.[pays];
   const prete = grille && grille._cle === `${pays}/${jour}` ? grille : null;
 
-  // Bornes réelles de la journée : selon le fuseau, minuit local ne tombe pas
-  // sur la minute 0, et les programmes de nuit débordent au-delà de 24 h.
+  /**
+   * Bornes réelles de la frise. Selon le fuseau, minuit local ne tombe pas
+   * sur la minute 0, et les programmes de nuit débordent au-delà de 24 h.
+   *
+   * Elles se calculent sur les seuls programmes affichés, pas sur toute la
+   * journée : sinon, dès qu'une catégorie ou une recherche réduit la liste,
+   * la frise gardait sa largeur d'origine et on défilait dans le vide bien
+   * après le dernier programme.
+   */
   const bornes = useMemo(() => {
-    if (!prete?.p?.length) return { de: 0, a: 1440 };
+    if (!conf || !prete?.p?.length) return { de: 0, a: 1440 };
+    const q = recherche.trim().toLowerCase();
     let de = Infinity;
     let a = -Infinity;
-    for (const [, debut, duree] of prete.p) {
+    for (const [i, debut, duree, titre] of prete.p) {
+      if (!retenu(conf, i, titre, categorie, q)) continue;
       if (debut < de) de = debut;
       const fin = debut + (duree || 60);
       if (fin > a) a = fin;
     }
+    if (de === Infinity) return { de: 0, a: 1440 };
     return { de: Math.floor(de / PAS) * PAS, a: Math.ceil(a / PAS) * PAS };
-  }, [prete]);
+  }, [conf, prete, categorie, recherche]);
 
   const largeurPiste = (bornes.a - bornes.de) * PX_PAR_MIN;
   const xDe = (min) => (min - bornes.de) * PX_PAR_MIN;
@@ -167,7 +190,49 @@ export default function App() {
     const el = planning.current;
     if (!el) return;
     let raf = 0;
+
+    /**
+     * Verrouillage d'axe. Un doigt ne trace jamais une ligne parfaitement
+     * droite : sans cela, faire défiler les heures décale aussi les chaînes,
+     * et la grille part de biais. Dès que le geste dépasse quelques pixels,
+     * on retient la direction dominante et on remet l'autre axe à sa valeur
+     * de départ, à chaque événement. Le défilement natif et son inertie sont
+     * conservés sur l'axe choisi ; seul le mouvement parasite est annulé.
+     */
+    const v = { axe: null, gauche: el.scrollLeft, haut: el.scrollTop, minuteur: 0, corrige: false };
+    const SEUIL = 8;
+
+    const verrouiller = () => {
+      // Notre propre correction déclenche un événement : on l'ignore.
+      if (v.corrige) {
+        v.corrige = false;
+      } else {
+        if (v.axe === null) {
+          const dx = Math.abs(el.scrollLeft - v.gauche);
+          const dy = Math.abs(el.scrollTop - v.haut);
+          if (Math.max(dx, dy) > SEUIL) v.axe = dx > dy ? "x" : "y";
+        }
+        if (v.axe === "x" && el.scrollTop !== v.haut) {
+          v.corrige = true;
+          el.scrollTop = v.haut;
+        } else if (v.axe === "y" && el.scrollLeft !== v.gauche) {
+          v.corrige = true;
+          el.scrollLeft = v.gauche;
+        }
+      }
+      // Fin du geste : on rouvre les deux axes pour le suivant.
+      clearTimeout(v.minuteur);
+      v.minuteur = setTimeout(() => {
+        v.axe = null;
+        v.gauche = el.scrollLeft;
+        v.haut = el.scrollTop;
+      }, 180);
+    };
+
     const maj = () => {
+      // Le verrou doit agir dans l'événement même : différé, le décalage
+      // serait visible le temps d'une image.
+      verrouiller();
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         // Marge proportionnelle à l'écran : 600 px fixes, c'était une
@@ -180,13 +245,32 @@ export default function App() {
         setVue({ haut: el.scrollTop, hauteur: el.clientHeight });
       });
     };
+
+    // Un nouveau contact repart d'une page blanche, sans attendre le délai.
+    const debut = () => {
+      clearTimeout(v.minuteur);
+      v.axe = null;
+      v.gauche = el.scrollLeft;
+      v.haut = el.scrollTop;
+    };
+
+    const dimension = () => {
+      debut();
+      maj();
+    };
+
     maj();
     el.addEventListener("scroll", maj, { passive: true });
-    window.addEventListener("resize", maj);
+    el.addEventListener("touchstart", debut, { passive: true });
+    el.addEventListener("pointerdown", debut, { passive: true });
+    window.addEventListener("resize", dimension);
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(v.minuteur);
       el.removeEventListener("scroll", maj);
-      window.removeEventListener("resize", maj);
+      el.removeEventListener("touchstart", debut);
+      el.removeEventListener("pointerdown", debut);
+      window.removeEventListener("resize", dimension);
     };
   }, [bornes, prete]);
 
@@ -197,9 +281,7 @@ export default function App() {
     const parChaine = new Map();
 
     for (const [i, debut, duree, titre, sousTitre, genre] of prete.p) {
-      const [nom, , cat] = conf.chaines[i] ?? ["?", null, "Autres"];
-      if (categorie !== "toutes" && cat !== categorie) continue;
-      if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q)) continue;
+      if (!retenu(conf, i, titre, categorie, q)) continue;
       if (!parChaine.has(i)) parChaine.set(i, []);
       parChaine.get(i).push({ debut, duree: duree || 60, titre, sousTitre, genre });
     }
