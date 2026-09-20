@@ -70,13 +70,40 @@ const REPERES = [
 ];
 
 /**
+ * Sélection transversale : les films eux-mêmes, où qu'ils passent.
+ * Les autres catégories classent les chaînes ; celle-ci classe les
+ * programmes, ce qui n'est pas la même question — un film sur TF1 n'est pas
+ * sur une chaîne de cinéma.
+ */
+const FILMS = "__films";
+
+/** Genres qui désignent un film, en français comme en espagnol. */
+const GENRES_FILM = [
+  "film", "cinema", "cinéma", "long metrage", "long métrage",
+  "movie", "cine", "pelicula", "película", "largometraje", "telefilm", "téléfilm",
+];
+
+function estFilm(genre) {
+  if (!genre) return false;
+  const g = genre.toLowerCase();
+  // « Magazine du cinéma » parle de films sans en être un.
+  if (g.includes("magazine") || g.includes("actualite") || g.includes("actualité"))
+    return false;
+  return GENRES_FILM.some((m) => g.includes(m));
+}
+
+/**
  * Un programme entre-t-il dans la sélection courante ? Partagé entre le
  * calcul des bornes et la construction de la liste, pour que la frise fasse
  * exactement la largeur de ce qu'elle montre.
  */
-function retenu(conf, i, titre, categorie, q) {
+function retenu(conf, i, titre, genre, categorie, q) {
   const [nom, , cat] = conf.chaines[i] ?? ["?", null, "Autres"];
-  if (categorie !== "toutes" && cat !== categorie) return false;
+  if (categorie === FILMS) {
+    if (!estFilm(genre)) return false;
+  } else if (categorie !== "toutes" && cat !== categorie) {
+    return false;
+  }
   if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q))
     return false;
   return true;
@@ -194,8 +221,8 @@ export default function App() {
     const q = recherche.trim().toLowerCase();
     let de = Infinity;
     let a = -Infinity;
-    for (const [i, debut, duree, titre] of prete.p) {
-      if (!retenu(conf, i, titre, categorie, q)) continue;
+    for (const [i, debut, duree, titre, , genre] of prete.p) {
+      if (!retenu(conf, i, titre, genre, categorie, q)) continue;
       if (debut < de) de = debut;
       const fin = debut + (duree || 60);
       if (fin > a) a = fin;
@@ -484,7 +511,7 @@ export default function App() {
     const parChaine = new Map();
 
     for (const [i, debut, duree, titre, sousTitre, genre] of prete.p) {
-      if (!retenu(conf, i, titre, categorie, q)) continue;
+      if (!retenu(conf, i, titre, genre, categorie, q)) continue;
       if (!parChaine.has(i)) parChaine.set(i, []);
       parChaine.get(i).push({ debut, duree: duree || 60, titre, sousTitre, genre });
     }
@@ -705,6 +732,7 @@ export default function App() {
             aria-label="Catégorie"
           >
             <option value="toutes">Toutes catégories</option>
+            <option value={FILMS}>Films, toutes chaînes</option>
             {categoriesDispo.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
