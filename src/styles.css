@@ -401,13 +401,19 @@ body {
   padding: 0;
 }
 
+/* Deux lignes plutôt qu'une coupure : « Canal+ Grand Écran » tient
+   entièrement, là où une seule ligne le réduisait à « Canal+ G… ». */
 .chaine {
   font-size: 0.88rem;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.15;
+  display: -webkit-box;
+  /* Trois lignes : « beIN Sports 1 » ne tient pas en deux dans la colonne
+     d'un téléphone, et perdre le numéro rendrait la chaîne méconnaissable. */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 
 .ligne.en-avant .chaine { font-weight: 800; }
@@ -527,7 +533,9 @@ body {
 
 @media (max-width: 46rem) {
   :root {
-    --rail: 9.5rem;
+    /* 9,5 rem ne laissaient que 56 px au nom : « L'Équipe » se coupait en
+       plein mot. Seize pixels de plus suffisent, et la frise reste large. */
+    --rail: 10.5rem;
     --ligne-h: 3.75rem;
   }
   body { font-size: 15px; }

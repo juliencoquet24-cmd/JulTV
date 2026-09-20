@@ -242,6 +242,33 @@ function tableNumeros(liste) {
  * fournissent presque jamais, si bien que des sections entières se
  * retrouvaient vides ou réduites à deux ou trois chaînes.
  */
+/** Nom canonique de chaque libellé, tel qu'il est écrit dans la liste. */
+function tableNoms(liste) {
+  const table = new Map();
+  for (const entree of liste ?? []) {
+    const canon = typeof entree === "string" ? entree : entree?.nom;
+    if (!canon) continue;
+    for (const nom of libelles(entree)) {
+      const cle = normaliser(nom);
+      if (cle && !table.has(cle)) table.set(cle, canon);
+    }
+  }
+  return table;
+}
+
+/** Comme categorieDe, mais pour le nom canonique. */
+function nomCanonique(nom, table) {
+  const n = normaliser(nom);
+  if (table.has(n)) return table.get(n);
+  for (const suf of SUFFIXES) {
+    if (n.endsWith(suf)) {
+      const base = n.slice(0, -suf.length);
+      if (base && table.has(base)) return table.get(base);
+    }
+  }
+  return null;
+}
+
 function tableCategories(liste) {
   const table = new Map();
   for (const entree of liste ?? []) {
@@ -555,6 +582,7 @@ async function traiterPays(code, conf, numerotation) {
   const tCanaux = tableNumeros(reglages.canaux);
   const tPriorites = tableNumeros(reglages.priorites);
   const tCategories = tableCategories(reglages.canaux);
+  const tNoms = tableNoms(reglages.canaux);
 
   /**
    * On ne garde que les chaînes listées dans numerotation.json.
@@ -608,7 +636,11 @@ async function traiterPays(code, conf, numerotation) {
   const gardees = new Map();
   const rangs = new Map();
   for (const m of meilleur.values()) {
-    gardees.set(m.id, m.c);
+    // Le nom vient de la liste, pas du flux : les sources écrivent
+    // « CANAL+ CINEMA(S) HD » ou « beIN SPORTS 1 Dolby », qui ne tiennent
+    // pas dans la colonne et se retrouvent tronqués à l'affichage.
+    const canon = nomCanonique(m.c.nom, tNoms);
+    gardees.set(m.id, canon ? { ...m.c, nom: canon } : m.c);
     rangs.set(m.id, { num: m.num, pri: m.pri });
   }
 

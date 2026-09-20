@@ -6,8 +6,14 @@ const RAFRAICHISSEMENT = 5 * 60 * 1000;
 /** Largeur d'une minute de programme, en pixels. 30 min ≈ 110 px. */
 const PX_PAR_MIN = 3.1;
 
-/** En dessous, le bloc est trop étroit pour porter du texte lisible. */
-const LARGEUR_TEXTE = 52;
+/**
+ * Seuils d'affichage d'un bloc, en pixels. À 3,1 px la minute, un programme
+ * de cinq minutes fait quinze pixels : aucun texte n'y tient. Plutôt que
+ * tout ou rien, trois paliers — titre et heure, titre seul en plus petit,
+ * puis rien du tout et l'infobulle prend le relais.
+ */
+const LARGEUR_TEXTE = 92;
+const LARGEUR_TITRE = 34;
 const PAS = 30; // graduation de l'axe, en minutes
 
 /** Minutes depuis minuit UTC du jour → étiquette dans le fuseau du pays. */
@@ -838,10 +844,11 @@ export default function App() {
                       const heure = heureDe(jour, p.debut, conf.timezone);
                       const classes = ["prog"];
                       if (direct) classes.push("direct");
-                      // Un bloc de quelques minutes ne peut pas porter de
-                      // texte : on le garde visible mais muet, plutôt que
-                      // d'aligner des tranches de lettres illisibles.
-                      if (largeur < LARGEUR_TEXTE) classes.push("muet");
+                      // Sous le plus petit seuil, le bloc reste visible mais
+                      // muet : aligner des tranches de lettres coupées est
+                      // pire que rien, et le titre reste dans l'infobulle.
+                      if (largeur < LARGEUR_TITRE) classes.push("muet");
+                      else if (largeur < LARGEUR_TEXTE) classes.push("serre");
                       return (
                         <article
                           key={p.debut}
@@ -861,9 +868,11 @@ export default function App() {
                             }
                           }}
                         >
-                          {largeur >= LARGEUR_TEXTE && (
+                          {largeur >= LARGEUR_TITRE && (
                             <>
-                              <span className="prog-heure">{heure}</span>
+                              {largeur >= LARGEUR_TEXTE && (
+                                <span className="prog-heure">{heure}</span>
+                              )}
                               <span className="prog-titre">{p.titre}</span>
                               {p.sousTitre && largeur > 190 && (
                                 <span className="prog-sous">{p.sousTitre}</span>
