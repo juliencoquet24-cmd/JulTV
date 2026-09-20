@@ -620,6 +620,45 @@ async function traiterPays(code, conf, numerotation) {
   }
   log(`${code}: ${gardees.size} chaînes retenues sur ${chaines.size} reçues (doublons fondus)`);
 
+  /**
+   * Garde-fou contre une source défaillante. Certains flux renvoient la
+   * même grille pour toutes leurs chaînes : on se retrouvait avec dix
+   * chaînes espagnoles diffusant le même film à la même minute. Deux ou
+   * trois chaînes peuvent légitimement être en simulcast ; au-delà, c'est
+   * un défaut de la source, et on ne garde que la première.
+   */
+  const SEUIL_CLONES = 4;
+  const empreintes = new Map();
+  for (const id of gardees.keys()) {
+    const sienne = diffusions
+      .filter((d) => d.chaine === id)
+      .map((d) => `${d.debut.getTime()}|${d.titre}`)
+      .sort()
+      .join("~");
+    if (!sienne) continue;
+    if (!empreintes.has(sienne)) empreintes.set(sienne, []);
+    empreintes.get(sienne).push(id);
+  }
+
+  let clones = 0;
+  for (const ids of empreintes.values()) {
+    if (ids.length < SEUIL_CLONES) continue;
+    // La première dans l'ordre de la liste est la plus plausible.
+    const trie = ids.sort(
+      (a, b) => (rangs.get(a).num ?? 1e9) - (rangs.get(b).num ?? 1e9)
+    );
+    for (const id of trie.slice(1)) {
+      gardees.delete(id);
+      rangs.delete(id);
+      clones++;
+    }
+  }
+  if (clones) {
+    console.error(
+      `[epg] ${code}: ${clones} chaînes écartées, grille identique à une autre — la source est probablement en défaut`
+    );
+  }
+
   const index = new Map([...gardees.keys()].map((id, i) => [id, i]));
   const numeros = new Map();
   const priorites = new Map();

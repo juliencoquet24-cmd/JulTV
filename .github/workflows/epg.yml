@@ -21,8 +21,9 @@ concurrency:
 jobs:
   construire:
     runs-on: ubuntu-latest
-    # Les grabbers espagnols sont lents : ils interrogent les sites page par page.
-    timeout-minutes: 90
+    # Toutes les sources sont désormais des fichiers XMLTV téléchargés :
+    # plus de scraping, donc un build de quelques minutes au lieu d'une heure.
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -37,12 +38,6 @@ jobs:
 
       - name: Outils de décompression
         run: sudo apt-get update && sudo apt-get install -y xz-utils unzip
-
-      - name: Cloner le grabber iptv-org
-        run: |
-          mkdir -p .epg-tmp
-          git clone --depth 1 https://github.com/iptv-org/epg.git .epg-tmp/iptv-org-epg
-          cd .epg-tmp/iptv-org-epg && npm install --no-audit --no-fund
 
       - name: Construire les données EPG
         env:

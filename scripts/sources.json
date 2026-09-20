@@ -5,44 +5,57 @@
     "type 'grab' : grille reconstruite par le grabber iptv-org/epg à partir d'un site.",
     "Ajoute ou retire des entrées librement : le builder les traite toutes pareil."
   ],
-
   "fr": {
     "label": "France",
     "timezone": "Europe/Paris",
     "sources": [
       {
         "type": "url",
-        "name": "xmltvfr-complet",
+        "name": "xmltvfr",
         "url": "https://xmltvfr.fr/xmltv/xmltv.zip",
-        "note": "~785 chaînes francophones, tous bouquets (TNT, Canal+, beIN, Ciné+, OCS, Orange, Free, SFR). URL copiée depuis https://xmltvfr.fr/xmltv.php le 19/09/2026."
+        "note": "Source principale, déjà en service : ~785 chaînes francophones, tous bouquets. Placée en tête car c'est elle qui fixe le nom et le logo d'une chaîne quand plusieurs flux la fournissent."
+      },
+      {
+        "type": "url",
+        "name": "xmltv-fr-guide",
+        "url": "https://xmltv.fr/guide/tvguide.xml.gz",
+        "note": "Second projet français, indépendant du précédent : comble ses trous."
+      },
+      {
+        "type": "url",
+        "name": "iptvorg-telecablesat",
+        "url": "https://iptv-org.github.io/epg/guides/fr/tv-programme.telecablesat.fr.xml",
+        "note": "Télécâble Sat : bonne couverture du câble et des bouquets FAI."
+      },
+      {
+        "type": "url",
+        "name": "iptvorg-canalplus",
+        "url": "https://iptv-org.github.io/epg/guides/fr/canalplus.com.xml",
+        "note": "Bouquet Canal+ : cinéma, séries, sport."
       }
     ]
   },
-
   "es": {
     "label": "Espagne",
     "timezone": "Europe/Madrid",
     "sources": [
       {
-        "type": "grab",
-        "name": "movistarplus",
-        "site": "movistarplus.es",
-        "days": 5,
-        "note": "TDT + tous les bouquets Movistar Plus+ (Vamos, LaLiga, Cine, Deportes...)"
+        "type": "url",
+        "name": "tdtchannels",
+        "url": "https://www.tdtchannels.com/epg/TV.xml.gz",
+        "note": "Projet communautaire TDTChannels : TNT nationale, chaînes régionales et une partie du câble. Source espagnole la plus complète en libre accès."
       },
       {
-        "type": "grab",
-        "name": "elpais",
-        "site": "programacion-tv.elpais.com",
-        "days": 5,
-        "note": "Généralistes et autonomiques, utile en recoupement"
+        "type": "url",
+        "name": "iptvorg-movistar",
+        "url": "https://iptv-org.github.io/epg/guides/es/movistar.plus.xml",
+        "note": "Bouquet Movistar Plus+ : cinéma, séries, sport."
       },
       {
-        "type": "grab",
-        "name": "orange",
-        "site": "orangetv.orange.es",
-        "days": 4,
-        "note": "227 chaînes, bouquet Orange TV Espagne — remplace tvtoday.es qui n'existe pas dans iptv-org/epg"
+        "type": "url",
+        "name": "iptvorg-mtv",
+        "url": "https://iptv-org.github.io/epg/guides/es/m.tv.xml",
+        "note": "Complément multi-sources, comble les trous des deux précédentes."
       }
     ]
   }
