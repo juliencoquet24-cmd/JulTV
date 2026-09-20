@@ -246,8 +246,170 @@ export default function App() {
       });
     };
 
-    // Un nouveau contact repart d'une page blanche, sans attendre le délai.
+    /**
+     * Trackpad et molette. Sur macOS, le défilement est composité hors du fil
+     * principal : remettre scrollTop à sa place depuis l'événement `scroll`
+     * arrive trop tard, le compositeur a déjà bougé la vue et la diagonale
+     * reste visible. On refuse donc le geste natif et on conduit nous-mêmes
+     * le déplacement, sur le seul axe retenu.
+     *
+     * Plutôt que d'appliquer chaque cran sèchement, on pousse une cible que
+     * la vue rejoint en s'amortissant : le mouvement garde son élan après
+     * que les doigts ont quitté le trackpad, et s'arrête sans à-coup.
+     */
+    const cible = { x: el.scrollLeft, y: el.scrollTop, anime: 0 };
+    const AMORTI = 0.2; // fraction du chemin restant parcourue par image
+
+    const glisser = () => {
+      const ecartX = cible.x - el.scrollLeft;
+      const ecartY = cible.y - el.scrollTop;
+
+      if (Math.abs(ecartX) < 0.5 && Math.abs(ecartY) < 0.5) {
+        el.scrollLeft = cible.x;
+        el.scrollTop = cible.y;
+        cible.anime = 0;
+      } else {
+        el.scrollLeft += ecartX * AMORTI;
+        el.scrollTop += ecartY * AMORTI;
+        cible.anime = requestAnimationFrame(glisser);
+      }
+      // Le verrou doit suivre le mouvement qu'on produit, sinon il le
+      // prendrait pour un écart à corriger.
+      v.gauche = el.scrollLeft;
+      v.haut = el.scrollTop;
+    };
+
+    const surMolette = (e) => {
+      // deltaMode 1 compte en lignes, 2 en pages : ramené en pixels.
+      const f = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? el.clientHeight : 1;
+      const dx = e.deltaX * f;
+      const dy = e.deltaY * f;
+
+      if (v.axe === null) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 1) return;
+        v.axe = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+
+      e.preventDefault();
+
+      // Au repos, la cible repart de la position réelle : sans ça, un
+      // défilement interrompu à la main ferait sauter la vue au reprise.
+      if (!cible.anime) {
+        cible.x = el.scrollLeft;
+        cible.y = el.scrollTop;
+      }
+
+      const maxX = el.scrollWidth - el.clientWidth;
+      const maxY = el.scrollHeight - el.clientHeight;
+      if (v.axe === "x") cible.x = Math.min(Math.max(cible.x + dx, 0), maxX);
+      else cible.y = Math.min(Math.max(cible.y + dy, 0), maxY);
+
+      if (!cible.anime) cible.anime = requestAnimationFrame(glisser);
+
+      clearTimeout(v.minuteur);
+      v.minuteur = setTimeout(() => {
+        v.axe = null;
+        v.gauche = el.scrollLeft;
+        v.haut = el.scrollTop;
+      }, 180);
+    };
+
+    /**
+     * Tactile. Même raison que pour le trackpad : sur iOS le défilement est
+     * composité, corriger l'axe depuis l'événement `scroll` arrive après que
+     * la vue a bougé, et la correction se bat avec l'inertie du système —
+     * d'où les à-coups. On conduit donc le doigt nous-mêmes, puis on relance
+     * un glissement dont l'élan vient de la vitesse mesurée au relâchement.
+     */
+    const doigt = { x: 0, y: 0, t: 0, vx: 0, vy: 0, actif: false };
+
+    const toucheDebut = (e) => {
+      if (e.touches.length !== 1) return;
+      if (cible.anime) {
+        cancelAnimationFrame(cible.anime);
+        cible.anime = 0;
+      }
+      clearTimeout(v.minuteur);
+      v.axe = null;
+      v.gauche = el.scrollLeft;
+      v.haut = el.scrollTop;
+
+      const t = e.touches[0];
+      doigt.x = t.clientX;
+      doigt.y = t.clientY;
+      doigt.t = performance.now();
+      doigt.vx = 0;
+      doigt.vy = 0;
+      doigt.actif = true;
+      cible.x = el.scrollLeft;
+      cible.y = el.scrollTop;
+    };
+
+    const toucheBouge = (e) => {
+      if (!doigt.actif || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = doigt.x - t.clientX;
+      const dy = doigt.y - t.clientY;
+
+      if (v.axe === null) {
+        // Sous le seuil, on laisse faire : un simple appui ne doit rien bouger.
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
+        v.axe = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+
+      e.preventDefault();
+      const maintenant = performance.now();
+      const dt = Math.max(maintenant - doigt.t, 1);
+
+      if (v.axe === "x") {
+        el.scrollLeft += dx;
+        // Vitesse lissée : une seule image de mesure serait trop nerveuse.
+        doigt.vx = 0.7 * (dx / dt) + 0.3 * doigt.vx;
+      } else {
+        el.scrollTop += dy;
+        doigt.vy = 0.7 * (dy / dt) + 0.3 * doigt.vy;
+      }
+
+      doigt.x = t.clientX;
+      doigt.y = t.clientY;
+      doigt.t = maintenant;
+      v.gauche = el.scrollLeft;
+      v.haut = el.scrollTop;
+    };
+
+    const toucheFin = () => {
+      if (!doigt.actif) return;
+      doigt.actif = false;
+
+      // L'élan restant : la vitesse au moment du lâcher, projetée en avant.
+      const ELAN = 160; // millisecondes de course résiduelle
+      const maxX = el.scrollWidth - el.clientWidth;
+      const maxY = el.scrollHeight - el.clientHeight;
+      cible.x = el.scrollLeft;
+      cible.y = el.scrollTop;
+
+      if (v.axe === "x" && Math.abs(doigt.vx) > 0.05) {
+        cible.x = Math.min(Math.max(el.scrollLeft + doigt.vx * ELAN, 0), maxX);
+      } else if (v.axe === "y" && Math.abs(doigt.vy) > 0.05) {
+        cible.y = Math.min(Math.max(el.scrollTop + doigt.vy * ELAN, 0), maxY);
+      }
+
+      if (!cible.anime) cible.anime = requestAnimationFrame(glisser);
+
+      clearTimeout(v.minuteur);
+      v.minuteur = setTimeout(() => {
+        v.axe = null;
+        v.gauche = el.scrollLeft;
+        v.haut = el.scrollTop;
+      }, 180);
+    };
+
+    // Souris : un clic remet simplement le verrou à zéro.
     const debut = () => {
+      if (cible.anime) {
+        cancelAnimationFrame(cible.anime);
+        cible.anime = 0;
+      }
       clearTimeout(v.minuteur);
       v.axe = null;
       v.gauche = el.scrollLeft;
@@ -261,15 +423,24 @@ export default function App() {
 
     maj();
     el.addEventListener("scroll", maj, { passive: true });
-    el.addEventListener("touchstart", debut, { passive: true });
-    el.addEventListener("pointerdown", debut, { passive: true });
+    el.addEventListener("wheel", surMolette, { passive: false });
+    el.addEventListener("touchstart", toucheDebut, { passive: true });
+    el.addEventListener("touchmove", toucheBouge, { passive: false });
+    el.addEventListener("touchend", toucheFin, { passive: true });
+    el.addEventListener("touchcancel", toucheFin, { passive: true });
+    el.addEventListener("mousedown", debut, { passive: true });
     window.addEventListener("resize", dimension);
     return () => {
       cancelAnimationFrame(raf);
+      if (cible.anime) cancelAnimationFrame(cible.anime);
       clearTimeout(v.minuteur);
       el.removeEventListener("scroll", maj);
-      el.removeEventListener("touchstart", debut);
-      el.removeEventListener("pointerdown", debut);
+      el.removeEventListener("wheel", surMolette);
+      el.removeEventListener("touchstart", toucheDebut);
+      el.removeEventListener("touchmove", toucheBouge);
+      el.removeEventListener("touchend", toucheFin);
+      el.removeEventListener("touchcancel", toucheFin);
+      el.removeEventListener("mousedown", debut);
       window.removeEventListener("resize", dimension);
     };
   }, [bornes, prete]);
