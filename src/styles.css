@@ -566,3 +566,175 @@ body {
   .point { animation: none; }
   .planning { scroll-behavior: auto; }
 }
+
+/* --------------------------------------------------------------- la fiche */
+
+/* Le programme est cliquable : il doit le dire au survol comme au doigt. */
+.prog { cursor: pointer; }
+.prog:focus-visible { outline-offset: -3px; }
+
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: color-mix(in srgb, var(--encre) 45%, transparent);
+  padding: var(--pas-4);
+  padding-bottom: calc(var(--pas-4) + env(safe-area-inset-bottom));
+  animation: apparait 0.14s ease-out;
+}
+
+@keyframes apparait { from { opacity: 0; } }
+
+.fiche {
+  position: relative;
+  width: min(34rem, 100%);
+  max-height: 82vh;
+  max-height: 82dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--papier);
+  border: 2px solid var(--bleu);
+  border-radius: 4px;
+  padding: var(--pas-4) var(--pas-4) var(--pas-6);
+  animation: monte 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* Sur téléphone la fiche monte du bas, là où se trouve le pouce. */
+@keyframes monte { from { transform: translateY(14px); } }
+
+@media (min-width: 46rem) {
+  .voile { align-items: center; }
+}
+
+.fermer {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 44px;
+  height: 44px;
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--bleu);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.fiche-chaine {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 2.5rem 0.3rem 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--encre-douce);
+}
+
+.fiche-canal {
+  color: var(--bleu);
+  font-variant-numeric: tabular-nums;
+}
+
+.fiche-direct {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--papier);
+  background: var(--rouge);
+  border-radius: 2px;
+  padding: 0.12rem 0.4rem;
+}
+
+.fiche-titre {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.fiche-sous {
+  margin: 0.2rem 0 0;
+  font-size: 1rem;
+  color: var(--encre-douce);
+}
+
+.fiche-horaire {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--bleu);
+}
+
+.fiche-image {
+  display: block;
+  width: 100%;
+  margin-top: var(--pas-3);
+  border: 1px solid var(--bleu-filet);
+  border-radius: 3px;
+}
+
+.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: var(--pas-3) 0 0;
+  padding: 0;
+}
+
+.etiquette {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bleu);
+  background: var(--bleu-pale);
+  border: 1px solid var(--bleu-filet);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.fiche-episode {
+  margin: var(--pas-3) 0 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.fiche-resume {
+  margin: var(--pas-2) 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.fiche-infos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.75rem;
+  margin: var(--pas-4) 0 0;
+  padding-top: var(--pas-3);
+  border-top: 1px solid var(--bleu-filet);
+  font-size: 0.88rem;
+}
+
+.fiche-infos dt {
+  font-weight: 700;
+  color: var(--encre-douce);
+  white-space: nowrap;
+}
+
+.fiche-infos dd { margin: 0; }
+
+.fiche-etat {
+  margin: var(--pas-3) 0 0;
+  font-size: 0.88rem;
+  color: var(--encre-douce);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voile, .fiche { animation: none; }
+}

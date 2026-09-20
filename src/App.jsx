@@ -89,6 +89,8 @@ export default function App() {
   const [grille, setGrille] = useState(null);
   const [categorie, setCategorie] = useState("toutes");
   const [recherche, setRecherche] = useState("");
+  const [fiche, setFiche] = useState(null);
+  const [details, setDetails] = useState({ cle: null, data: null, etat: "vide" });
   const [erreur, setErreur] = useState(null);
   const [tic, setTic] = useState(() => Date.now());
   const cache = useRef(new Map());
@@ -144,6 +146,36 @@ export default function App() {
       document.removeEventListener("visibilitychange", reveil);
     };
   }, [charger, pays, jour]);
+
+  /**
+   * Détails de la journée : résumés, distribution, épisodes. Chargés à la
+   * première ouverture d'une fiche seulement — ils pèsent plusieurs fois le
+   * poids de la grille, et la plupart des visites n'en ouvrent aucune.
+   */
+  // La clé en cours de chargement vit dans une référence, pas dans l'état :
+  // la mettre dans les dépendances relançait l'effet dès qu'on marquait le
+  // chargement, et le nettoyage annulait alors sa propre requête.
+  const detailsDemandes = useRef(null);
+
+  useEffect(() => {
+    if (!fiche || !pays || !jour) return;
+    const cle = `${pays}/${jour}`;
+    if (detailsDemandes.current === cle) return;
+    detailsDemandes.current = cle;
+    setDetails({ cle, data: null, etat: "charge" });
+    fetch(`${BASE}/${cle}.details.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
+      .then((d) => setDetails({ cle, data: d, etat: "pret" }))
+      .catch(() => setDetails({ cle, data: {}, etat: "absent" }));
+  }, [fiche, pays, jour]);
+
+  // Échap referme la fiche, comme partout ailleurs.
+  useEffect(() => {
+    if (!fiche) return;
+    const t = (e) => e.key === "Escape" && setFiche(null);
+    document.addEventListener("keydown", t);
+    return () => document.removeEventListener("keydown", t);
+  }, [fiche]);
 
   const conf = index?.pays?.[pays];
   const prete = grille && grille._cle === `${pays}/${jour}` ? grille : null;
@@ -753,7 +785,15 @@ export default function App() {
                       <span className="canal vide" aria-hidden="true" />
                     )}
                     {l.icone ? (
-                      <img className="logo" src={l.icone} alt="" loading="lazy" />
+                      <img
+                        className="logo"
+                        src={l.icone}
+                        alt=""
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.visibility = "hidden";
+                        }}
+                      />
                     ) : (
                       <span className="logo logo-texte">{l.nom.slice(0, 2)}</span>
                     )}
@@ -783,6 +823,15 @@ export default function App() {
                             width: `${Math.max(largeur - 2, 3)}px`,
                           }}
                           title={`${heure} — ${p.titre}${p.sousTitre ? ` · ${p.sousTitre}` : ""}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setFiche({ ...p, chaine: l, heure, direct })}
+                          onKeyDown={(ev) => {
+                            if (ev.key === "Enter" || ev.key === " ") {
+                              ev.preventDefault();
+                              setFiche({ ...p, chaine: l, heure, direct });
+                            }
+                          }}
                         >
                           {largeur >= LARGEUR_TEXTE && (
                             <>
@@ -811,6 +860,16 @@ export default function App() {
         </div>
       )}
 
+      {fiche && (
+        <Fiche
+          prog={fiche}
+          jour={jour}
+          timezone={conf.timezone}
+          details={details.cle === `${pays}/${jour}` ? details : { etat: "charge" }}
+          onFermer={() => setFiche(null)}
+        />
+      )}
+
       <footer className="pied">
         <p>
           {conf.chaines.length} chaînes · grille reconstruite quatre fois par jour,
@@ -824,6 +883,104 @@ export default function App() {
           Données XMLTV de xmltvfr.fr pour la France, grabbers iptv-org pour l'Espagne.
         </p>
       </footer>
+    </div>
+  );
+}
+
+function Fiche({ prog, jour, timezone, details, onFermer }) {
+  const d = details.data?.[`${prog.chaine.i}:${prog.debut}`] ?? null;
+  const fin = heureDe(jour, prog.debut + prog.duree, timezone);
+  const h = Math.floor(prog.duree / 60);
+  const m = prog.duree % 60;
+  const duree = h ? `${h} h${m ? ` ${String(m).padStart(2, "0")}` : ""}` : `${m} min`;
+
+  return (
+    <div className="voile" onClick={onFermer} role="presentation">
+      <div
+        className="fiche"
+        role="dialog"
+        aria-modal="true"
+        aria-label={prog.titre}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="fermer" onClick={onFermer} aria-label="Fermer">
+          ×
+        </button>
+
+        <p className="fiche-chaine">
+          {prog.chaine.numero && <span className="fiche-canal">{prog.chaine.numero}</span>}
+          {prog.chaine.nom}
+          {prog.direct && <span className="fiche-direct">en direct</span>}
+        </p>
+
+        <h2 className="fiche-titre">{prog.titre}</h2>
+        {prog.sousTitre && <p className="fiche-sous">{prog.sousTitre}</p>}
+
+        <p className="fiche-horaire">
+          {prog.heure} – {fin} · {duree}
+        </p>
+
+        {d?.image && (
+          <img
+            className="fiche-image"
+            src={d.image}
+            alt=""
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        )}
+
+        <ul className="etiquettes">
+          {(d?.genres?.length ? d.genres : prog.genre ? [prog.genre] : []).map((g) => (
+            <li key={g} className="etiquette">{g}</li>
+          ))}
+          {d?.annee && <li className="etiquette">{d.annee}</li>}
+          {d?.rediffusion && <li className="etiquette">Rediffusion</li>}
+          {d?.avis && <li className="etiquette">{d.avis}</li>}
+        </ul>
+
+        {details.etat === "charge" && <p className="fiche-etat">Chargement des détails…</p>}
+
+        {d?.episode && <p className="fiche-episode">{d.episode}</p>}
+        {d?.resume && <p className="fiche-resume">{d.resume}</p>}
+
+        {(d?.realisateur || d?.acteurs?.length || d?.pays || d?.note) && (
+          <dl className="fiche-infos">
+            {d.realisateur && (
+              <>
+                <dt>Réalisation</dt>
+                <dd>{d.realisateur}</dd>
+              </>
+            )}
+            {d.acteurs?.length > 0 && (
+              <>
+                <dt>Avec</dt>
+                <dd>{d.acteurs.join(", ")}</dd>
+              </>
+            )}
+            {d.pays && (
+              <>
+                <dt>Pays</dt>
+                <dd>{d.pays}</dd>
+              </>
+            )}
+            {d.note && (
+              <>
+                <dt>Note</dt>
+                <dd>{d.note}</dd>
+              </>
+            )}
+          </dl>
+        )}
+
+        {details.etat !== "charge" && !d && (
+          <p className="fiche-etat">
+            Cette source ne fournit pas de description pour ce programme.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

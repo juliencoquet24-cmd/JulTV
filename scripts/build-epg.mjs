@@ -173,6 +173,7 @@ function lireXmltv(xml, chaines, diffusions, exclues) {
       titre: texte(p.title) ?? "(sans titre)",
       sousTitre: texte(p["sub-title"]),
       genre: texte(p.category?.[0] ?? p.category),
+      details: detailsDe(p),
     });
   }
 }
@@ -405,6 +406,68 @@ function categoriser(diffusions, index, chaines) {
   return resultat;
 }
 
+/** Quelques valeurs, sans les vides : un objet à moitié null pèse pour rien. */
+function compacter(objet) {
+  const out = {};
+  for (const [k, v] of Object.entries(objet)) {
+    if (v === null || v === undefined || v === "") continue;
+    if (Array.isArray(v) && !v.length) continue;
+    out[k] = v;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+const liste = (v, max) => {
+  if (v == null) return [];
+  const t = (Array.isArray(v) ? v : [v]).map(texte).filter(Boolean);
+  return max ? t.slice(0, max) : t;
+};
+
+/**
+ * Détails d'une diffusion : résumé, distribution, année, épisode.
+ *
+ * Ils partent dans un fichier à part, chargé seulement à l'ouverture d'une
+ * fiche : les résumés pèsent plusieurs fois le poids de la grille elle-même,
+ * et personne ne les lit tous.
+ */
+function detailsDe(p) {
+  // "1 . 4 . 0/1" en notation xmltv_ns : saison 2, épisode 5, comptés à zéro.
+  let episode = null;
+  for (const e of Array.isArray(p["episode-num"]) ? p["episode-num"] : [p["episode-num"]]) {
+    const val = texte(e);
+    if (!val) continue;
+    const sys = e?.["@system"];
+    if (sys === "xmltv_ns") {
+      const [sa, ep] = val.split(".");
+      const n = (x) => {
+        const v = parseInt(String(x).split("/")[0].trim(), 10);
+        return Number.isFinite(v) ? v + 1 : null;
+      };
+      const s2 = n(sa);
+      const e2 = n(ep);
+      if (s2 && e2) episode = `Saison ${s2}, épisode ${e2}`;
+      else if (e2) episode = `Épisode ${e2}`;
+    } else if (!episode) {
+      episode = val;
+    }
+  }
+
+  const credits = p.credits ?? {};
+  return compacter({
+    resume: texte(p.desc)?.slice(0, 900) ?? null,
+    genres: liste(p.category, 4),
+    annee: texte(p.date)?.slice(0, 4) ?? null,
+    episode,
+    realisateur: liste(credits.director, 2).join(", ") || null,
+    acteurs: liste(credits.actor, 6),
+    pays: liste(p.country, 2).join(", ") || null,
+    note: texte(p["star-rating"]?.value ?? p["star-rating"]) ?? null,
+    avis: texte(p.rating?.value ?? p.rating) ?? null,
+    rediffusion: p["previously-shown"] !== undefined ? true : null,
+    image: p.icon?.[0]?.["@src"] ?? p.icon?.["@src"] ?? null,
+  });
+}
+
 // ---------------------------------------------------------------- compactage
 
 /** Découpe les diffusions par journée locale et les encode en tuples. */
@@ -417,6 +480,7 @@ function parJour(diffusions, index, timezone) {
   });
 
   const jours = new Map();
+  const details = new Map();
 
   for (const d of diffusions) {
     const i = index.get(d.chaine);
@@ -424,6 +488,7 @@ function parJour(diffusions, index, timezone) {
 
     const jour = jourDe.format(d.debut);
     if (!jours.has(jour)) jours.set(jour, []);
+    if (!details.has(jour)) details.set(jour, {});
 
     // Minutes depuis minuit UTC du jour, pour rester compact et sans ambiguïté.
     const minuit = Date.parse(`${jour}T00:00:00Z`);
@@ -433,10 +498,12 @@ function parJour(diffusions, index, timezone) {
       : 0;
 
     jours.get(jour).push([i, debut, duree, d.titre, d.sousTitre, d.genre]);
+    // Même clé que côté site : position de la chaîne, minute de début.
+    if (d.details) details.get(jour)[`${i}:${debut}`] = d.details;
   }
 
-  for (const liste of jours.values()) liste.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
-  return jours;
+  for (const l of jours.values()) l.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  return { jours, details };
 }
 
 // -------------------------------------------------------------------- limites
@@ -572,7 +639,7 @@ async function traiterPays(code, conf, numerotation) {
     categories.set(i, dec ?? deduites.get(i) ?? "Autres");
   }
   log(`${code}: ${declarees} catégories déclarées, ${index.size - declarees} déduites`);
-  const jours = parJour(diffusions, index, conf.timezone);
+  const { jours, details } = parJour(diffusions, index, conf.timezone);
   const retenus = joursUtiles(jours, conf.timezone);
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
@@ -581,12 +648,16 @@ async function traiterPays(code, conf, numerotation) {
       path.join(SORTIE, code, `${jour}.json`),
       JSON.stringify({ jour, p: jours.get(jour) })
     );
+    await writeFile(
+      path.join(SORTIE, code, `${jour}.details.json`),
+      JSON.stringify(details.get(jour) ?? {})
+    );
   }
 
   // Purge des journées périmées restées d'un build précédent.
   const presents = await readdir(path.join(SORTIE, code)).catch(() => []);
   for (const f of presents) {
-    const j = f.replace(/\.json$/, "");
+    const j = f.replace(/\.details\.json$/, "").replace(/\.json$/, "");
     if (/^\d{4}-\d{2}-\d{2}$/.test(j) && !retenus.includes(j)) {
       await writeFile(path.join(SORTIE, code, f), "").catch(() => {});
     }
