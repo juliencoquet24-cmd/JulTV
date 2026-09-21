@@ -76,6 +76,20 @@ const REPERES = [
 ];
 
 /**
+ * Lecture d'une diffusion. Format actuel : [chaîne, début, durée, titre,
+ * indice de genre], les genres étant listés une fois dans `g`. L'ancien
+ * format portait le sous-titre et le genre en clair ; on le lit encore, pour
+ * qu'une page restée en cache ne casse pas pendant la mise à jour.
+ */
+function lire(t, g) {
+  if (g) {
+    const gi = t[4];
+    return [t[0], t[1], t[2], t[3], gi >= 0 ? g[gi] : null];
+  }
+  return [t[0], t[1], t[2], t[3], t[5] ?? null];
+}
+
+/**
  * Sélection transversale : les films eux-mêmes, où qu'ils passent.
  * Les autres catégories classent les chaînes ; celle-ci classe les
  * programmes, ce qui n'est pas la même question — un film sur TF1 n'est pas
@@ -192,11 +206,14 @@ export default function App() {
 
   useEffect(() => {
     if (!fiche || !pays || !jour) return;
-    const cle = `${pays}/${jour}`;
+    // Une tranche de 40 chaînes par fichier : on ne charge que celle de la
+    // chaîne ouverte, et on garde en mémoire celles déjà reçues.
+    const tranche = Math.floor(fiche.chaine.i / 40);
+    const cle = `${pays}/${jour}.${tranche}`;
     if (detailsDemandes.current === cle) return;
     detailsDemandes.current = cle;
     setDetails({ cle, data: null, etat: "charge" });
-    fetch(`${BASE}/${cle}.details.json`, { cache: "no-cache" })
+    fetch(`${BASE}/${pays}/${jour}.details.${tranche}.json`, { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
       .then((d) => setDetails({ cle, data: d, etat: "pret" }))
       .catch(() => setDetails({ cle, data: {}, etat: "absent" }));
@@ -227,7 +244,8 @@ export default function App() {
     const q = recherche.trim().toLowerCase();
     let de = Infinity;
     let a = -Infinity;
-    for (const [i, debut, duree, titre, , genre] of prete.p) {
+    for (const t of prete.p) {
+      const [i, debut, duree, titre, genre] = lire(t, prete.g);
       if (!retenu(conf, i, titre, genre, categorie, q)) continue;
       if (debut < de) de = debut;
       const fin = debut + (duree || 60);
@@ -516,10 +534,11 @@ export default function App() {
     const q = recherche.trim().toLowerCase();
     const parChaine = new Map();
 
-    for (const [i, debut, duree, titre, sousTitre, genre] of prete.p) {
+    for (const t of prete.p) {
+      const [i, debut, duree, titre, genre] = lire(t, prete.g);
       if (!retenu(conf, i, titre, genre, categorie, q)) continue;
       if (!parChaine.has(i)) parChaine.set(i, []);
-      parChaine.get(i).push({ debut, duree: duree || 60, titre, sousTitre, genre });
+      parChaine.get(i).push({ debut, duree: duree || 60, titre, genre });
     }
 
     const lignes = [...parChaine.entries()]
@@ -902,7 +921,11 @@ export default function App() {
           prog={fiche}
           jour={jour}
           timezone={conf.timezone}
-          details={details.cle === `${pays}/${jour}` ? details : { etat: "charge" }}
+          details={
+            details.cle === `${pays}/${jour}.${Math.floor(fiche.chaine.i / 40)}`
+              ? details
+              : { etat: "charge" }
+          }
           onFermer={() => setFiche(null)}
         />
       )}
@@ -951,7 +974,7 @@ function Fiche({ prog, jour, timezone, details, onFermer }) {
         </p>
 
         <h2 className="fiche-titre">{prog.titre}</h2>
-        {prog.sousTitre && <p className="fiche-sous">{prog.sousTitre}</p>}
+        {d?.sousTitre && <p className="fiche-sous">{d.sousTitre}</p>}
 
         <p className="fiche-horaire">
           {prog.heure} – {fin} · {duree}
@@ -979,6 +1002,14 @@ function Fiche({ prog, jour, timezone, details, onFermer }) {
         </ul>
 
         {details.etat === "charge" && <p className="fiche-etat">Chargement des détails…</p>}
+
+        {d?.serie?.length > 0 && (
+          <ol className="fiche-serie">
+            {d.serie.map((ligne, k) => (
+              <li key={k}>{ligne}</li>
+            ))}
+          </ol>
+        )}
 
         {d?.episode && <p className="fiche-episode">{d.episode}</p>}
         {d?.resume && <p className="fiche-resume">{d.resume}</p>}
@@ -1012,7 +1043,7 @@ function Fiche({ prog, jour, timezone, details, onFermer }) {
           </dl>
         )}
 
-        {details.etat !== "charge" && !d && (
+        {details.etat !== "charge" && !d?.resume && !d?.serie && !d?.episode && (
           <p className="fiche-etat">
             Cette source ne fournit pas de description pour ce programme.
           </p>

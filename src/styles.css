@@ -746,3 +746,20 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .voile, .fiche { animation: none; }
 }
+
+/* Liste des titres d'un bloc regroupé : une ligne par clip ou épisode. */
+.fiche-serie {
+  list-style: none;
+  margin: var(--pas-3) 0 0;
+  padding: 0;
+  max-height: 16rem;
+  overflow-y: auto;
+  border-top: 1px solid var(--bleu-filet);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.fiche-serie li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--bleu-filet);
+}

@@ -585,7 +585,27 @@ function detailsDe(p) {
 
 // ---------------------------------------------------------------- compactage
 
-/** Découpe les diffusions par journée locale et les encode en tuples. */
+/**
+ * Programmes trop courts pour être lus dans la grille. Les chaînes musicales
+ * et jeunesse listent chaque clip et chaque dessin animé de trois minutes :
+ * sur une journée complète, une quarantaine de chaînes représentaient plus de
+ * la moitié des diffusions, et le fichier devenait trop lourd pour un
+ * téléphone. Une série d'au moins trois programmes courts consécutifs est
+ * fondue en un seul bloc ; le détail reste consultable dans la fiche.
+ */
+const COURT_MIN = 8;
+
+/** Nombre de chaînes par fichier de détails. */
+const TRANCHE_DETAILS = 40;
+const SERIE_MIN = 3;
+
+/**
+ * Découpe les diffusions par journée locale et les encode en tuples :
+ *   [chaîne, début, durée, titre, genre]
+ * Le genre est un indice dans la liste `g` du fichier, pas une chaîne : les
+ * mêmes quinze libellés se répétaient des dizaines de milliers de fois. Le
+ * sous-titre part dans les détails, chargés à l'ouverture d'une fiche.
+ */
 function parJour(diffusions, index, timezone) {
   const jourDe = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
@@ -593,31 +613,108 @@ function parJour(diffusions, index, timezone) {
     month: "2-digit",
     day: "2-digit",
   });
+  const heureDe = new Intl.DateTimeFormat("fr-FR", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-  const jours = new Map();
-  const details = new Map();
-
+  // Regroupement par journée, puis par chaîne.
+  const paquets = new Map();
   for (const d of diffusions) {
     const i = index.get(d.chaine);
     if (i === undefined) continue;
-
     const jour = jourDe.format(d.debut);
-    if (!jours.has(jour)) jours.set(jour, []);
-    if (!details.has(jour)) details.set(jour, {});
-
-    // Minutes depuis minuit UTC du jour, pour rester compact et sans ambiguïté.
-    const minuit = Date.parse(`${jour}T00:00:00Z`);
-    const debut = Math.round((d.debut.getTime() - minuit) / 60000);
-    const duree = d.fin
-      ? Math.max(1, Math.round((d.fin.getTime() - d.debut.getTime()) / 60000))
-      : 0;
-
-    jours.get(jour).push([i, debut, duree, d.titre, d.sousTitre, d.genre]);
-    // Même clé que côté site : position de la chaîne, minute de début.
-    if (d.details) details.get(jour)[`${i}:${debut}`] = d.details;
+    if (!paquets.has(jour)) paquets.set(jour, new Map());
+    const parChaine = paquets.get(jour);
+    if (!parChaine.has(i)) parChaine.set(i, []);
+    parChaine.get(i).push(d);
   }
 
-  for (const l of jours.values()) l.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  const jours = new Map();
+  const details = new Map();
+  const dureeMin = (d) =>
+    d.fin ? Math.max(1, Math.round((d.fin.getTime() - d.debut.getTime()) / 60000)) : 0;
+  const estCourt = (d) => {
+    const m = dureeMin(d);
+    return m > 0 && m < COURT_MIN;
+  };
+
+  for (const [jour, parChaine] of paquets) {
+    const minuit = Date.parse(`${jour}T00:00:00Z`);
+    const aMinutes = (date) => Math.round((date.getTime() - minuit) / 60000);
+
+    const genres = [];
+    const indices = new Map();
+    const codeGenre = (g) => {
+      if (!g) return -1;
+      if (!indices.has(g)) {
+        indices.set(g, genres.length);
+        genres.push(g);
+      }
+      return indices.get(g);
+    };
+
+    const tuples = [];
+    const det = {};
+
+    for (const [i, liste] of parChaine) {
+      liste.sort((a, b) => a.debut - b.debut);
+
+      let k = 0;
+      while (k < liste.length) {
+        const d = liste[k];
+
+        // Série de programmes courts qui se suivent sans trou.
+        if (estCourt(d)) {
+          let j = k + 1;
+          while (
+            j < liste.length &&
+            estCourt(liste[j]) &&
+            liste[j].debut.getTime() - (liste[j - 1].fin?.getTime() ?? 0) <= 60000
+          ) {
+            j++;
+          }
+          if (j - k >= SERIE_MIN) {
+            const serie = liste.slice(k, j);
+            const debut = aMinutes(serie[0].debut);
+            const derniere = serie[serie.length - 1];
+            const duree = Math.max(
+              1,
+              Math.round(((derniere.fin ?? derniere.debut).getTime() - serie[0].debut.getTime()) / 60000)
+            );
+            // Le genre dominant de la série donne son titre au bloc.
+            const compte = new Map();
+            for (const x of serie) if (x.genre) compte.set(x.genre, (compte.get(x.genre) ?? 0) + 1);
+            const genre = [...compte.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+            tuples.push([i, debut, duree, `${genre ?? "Programmes courts"} · ${serie.length} titres`, codeGenre(genre)]);
+            // Un bloc de clips peut couvrir la journée entière : quelques
+            // centaines de titres, que personne ne lira jusqu'au bout.
+            const MAX_SERIE = 30;
+            const lignes = serie
+              .slice(0, MAX_SERIE)
+              .map((x) => `${heureDe.format(x.debut).replace(":", "h")} ${x.titre}`);
+            if (serie.length > MAX_SERIE) lignes.push(`… et ${serie.length - MAX_SERIE} autres`);
+            det[`${i}:${debut}`] = { serie: lignes };
+            k = j;
+            continue;
+          }
+        }
+
+        const debut = aMinutes(d.debut);
+        tuples.push([i, debut, dureeMin(d), d.titre, codeGenre(d.genre)]);
+        const infos = d.sousTitre ? { ...(d.details ?? {}), sousTitre: d.sousTitre } : d.details;
+        if (infos) det[`${i}:${debut}`] = infos;
+        k++;
+      }
+    }
+
+    tuples.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+    jours.set(jour, { g: genres, p: tuples });
+    details.set(jour, det);
+  }
+
   return { jours, details };
 }
 
@@ -834,20 +931,29 @@ async function traiterPays(code, conf, numerotation) {
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
-    await writeFile(
-      path.join(SORTIE, code, `${jour}.json`),
-      JSON.stringify({ jour, p: jours.get(jour) })
-    );
-    await writeFile(
-      path.join(SORTIE, code, `${jour}.details.json`),
-      JSON.stringify(details.get(jour) ?? {})
-    );
+    const { g, p } = jours.get(jour);
+    await writeFile(path.join(SORTIE, code, `${jour}.json`), JSON.stringify({ jour, g, p }));
+
+    // Les détails sont découpés par tranches de chaînes : ouvrir une fiche ne
+    // charge que la tranche de cette chaîne, pas un mégaoctet de résumés.
+    const tranches = new Map();
+    for (const [cle, val] of Object.entries(details.get(jour) ?? {})) {
+      const t = Math.floor(Number(cle.split(":")[0]) / TRANCHE_DETAILS);
+      if (!tranches.has(t)) tranches.set(t, {});
+      tranches.get(t)[cle] = val;
+    }
+    for (const [t, contenu] of tranches) {
+      await writeFile(
+        path.join(SORTIE, code, `${jour}.details.${t}.json`),
+        JSON.stringify(contenu)
+      );
+    }
   }
 
   // Purge des journées périmées restées d'un build précédent.
   const presents = await readdir(path.join(SORTIE, code)).catch(() => []);
   for (const f of presents) {
-    const j = f.replace(/\.details\.json$/, "").replace(/\.json$/, "");
+    const j = f.replace(/\.details(\.\d+)?\.json$/, "").replace(/\.json$/, "");
     if (/^\d{4}-\d{2}-\d{2}$/.test(j) && !retenus.includes(j)) {
       await writeFile(path.join(SORTIE, code, f), "").catch(() => {});
     }
