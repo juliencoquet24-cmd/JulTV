@@ -314,6 +314,94 @@ function numeroDe(nom, table) {
   return rangDe(nom, table).rang;
 }
 
+/**
+ * Nom de base d'une chaîne, débarrassé de ses suffixes techniques, pour
+ * reconnaître un même canal d'un flux à l'autre : « TF1 », « TF1 HD » et
+ * « TF1 4K » donnent tous « tf1 ». Les suffixes s'enlèvent en boucle, pour
+ * venir à bout d'un « France 2 HD 4K ».
+ */
+function nomDeBase(nom) {
+  let n = normaliser(nom);
+  let change = true;
+  while (change) {
+    change = false;
+    for (const suf of SUFFIXES_TECHNIQUES) {
+      if (n.length > suf.length + 1 && n.endsWith(suf)) {
+        n = n.slice(0, -suf.length);
+        change = true;
+      }
+    }
+  }
+  return n;
+}
+
+/**
+ * Pays admis dans chaque grille. Les départements et territoires d'outre-mer
+ * ont leur propre code mais sont français : La 1ère Réunion reste chez elle.
+ */
+const PAYS_ADMIS = {
+  fr: ["fr", "re", "gp", "mq", "gf", "yt", "nc", "pf", "pm", "wf", "bl", "mf"],
+  es: ["es"],
+};
+
+/**
+ * Code pays porté par l'identifiant XMLTV. Les flux suivent tous la même
+ * convention : « TF1.fr », « RTLTVI.be », « RTS1.ch », parfois suivis d'une
+ * variante après une arobase, « TF1.fr@SD ».
+ */
+function paysDeIdentifiant(id) {
+  const m = /\.([a-z]{2})(?:@[^.]*)?$/i.exec(id ?? "");
+  return m ? m[1].toLowerCase() : null;
+}
+
+/**
+ * Filet pour les flux qui ne suffixent pas leurs identifiants : chaînes
+ * étrangères francophones et hispanophones qu'on retrouve couramment.
+ * Mots entiers seulement — « rts » ne doit pas attraper « sports ».
+ */
+const NOMS_ETRANGERS = [
+  // Belgique
+  /\b(rtl tvi|club rtl|plug rtl|tipik|abxplore|ab ?3|ln ?24|bx1|rtbf|la une|la deux|la trois|een|vtm|canvas|ketnet|npo ?\d?)\b/,
+  // Suisse, Luxembourg
+  /\b(rts( ?(un|deux|1|2))?|srf ?\d?|rsi ?\d?|l[ée]man bleu|canal alpha|la t[ée]l[ée]|rtl lux|rtl zwee)\b/,
+  // Canada
+  /\b(tva|radio-canada|noovo|ici t[ée]l[ée]|t[ée]l[ée]-qu[ée]bec|v t[ée]l[ée])\b/,
+  // Afrique et Maghreb
+  /\b(2m|al aoula|a\+ ?ivoire|rti ?\d?|ortm|rtb|crtv)\b/,
+  // Portugal, Amérique latine
+  /\b(rtp ?\d?|sic|tvi|latam|latinoam[ée]rica)\b/,
+  // Mentions de pays dans le nom
+  /\b(suisse|schweiz|belgique|belgi[eë]|belge|luxembourg|qu[ée]bec|canada|afrique|africa|maroc|alg[ée]rie|tunisie|s[ée]n[ée]gal|c[ôo]te d.ivoire|portugal|m[ée]xico|mexique|argentina|colombia|chile|per[úu])\b/,
+];
+
+/**
+ * Une chaîne est-elle hors du pays de la grille ? L'identifiant fait foi
+ * quand il porte un code pays ; sinon, le nom sert de filet.
+ */
+function estEtrangere(id, nom, code) {
+  const pays = paysDeIdentifiant(id);
+  if (pays) return !(PAYS_ADMIS[code] ?? [code]).includes(pays);
+  const n = (nom ?? "").toLowerCase();
+  return NOMS_ETRANGERS.some((r) => r.test(n));
+}
+
+/** Suffixes qui ne changent pas la chaîne — et seulement ceux-là. */
+const SUFFIXES_TECHNIQUES = ["hd", "fhd", "uhd", "4k", "sd", "hevc", "1080", "720", "tnt"];
+
+/**
+ * Une déclinaison en différé (« TF1 +1 », « M6+1 ») diffuse la même grille
+ * une heure plus tard : c'est un doublon de contenu, pas une chaîne de plus.
+ */
+const estDiffere = (nom) => /\+\s*[12]\s*$/.test(nom ?? "") || /\bplus\s*1\s*$/i.test(nom ?? "");
+
+/** Retire du nom affiché les mentions techniques que les flux y collent. */
+function nomPropre(nom) {
+  return (nom ?? "")
+    .replace(/\s+(HD|FHD|UHD|4K|SD|HEVC|1080p?|720p?|TNT)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 /** Comme numeroDe, mais dit aussi si le nom correspondait mot pour mot. */
 function rangDe(nom, table) {
   const n = normaliser(nom);
@@ -606,13 +694,41 @@ async function traiterPays(code, conf, numerotation) {
    * un logo d'abord, puis celle dont le nom correspond mot pour mot, puis
    * celle qui a le plus de programmes.
    */
+  /**
+   * Toutes les chaînes des flux sont gardées, pas seulement celles de la
+   * liste : numerotation.json sert désormais à ordonner, nommer et classer,
+   * plus à filtrer. Ce qui disparaît, ce sont les doublons — même chaîne
+   * sous deux noms, ou déclinaisons HD, 4K et différé d'un même canal.
+   *
+   * Une chaîne listée est reconnue par son rang ; les autres par leur nom
+   * de base, ce qui suffit à réunir « Chaîne X » et « Chaîne X HD ».
+   */
   const meilleur = new Map();
+  let differes = 0;
+  let etrangeres = 0;
   for (const [id, c] of chaines) {
+    if (estDiffere(c.nom)) {
+      differes++;
+      continue;
+    }
     const canal = rangDe(c.nom, tCanaux);
     const prio = rangDe(c.nom, tPriorites);
-    if (canal.rang === null && prio.rang === null) continue;
 
-    const cle = canal.rang !== null ? `c${canal.rang}` : `p${prio.rang}`;
+    // Une chaîne de ta liste passe toujours, même si son identifiant dit
+    // autre chose : TV5Monde est suffixée .ch par certains flux, et TMC
+    // s'appelle Télé Monte-Carlo sans pour autant être monégasque.
+    const listee = canal.rang !== null || prio.rang !== null;
+    if (!listee && estEtrangere(id, c.nom, code)) {
+      etrangeres++;
+      continue;
+    }
+
+    const cle =
+      canal.rang !== null
+        ? `c${canal.rang}`
+        : prio.rang !== null
+          ? `p${prio.rang}`
+          : `n${nomDeBase(c.nom)}`;
     const note =
       (c.icone ? 100 : 0) + ((canal.exact || prio.exact) ? 10 : 0);
     const candidat = {
@@ -640,17 +756,20 @@ async function traiterPays(code, conf, numerotation) {
     // « CANAL+ CINEMA(S) HD » ou « beIN SPORTS 1 Dolby », qui ne tiennent
     // pas dans la colonne et se retrouvent tronqués à l'affichage.
     const canon = nomCanonique(m.c.nom, tNoms);
-    gardees.set(m.id, canon ? { ...m.c, nom: canon } : m.c);
+    gardees.set(m.id, { ...m.c, nom: canon ?? nomPropre(m.c.nom) });
     rangs.set(m.id, { num: m.num, pri: m.pri });
   }
 
   if (!gardees.size) {
-    console.error(
-      `[epg] ${code}: aucune chaîne de numerotation.json retrouvée dans la source, pays ignoré`
-    );
+    console.error(`[epg] ${code}: aucune chaîne exploitable dans les sources, pays ignoré`);
     return null;
   }
-  log(`${code}: ${gardees.size} chaînes retenues sur ${chaines.size} reçues (doublons fondus)`);
+  const listees = [...rangs.values()].filter((r) => r.num !== null).length;
+  log(
+    `${code}: ${gardees.size} chaînes après fusion des doublons, sur ${chaines.size} entrées reçues ` +
+      `(${listees} reconnues dans la liste, ${gardees.size - listees} en plus, ` +
+      `${differes} différés et ${etrangeres} étrangères écartés)`
+  );
 
   /**
    * Garde-fou contre une source défaillante. Certains flux renvoient la
