@@ -139,7 +139,7 @@ const analyseur = new XMLParser({
   },
 });
 
-function lireXmltv(xml, chaines, diffusions, exclues) {
+function lireXmltv(xml, chaines, diffusions, exclues, source) {
   const doc = analyseur.parse(xml);
   const tv = doc?.tv;
   if (!tv) return;
@@ -167,6 +167,7 @@ function lireXmltv(xml, chaines, diffusions, exclues) {
     if (!debut) continue;
     const fin = dateXmltv(p["@stop"]);
     diffusions.push({
+      source,
       chaine: p["@channel"],
       debut,
       fin,
@@ -658,8 +659,16 @@ function parJour(diffusions, index, timezone) {
     const tuples = [];
     const det = {};
 
-    for (const [i, liste] of parChaine) {
-      liste.sort((a, b) => a.debut - b.debut);
+    for (const [i, liste0] of parChaine) {
+      liste0.sort((a, b) => a.debut - b.debut);
+      // Un même flux répète parfois un programme, ou en fait se chevaucher
+      // deux : on garde le premier et on écarte ce qui commence avant sa fin.
+      const liste = [];
+      for (const d of liste0) {
+        const prec = liste[liste.length - 1];
+        if (prec && d.debut.getTime() < (prec.fin ?? prec.debut).getTime()) continue;
+        liste.push(d);
+      }
 
       let k = 0;
       while (k < liste.length) {
@@ -747,7 +756,7 @@ async function traiterPays(code, conf, numerotation) {
   for (const src of conf.sources) {
     try {
       const xml = src.type === "grab" ? await viaGrabber(src) : await viaUrl(src);
-      lireXmltv(xml, chaines, diffusions, exclues);
+      lireXmltv(xml, chaines, diffusions, exclues, src.name);
       log(`${src.name}: ${chaines.size} chaînes, ${diffusions.length} diffusions cumulées`);
     } catch (e) {
       // Une source qui tombe ne doit pas faire échouer tout le build.
@@ -756,6 +765,27 @@ async function traiterPays(code, conf, numerotation) {
   }
 
   if (exclues.size) log(`${code}: ${exclues.size} chaînes adultes écartées`);
+
+  /**
+   * Une chaîne, une source. Les flux suivent la même convention
+   * d'identifiants — « TF1.fr » chez xmltvfr comme chez iptv-org — si bien
+   * qu'une chaîne fournie par quatre sources voyait ses programmes empilés
+   * quatre fois : blocs superposés, et un fichier quatre fois trop lourd
+   * pour un téléphone. La première source qui fournit une chaîne la garde.
+   */
+  const sourceDe = new Map();
+  for (const d of diffusions) {
+    if (!sourceDe.has(d.chaine)) sourceDe.set(d.chaine, d.source);
+  }
+  const avant = diffusions.length;
+  let w = 0;
+  for (const d of diffusions) {
+    if (sourceDe.get(d.chaine) === d.source) diffusions[w++] = d;
+  }
+  diffusions.length = w;
+  if (avant !== w) {
+    log(`${code}: ${avant - w} diffusions en double écartées (même chaîne fournie par plusieurs sources)`);
+  }
 
   if (!diffusions.length) {
     console.error(`[epg] ${code}: aucune donnée, pays ignoré`);
