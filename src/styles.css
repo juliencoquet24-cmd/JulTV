@@ -235,7 +235,10 @@ body {
 .planning {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  /* Vertical au doigt, horizontal par les boutons seulement : un geste ne
+     peut plus déplacer les deux axes à la fois. */
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
@@ -792,4 +795,50 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .attente-barre { animation: none; background: var(--papier-creux); }
+}
+
+
+/* ------------------------------------------------------ boutons du temps */
+
+/* Deux gros boutons posés sur la grille, à portée de pouce, de part et
+   d'autre de l'écran. Ils flottent au-dessus des programmes sans les
+   masquer : fond opaque, ombre légère, et assez d'écart au bord pour ne
+   pas gêner les gestes système d'iOS. */
+.navigation {
+  position: fixed;
+  left: calc(var(--rail) + 0.75rem);
+  right: 0.75rem;
+  bottom: calc(3.25rem + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.nav-bouton {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 4.5rem;
+  height: 3.5rem;
+  padding: 0 1.1rem;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--papier);
+  background: var(--bleu);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--encre) 28%, transparent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-bouton span[aria-hidden] { font-size: 1.7rem; line-height: 1; margin-top: -0.15rem; }
+.nav-bouton:active:not(:disabled) { transform: scale(0.95); }
+.nav-bouton:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
+
+@media (max-width: 46rem) {
+  .navigation { left: calc(var(--rail) + 0.5rem); right: 0.5rem; }
 }

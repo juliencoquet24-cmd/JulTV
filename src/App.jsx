@@ -85,6 +85,7 @@ export default function App() {
   const [erreur, setErreur] = useState(null);
   const [, setTic] = useState(() => Date.now()); // fait avancer la barre « en direct »
   const [fenetre, setFenetre] = useState({ de: -Infinity, a: Infinity });
+  const [bords, setBords] = useState({ debut: true, fin: false });
 
   const cache = useRef(new Map());
   const planning = useRef(null);
@@ -241,6 +242,8 @@ export default function App() {
           de: bornes.de + (el.scrollLeft - marge) / PX_PAR_MIN,
           a: bornes.de + (el.scrollLeft + el.clientWidth + marge) / PX_PAR_MIN,
         });
+        const max = el.scrollWidth - el.clientWidth;
+        setBords({ debut: el.scrollLeft <= 2, fin: el.scrollLeft >= max - 2 });
       });
     };
     maj();
@@ -264,6 +267,26 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [bornes]
   );
+
+  /*
+   * L'axe du temps ne se déplace plus au doigt, seulement par ces boutons :
+   * le défilement vertical reste natif, et un geste ne peut plus partir de
+   * biais puisqu'il n'y a plus qu'un seul axe sous le doigt.
+   */
+  const PAS_BOUTON = 60; // minutes
+  const decaler = useCallback((sens) => {
+    planning.current?.scrollBy({ left: sens * PAS_BOUTON * PX_PAR_MIN, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    const t = (e) => {
+      if (fiche || e.target.closest?.("input, select, textarea")) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); decaler(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); decaler(-1); }
+    };
+    document.addEventListener("keydown", t);
+    return () => document.removeEventListener("keydown", t);
+  }, [decaler, fiche]);
 
   const maintenant = jour ? minutesCourantes(jour) : 0;
   const dansLaJournee = maintenant >= bornes.de && maintenant < bornes.a;
@@ -409,6 +432,19 @@ export default function App() {
             ))}
           </div>
         </div>
+      )}
+
+      {prete && nbLignes > 0 && (
+        <nav className="navigation" aria-label="Se déplacer dans le temps">
+          <button className="nav-bouton" onClick={() => decaler(-1)} disabled={bords.debut} aria-label="Une heure plus tôt">
+            <span aria-hidden="true">‹</span>
+            <span className="nav-texte">1 h</span>
+          </button>
+          <button className="nav-bouton" onClick={() => decaler(1)} disabled={bords.fin} aria-label="Une heure plus tard">
+            <span className="nav-texte">1 h</span>
+            <span aria-hidden="true">›</span>
+          </button>
+        </nav>
       )}
 
       {fiche && (
