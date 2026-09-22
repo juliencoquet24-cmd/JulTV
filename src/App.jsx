@@ -112,22 +112,7 @@ function estFilm(genre) {
   return GENRES_FILM.some((m) => g.includes(m));
 }
 
-/**
- * Un programme entre-t-il dans la sélection courante ? Partagé entre le
- * calcul des bornes et la construction de la liste, pour que la frise fasse
- * exactement la largeur de ce qu'elle montre.
- */
-function retenu(conf, i, titre, genre, categorie, q) {
-  const [nom, , cat] = conf.chaines[i] ?? ["?", null, "Autres"];
-  if (categorie === FILMS) {
-    if (!estFilm(genre)) return false;
-  } else if (categorie !== "toutes" && cat !== categorie) {
-    return false;
-  }
-  if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q))
-    return false;
-  return true;
-}
+
 
 export default function App() {
   const [index, setIndex] = useState(null);
@@ -143,6 +128,39 @@ export default function App() {
   const cache = useRef(new Map());
   const planning = useRef(null);
   const dejaCentre = useRef(false);
+
+  /**
+   * Contenu de la grille, chargé chaîne par chaîne plutôt que d'un bloc.
+   * Le fichier du jour ne contient plus aucun programme (voir `charger`) :
+   * seules les tranches de chaînes réellement affichées sont récupérées,
+   * à la manière du guide TV de Canal+. `lots` vit dans une référence pour
+   * ne pas re-rendre à chaque octet reçu ; `lotsVersion` fait le lien avec
+   * React quand une tranche arrive.
+   */
+  const lots = useRef(new Map());
+  const [lotsVersion, setLotsVersion] = useState(0);
+  const lotTaille = index?.pays?.[pays]?.chunk ?? 40;
+  const lotDe = useCallback((i) => Math.floor(i / lotTaille), [lotTaille]);
+
+  const assurerLot = useCallback(
+    (l) => {
+      if (!pays || !jour || l < 0) return;
+      const cle = `${pays}/${jour}/${l}`;
+      if (lots.current.has(cle)) return; // déjà là, ou déjà en chemin
+      lots.current.set(cle, undefined); // marque la place, évite un doublon
+      fetch(`${BASE}/${pays}/${jour}.c${l}.json`, { cache: "no-cache" })
+        .then((r) => (r.ok ? r.json() : { p: [] }))
+        .then((d) => {
+          lots.current.set(cle, d.p ?? []);
+          setLotsVersion((v) => v + 1);
+        })
+        .catch(() => {
+          lots.current.set(cle, []);
+          setLotsVersion((v) => v + 1);
+        });
+    },
+    [pays, jour]
+  );
 
   useEffect(() => {
     fetch(`${BASE}/index.json`, { cache: "no-cache" })
@@ -183,6 +201,11 @@ export default function App() {
       if (document.visibilityState !== "visible") return;
       setTic(Date.now());
       cache.current.clear();
+      // Les tranches déjà reçues doivent aussi tomber : une grille
+      // republiée peut avoir renuméroté les chaînes, garder d'anciens lots
+      // les mélangerait avec les nouveaux.
+      lots.current.clear();
+      setLotsVersion((v) => v + 1);
       charger(pays, jour);
     };
     const maj = setInterval(reveil, RAFRAICHISSEMENT);
@@ -231,29 +254,23 @@ export default function App() {
   const prete = grille && grille._cle === `${pays}/${jour}` ? grille : null;
 
   /**
-   * Bornes réelles de la frise. Selon le fuseau, minuit local ne tombe pas
-   * sur la minute 0, et les programmes de nuit débordent au-delà de 24 h.
-   *
-   * Elles se calculent sur les seuls programmes affichés, pas sur toute la
-   * journée : sinon, dès qu'une catégorie ou une recherche réduit la liste,
-   * la frise gardait sa largeur d'origine et on défilait dans le vide bien
-   * après le dernier programme.
+   * Bornes de la frise : la journée entière, ou la plage réelle d'une
+   * catégorie ("Sport" ne va pas jusqu'à l'émission de nuit sur Arte).
+   * Précalculées une fois pour toutes au moment du build (voir
+   * scripts/build-epg.mjs), et non plus mesurées ici sur les programmes
+   * chargés : les calculer côté site aurait obligé à charger le contenu de
+   * toutes les chaînes avant même de savoir jusqu'où dessiner l'axe, ce qui
+   * aurait annulé l'intérêt du chargement à la demande. Une recherche ne
+   * resserre plus les bornes ; l'approximation est jugée préférable à devoir
+   * tout charger pour l'affiner.
    */
   const bornes = useMemo(() => {
-    if (!conf || !prete?.p?.length) return { de: 0, a: 1440 };
-    const q = recherche.trim().toLowerCase();
-    let de = Infinity;
-    let a = -Infinity;
-    for (const t of prete.p) {
-      const [i, debut, duree, titre, genre] = lire(t, prete.g);
-      if (!retenu(conf, i, titre, genre, categorie, q)) continue;
-      if (debut < de) de = debut;
-      const fin = debut + (duree || 60);
-      if (fin > a) a = fin;
+    if (!prete?.bornes) return { de: 0, a: 1440 };
+    if (categorie !== "toutes" && categorie !== FILMS) {
+      return prete.bornes.parCategorie[categorie] ?? prete.bornes.toutes;
     }
-    if (de === Infinity) return { de: 0, a: 1440 };
-    return { de: Math.floor(de / PAS) * PAS, a: Math.ceil(a / PAS) * PAS };
-  }, [conf, prete, categorie, recherche]);
+    return prete.bornes.toutes;
+  }, [prete, categorie]);
 
   const largeurPiste = (bornes.a - bornes.de) * PX_PAR_MIN;
   const xDe = (min) => (min - bornes.de) * PX_PAR_MIN;
@@ -528,45 +545,21 @@ export default function App() {
     };
   }, [bornes, prete]);
 
-  const groupes = useMemo(() => {
-    if (!conf || !prete) return [];
+  /** Trie et range les lignes d'une catégorie, mise en avant puis numéro. */
+  function ranger(lignes) {
+    return lignes.sort((a, b) => {
+      if (a.priorite && b.priorite) return a.priorite - b.priorite;
+      if (a.priorite) return -1;
+      if (b.priorite) return 1;
+      if (a.numero && b.numero) return a.numero - b.numero;
+      if (a.numero) return -1;
+      if (b.numero) return 1;
+      return a.nom.localeCompare(b.nom, "fr");
+    });
+  }
 
-    const q = recherche.trim().toLowerCase();
-    const parChaine = new Map();
-
-    for (const t of prete.p) {
-      const [i, debut, duree, titre, genre] = lire(t, prete.g);
-      if (!retenu(conf, i, titre, genre, categorie, q)) continue;
-      if (!parChaine.has(i)) parChaine.set(i, []);
-      parChaine.get(i).push({ debut, duree: duree || 60, titre, genre });
-    }
-
-    const lignes = [...parChaine.entries()]
-      .map(([i, programmes]) => {
-        const [nom, icone, cat, numero, priorite] =
-          conf.chaines[i] ?? ["?", null, "Autres", null, null];
-        return {
-          i,
-          nom,
-          icone,
-          numero: numero ?? null,
-          priorite: priorite ?? null,
-          categorie: cat ?? "Autres",
-          programmes,
-        };
-      })
-      .sort((a, b) => {
-        if (a.priorite && b.priorite) return a.priorite - b.priorite;
-        if (a.priorite) return -1;
-        if (b.priorite) return 1;
-        if (a.numero && b.numero) return a.numero - b.numero;
-        if (a.numero) return -1;
-        if (b.numero) return 1;
-        return a.nom.localeCompare(b.nom, "fr");
-      });
-
+  function grouper(lignes, conf) {
     if (categorie !== "toutes") return [{ categorie: null, lignes }];
-
     const parCat = new Map();
     for (const l of lignes) {
       if (!parCat.has(l.categorie)) parCat.set(l.categorie, []);
@@ -575,7 +568,78 @@ export default function App() {
     return (conf.categories ?? [])
       .filter((c) => parCat.has(c))
       .map((c) => ({ categorie: c, lignes: parCat.get(c) }));
-  }, [conf, prete, categorie, recherche]);
+  }
+
+  const groupes = useMemo(() => {
+    if (!conf || !prete) return [];
+    const q = recherche.trim().toLowerCase();
+
+    // Films, toutes chaînes : une sélection transversale par programme, pas
+    // par chaîne. Elle a besoin du contenu de tout le monde pour savoir qui
+    // diffuse un film à cet instant ; un effet séparé charge alors tous les
+    // lots. Les chaînes dont le lot n'est pas encore arrivé n'apparaissent
+    // simplement pas encore, la liste se complète au fil des réponses.
+    if (categorie === FILMS) {
+      const parChaine = new Map();
+      for (const [cle, tuples] of lots.current) {
+        if (!cle.startsWith(`${pays}/${jour}/`) || !tuples) continue;
+        for (const t of tuples) {
+          const [i, debut, duree, titre, genre] = lire(t, prete.g);
+          if (!estFilm(genre)) continue;
+          const [nom] = conf.chaines[i] ?? ["?"];
+          if (q && !nom.toLowerCase().includes(q) && !titre.toLowerCase().includes(q)) continue;
+          if (!parChaine.has(i)) parChaine.set(i, []);
+          parChaine.get(i).push({ debut, duree: duree || 60, titre, genre });
+        }
+      }
+      const lignes = ranger(
+        [...parChaine.entries()].map(([i, programmes]) => {
+          const [nom, icone, cat, numero, priorite] =
+            conf.chaines[i] ?? ["?", null, "Autres", null, null];
+          return { i, nom, icone, numero, priorite, categorie: cat ?? "Autres", programmes };
+        })
+      );
+      return [{ categorie: null, lignes }];
+    }
+
+    // Cas courant : la liste des chaînes vient des métadonnées seules, donc
+    // elle est immédiate et complète sans avoir rien téléchargé. Chaque
+    // chaîne garde `programmes: null` tant que sa tranche n'est pas encore
+    // arrivée — un signal pour la ligne, plus bas, d'afficher une trame
+    // d'attente plutôt qu'une case vide.
+    const lignes = [];
+    for (let i = 0; i < conf.chaines.length; i++) {
+      const [nom, icone, cat, numero, priorite] = conf.chaines[i];
+      if (categorie !== "toutes" && cat !== categorie) continue;
+      if (q && !nom.toLowerCase().includes(q)) continue;
+
+      const cle = `${pays}/${jour}/${lotDe(i)}`;
+      const lot = lots.current.get(cle);
+      const programmes = lot
+        ? lot
+            .filter((t) => t[0] === i)
+            .map((t) => {
+              const [, debut, duree, titre, genre] = lire(t, prete.g);
+              return { debut, duree: duree || 60, titre, genre };
+            })
+        : lot === undefined && lots.current.has(cle)
+          ? "attente" // requête en vol
+          : null; // pas encore demandée
+
+      lignes.push({
+        i,
+        nom,
+        icone,
+        numero: numero ?? null,
+        priorite: priorite ?? null,
+        categorie: cat ?? "Autres",
+        programmes,
+      });
+    }
+
+    return grouper(ranger(lignes), conf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conf, prete, categorie, recherche, pays, jour, lotDe, lotsVersion]);
 
   /**
    * Les groupes sont aplatis en une seule liste d'éléments — bandes de
@@ -636,6 +700,38 @@ export default function App() {
     while (fin < items.length && positions[fin] < bas) fin++;
     return { debut, fin };
   }, [items, positions, vue]);
+
+  /**
+   * Déclenche le chargement des tranches de chaînes qui entrent dans la
+   * fenêtre rendue à l'écran, plus une de marge de chaque côté pour que le
+   * contenu soit déjà là quand le défilement l'amène en vue. C'est le cœur
+   * du chargement à la demande : sans cet effet, `groupes` afficherait des
+   * lignes vides pour toujours, faute de jamais réclamer leur contenu.
+   */
+  useEffect(() => {
+    if (!prete || categorie === FILMS) return;
+    const necessaires = new Set();
+    for (let idx = tranche.debut; idx < tranche.fin; idx++) {
+      const it = items[idx];
+      if (it?.type === "ligne") necessaires.add(lotDe(it.ligne.i));
+    }
+    for (const l of [...necessaires]) {
+      necessaires.add(l - 1);
+      necessaires.add(l + 1);
+    }
+    for (const l of necessaires) assurerLot(l);
+  }, [prete, categorie, items, tranche, lotDe, assurerLot]);
+
+  /**
+   * Mode transversal Films : par nature, il faut le contenu de toutes les
+   * chaînes pour savoir lesquelles diffusent un film à l'instant. Le coût
+   * n'est payé que par qui choisit cette vue, pas par tout le monde.
+   */
+  useEffect(() => {
+    if (categorie !== FILMS || !conf) return;
+    const nb = Math.ceil(conf.chaines.length / lotTaille);
+    for (let l = 0; l < nb; l++) assurerLot(l);
+  }, [categorie, conf, lotTaille, assurerLot]);
 
   const categoriesDispo = useMemo(() => {
     if (!conf) return [];
@@ -853,8 +949,13 @@ export default function App() {
                     <span className="chaine">{l.nom}</span>
                   </div>
 
-                  <div className="piste">
-                    {l.programmes.map((p) => {
+                  <div className={Array.isArray(l.programmes) ? "piste" : "piste attente"}>
+                    {!Array.isArray(l.programmes) && (
+                      // Tranche pas encore arrivée : une trame plutôt qu'une
+                      // case vide, le temps que la requête revienne.
+                      <span className="attente-barre" aria-hidden="true" />
+                    )}
+                    {Array.isArray(l.programmes) && l.programmes.map((p) => {
                       if (p.debut + p.duree <= fenetre.de || p.debut >= fenetre.a)
                         return null;
                       const largeur = p.duree * PX_PAR_MIN;

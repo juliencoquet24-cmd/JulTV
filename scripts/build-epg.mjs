@@ -489,35 +489,42 @@ function nomVersCategorie(nom) {
 }
 
 /**
- * @returns Map(indexChaine → catégorie), sur l'ensemble des diffusions
- * connues (tous jours confondus) pour que l'étiquette d'une chaîne ne
- * change pas d'un jour à l'autre selon ce qui est diffusé ce jour-là.
+ * @returns Map(identifiant de chaîne → catégorie), sur l'ensemble des
+ * diffusions connues (tous jours confondus) pour que l'étiquette d'une
+ * chaîne ne change pas d'un jour à l'autre selon ce qui est diffusé ce
+ * jour-là.
+ *
+ * Clé sur l'identifiant plutôt que sur un indice numérique : la catégorie
+ * doit être connue avant qu'on décide de l'ordre final d'affichage — c'est
+ * justement elle qui sert à le construire (voir plus bas, "ordreAffichage").
+ * La numéroter d'avance aurait recréé la dépendance circulaire qu'on essaie
+ * de casser.
  */
-function categoriser(diffusions, index, chaines) {
-  const comptes = new Map(); // i → Map(catégorie → n)
+function categoriser(diffusions, chaines) {
+  const comptes = new Map(); // id → Map(catégorie → n)
 
   for (const d of diffusions) {
-    const i = index.get(d.chaine);
+    if (!chaines.has(d.chaine)) continue;
     const cat = genreVersCategorie(d.genre);
-    if (i === undefined || !cat) continue;
-    if (!comptes.has(i)) comptes.set(i, new Map());
-    const m = comptes.get(i);
+    if (!cat) continue;
+    if (!comptes.has(d.chaine)) comptes.set(d.chaine, new Map());
+    const m = comptes.get(d.chaine);
     m.set(cat, (m.get(cat) ?? 0) + 1);
   }
 
   const resultat = new Map();
-  for (const [i, m] of comptes) {
+  for (const [id, m] of comptes) {
     let total = 0, meilleure = null, max = 0;
     for (const [cat, n] of m) {
       total += n;
       if (n > max) { max = n; meilleure = cat; }
     }
     // Sous 45 %, aucun genre ne domine vraiment : chaîne généraliste.
-    resultat.set(i, max / total >= 0.45 ? meilleure : "Généralistes");
+    resultat.set(id, max / total >= 0.45 ? meilleure : "Généralistes");
   }
 
-  for (const [id, i] of index) {
-    if (!resultat.has(i)) resultat.set(i, nomVersCategorie(chaines.get(id).nom));
+  for (const id of chaines.keys()) {
+    if (!resultat.has(id)) resultat.set(id, nomVersCategorie(chaines.get(id).nom));
   }
   return resultat;
 }
@@ -600,14 +607,30 @@ const COURT_MIN = 8;
 const TRANCHE_DETAILS = 40;
 const SERIE_MIN = 3;
 
+/** Chaînes par fichier de grille : autant que pour les détails, même logique. */
+const TRANCHE_CHAINES = TRANCHE_DETAILS;
+
+/** Graduation de 30 min, comme le front : les bornes précalculées s'y calent. */
+const PAS_BORNES = 30;
+const arrondirBornes = (de, a) => ({
+  de: Math.floor(de / PAS_BORNES) * PAS_BORNES,
+  a: Math.ceil(a / PAS_BORNES) * PAS_BORNES,
+});
+
 /**
  * Découpe les diffusions par journée locale et les encode en tuples :
  *   [chaîne, début, durée, titre, genre]
  * Le genre est un indice dans la liste `g` du fichier, pas une chaîne : les
  * mêmes quinze libellés se répétaient des dizaines de milliers de fois. Le
  * sous-titre part dans les détails, chargés à l'ouverture d'une fiche.
+ *
+ * `categories` (chaîne → catégorie) sert uniquement à précalculer, pour
+ * chaque jour, les bornes horaires de la frise — la journée entière et
+ * chacune des catégories. Sans ce calcul fait une fois ici, le front devrait
+ * charger le contenu de toutes les chaînes pour savoir où arrêter le
+ * défilement, ce qui viderait de son sens le chargement à la demande.
  */
-function parJour(diffusions, index, timezone) {
+function parJour(diffusions, index, timezone, categories) {
   const jourDe = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
@@ -720,7 +743,30 @@ function parJour(diffusions, index, timezone) {
     }
 
     tuples.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
-    jours.set(jour, { g: genres, p: tuples });
+
+    // Bornes de la journée entière, et de chaque catégorie séparément :
+    // filtrer sur "Sport" doit arrêter le défilement à la fin du dernier
+    // match, pas à la fin du dernier programme toutes chaînes confondues.
+    let bTous = { de: Infinity, a: -Infinity };
+    const bCat = new Map();
+    for (const [i, debut, duree] of tuples) {
+      const fin = debut + (duree || 60);
+      if (debut < bTous.de) bTous.de = debut;
+      if (fin > bTous.a) bTous.a = fin;
+      const cat = categories?.get(i) ?? "Autres";
+      const bc = bCat.get(cat) ?? { de: Infinity, a: -Infinity };
+      if (debut < bc.de) bc.de = debut;
+      if (fin > bc.a) bc.a = fin;
+      bCat.set(cat, bc);
+    }
+    const bornes = {
+      toutes: tuples.length ? arrondirBornes(bTous.de, bTous.a) : { de: 0, a: 1440 },
+      parCategorie: Object.fromEntries(
+        [...bCat.entries()].map(([cat, b]) => [cat, arrondirBornes(b.de, b.a)])
+      ),
+    };
+
+    jours.set(jour, { g: genres, p: tuples, bornes });
     details.set(jour, det);
   }
 
@@ -937,42 +983,94 @@ async function traiterPays(code, conf, numerotation) {
     );
   }
 
-  const index = new Map([...gardees.keys()].map((id, i) => [id, i]));
+  // Catégorie déclarée si elle existe, sinon déduite des genres diffusés.
+  // Calculée par identifiant, avant tout numéro de position : elle sert
+  // justement à décider cette position juste après.
+  const deduites = categoriser(diffusions, gardees);
+  const categorieFinaleDe = new Map();
+  let declarees = 0;
+  for (const id of gardees.keys()) {
+    const dec = categorieDe(gardees.get(id).nom, tCategories);
+    if (dec) declarees++;
+    categorieFinaleDe.set(id, dec ?? deduites.get(id) ?? "Autres");
+  }
+  log(`${code}: ${declarees} catégories déclarées, ${gardees.size - declarees} déduites`);
+
+  /**
+   * Ordre final d'affichage : par catégorie (dans l'ordre de
+   * CATEGORIES_ORDRE), puis mise en avant, puis numéro de canal, puis nom.
+   * Exactement l'ordre que le site recompose lui-même à l'écran — sauf
+   * qu'ici il devient l'ordre RÉEL des données, une fois pour toutes.
+   *
+   * C'est ce qui permet le chargement à la demande : le site charge des
+   * tranches d'indices contigus (chaîne 40 à 79, par exemple). Si cet ordre
+   * ne correspondait pas à l'ordre affiché, la moindre catégorie ou le
+   * moindre écran visible aurait pu piocher une chaîne sur deux dans toute
+   * la liste, et il aurait fallu charger la quasi-totalité de la grille pour
+   * n'en montrer qu'un écran — exactement le problème qu'on cherche à
+   * éviter.
+   */
+  const rangCategorie = new Map(CATEGORIES_ORDRE.map((c, k) => [c, k]));
+  const ordre = [...gardees.keys()].sort((a, b) => {
+    const ca = rangCategorie.get(categorieFinaleDe.get(a)) ?? 999;
+    const cb = rangCategorie.get(categorieFinaleDe.get(b)) ?? 999;
+    if (ca !== cb) return ca - cb;
+    const ra = rangs.get(a), rb = rangs.get(b);
+    if (ra.pri && rb.pri) return ra.pri - rb.pri;
+    if (ra.pri) return -1;
+    if (rb.pri) return 1;
+    if (ra.num && rb.num) return ra.num - rb.num;
+    if (ra.num) return -1;
+    if (rb.num) return 1;
+    return gardees.get(a).nom.localeCompare(gardees.get(b).nom, "fr");
+  });
+
+  const index = new Map(ordre.map((id, i) => [id, i]));
   const numeros = new Map();
   const priorites = new Map();
+  const categories = new Map();
   for (const [id, i] of index) {
     const { num, pri } = rangs.get(id);
     if (num !== null) numeros.set(i, num);
     if (pri !== null) priorites.set(i, pri);
+    categories.set(i, categorieFinaleDe.get(id));
   }
 
-  // Catégorie déclarée si elle existe, sinon déduite des genres diffusés.
-  const deduites = categoriser(diffusions, index, gardees);
-  const categories = new Map();
-  let declarees = 0;
-  for (const [id, i] of index) {
-    const dec = categorieDe(gardees.get(id).nom, tCategories);
-    if (dec) declarees++;
-    categories.set(i, dec ?? deduites.get(i) ?? "Autres");
-  }
-  log(`${code}: ${declarees} catégories déclarées, ${index.size - declarees} déduites`);
-  const { jours, details } = parJour(diffusions, index, conf.timezone);
+  const { jours, details } = parJour(diffusions, index, conf.timezone, categories);
   const retenus = joursUtiles(jours, conf.timezone);
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
-    const { g, p } = jours.get(jour);
-    await writeFile(path.join(SORTIE, code, `${jour}.json`), JSON.stringify({ jour, g, p }));
+    const { g, p, bornes } = jours.get(jour);
 
-    // Les détails sont découpés par tranches de chaînes : ouvrir une fiche ne
-    // charge que la tranche de cette chaîne, pas un mégaoctet de résumés.
-    const tranches = new Map();
+    // Le fichier du jour ne contient plus aucun programme : juste de quoi
+    // dessiner l'axe (bornes) et décoder les tuples (genres). Le contenu
+    // proprement dit arrive chaîne par chaîne, à la demande — voir plus bas.
+    await writeFile(path.join(SORTIE, code, `${jour}.json`), JSON.stringify({ jour, g, bornes }));
+
+    // Grille et détails suivent le même découpage par tranche de chaînes :
+    // ouvrir ou faire défiler jusqu'à une chaîne ne charge que sa tranche,
+    // jamais les 700 autres.
+    const tranchesGrille = new Map();
+    for (const t of p) {
+      const c = Math.floor(t[0] / TRANCHE_CHAINES);
+      if (!tranchesGrille.has(c)) tranchesGrille.set(c, []);
+      tranchesGrille.get(c).push(t);
+    }
+    for (const [c, tuples] of tranchesGrille) {
+      await writeFile(
+        path.join(SORTIE, code, `${jour}.c${c}.json`),
+        JSON.stringify({ p: tuples })
+      );
+    }
+
+    const tranchesDetails = new Map();
     for (const [cle, val] of Object.entries(details.get(jour) ?? {})) {
       const t = Math.floor(Number(cle.split(":")[0]) / TRANCHE_DETAILS);
-      if (!tranches.has(t)) tranches.set(t, {});
-      tranches.get(t)[cle] = val;
+      if (!tranchesDetails.has(t)) tranchesDetails.set(t, {});
+      tranchesDetails.get(t)[cle] = val;
     }
-    for (const [t, contenu] of tranches) {
+    for (const [t, contenu] of tranchesDetails) {
       await writeFile(
         path.join(SORTIE, code, `${jour}.details.${t}.json`),
         JSON.stringify(contenu)
@@ -983,7 +1081,7 @@ async function traiterPays(code, conf, numerotation) {
   // Purge des journées périmées restées d'un build précédent.
   const presents = await readdir(path.join(SORTIE, code)).catch(() => []);
   for (const f of presents) {
-    const j = f.replace(/\.details(\.\d+)?\.json$/, "").replace(/\.json$/, "");
+    const j = f.replace(/\.details(\.\d+)?\.json$/, "").replace(/\.c\d+\.json$/, "").replace(/\.json$/, "");
     if (/^\d{4}-\d{2}-\d{2}$/.test(j) && !retenus.includes(j)) {
       await writeFile(path.join(SORTIE, code, f), "").catch(() => {});
     }
@@ -994,15 +1092,15 @@ async function traiterPays(code, conf, numerotation) {
     label: conf.label,
     timezone: conf.timezone,
     jours: retenus,
+    chunk: TRANCHE_CHAINES,
     categories: CATEGORIES_ORDRE,
     // [nom, icône, catégorie, numéro de canal, rang de mise en avant]
-    chaines: [...gardees.values()].map((c, i) => [
-      c.nom,
-      c.icone,
-      categories.get(i) ?? "Autres",
-      numeros.get(i) ?? null,
-      priorites.get(i) ?? null,
-    ]),
+    // Dans l'ordre `ordre` : c'est cet ordre, et lui seul, qui fait
+    // coïncider la position d'une chaîne avec celle de son contenu.
+    chaines: ordre.map((id, i) => {
+      const c = gardees.get(id);
+      return [c.nom, c.icone, categories.get(i) ?? "Autres", numeros.get(i) ?? null, priorites.get(i) ?? null];
+    }),
   };
 }
 
