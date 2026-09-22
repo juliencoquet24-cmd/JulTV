@@ -891,7 +891,10 @@ async function traiterPays(code, conf, numerotation) {
     // autre chose : TV5Monde est suffixée .ch par certains flux, et TMC
     // s'appelle Télé Monte-Carlo sans pour autant être monégasque.
     const listee = canal.rang !== null || prio.rang !== null;
-    if (!listee && estEtrangere(id, c.nom, code)) {
+    // Retour à l'essentiel : seule ta liste de chaînes entre dans la grille.
+    // Garder toutes les chaînes des flux multipliait le volume par sept, et
+    // c'est ce volume, pas l'affichage, qui rendait le site lent.
+    if (!listee) {
       etrangeres++;
       continue;
     }
@@ -941,7 +944,7 @@ async function traiterPays(code, conf, numerotation) {
   log(
     `${code}: ${gardees.size} chaînes après fusion des doublons, sur ${chaines.size} entrées reçues ` +
       `(${listees} reconnues dans la liste, ${gardees.size - listees} en plus, ` +
-      `${differes} différés et ${etrangeres} étrangères écartés)`
+      `${differes} différés écartés, ${etrangeres} hors liste ignorées)`
   );
 
   /**
@@ -1041,41 +1044,14 @@ async function traiterPays(code, conf, numerotation) {
 
   await mkdir(path.join(SORTIE, code), { recursive: true });
   for (const jour of retenus) {
-    const { g, p, bornes } = jours.get(jour);
-
-    // Le fichier du jour ne contient plus aucun programme : juste de quoi
-    // dessiner l'axe (bornes) et décoder les tuples (genres). Le contenu
-    // proprement dit arrive chaîne par chaîne, à la demande — voir plus bas.
-    await writeFile(path.join(SORTIE, code, `${jour}.json`), JSON.stringify({ jour, g, bornes }));
-
-    // Grille et détails suivent le même découpage par tranche de chaînes :
-    // ouvrir ou faire défiler jusqu'à une chaîne ne charge que sa tranche,
-    // jamais les 700 autres.
-    const tranchesGrille = new Map();
-    for (const t of p) {
-      const c = Math.floor(t[0] / TRANCHE_CHAINES);
-      if (!tranchesGrille.has(c)) tranchesGrille.set(c, []);
-      tranchesGrille.get(c).push(t);
-    }
-    for (const [c, tuples] of tranchesGrille) {
-      await writeFile(
-        path.join(SORTIE, code, `${jour}.c${c}.json`),
-        JSON.stringify({ p: tuples })
-      );
-    }
-
-    const tranchesDetails = new Map();
-    for (const [cle, val] of Object.entries(details.get(jour) ?? {})) {
-      const t = Math.floor(Number(cle.split(":")[0]) / TRANCHE_DETAILS);
-      if (!tranchesDetails.has(t)) tranchesDetails.set(t, {});
-      tranchesDetails.get(t)[cle] = val;
-    }
-    for (const [t, contenu] of tranchesDetails) {
-      await writeFile(
-        path.join(SORTIE, code, `${jour}.details.${t}.json`),
-        JSON.stringify(contenu)
-      );
-    }
+    const { g, p } = jours.get(jour);
+    // Un fichier par jour : avec ta seule liste, il pèse une centaine de Ko,
+    // assez léger pour être chargé d'un bloc sans rien découper.
+    await writeFile(path.join(SORTIE, code, `${jour}.json`), JSON.stringify({ jour, g, p }));
+    await writeFile(
+      path.join(SORTIE, code, `${jour}.details.json`),
+      JSON.stringify(details.get(jour) ?? {})
+    );
   }
 
   // Purge des journées périmées restées d'un build précédent.
@@ -1092,7 +1068,6 @@ async function traiterPays(code, conf, numerotation) {
     label: conf.label,
     timezone: conf.timezone,
     jours: retenus,
-    chunk: TRANCHE_CHAINES,
     categories: CATEGORIES_ORDRE,
     // [nom, icône, catégorie, numéro de canal, rang de mise en avant]
     // Dans l'ordre `ordre` : c'est cet ordre, et lui seul, qui fait

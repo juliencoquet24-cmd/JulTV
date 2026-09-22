@@ -339,9 +339,10 @@ body {
   display: flex;
   align-items: stretch;
   border-top: 1px solid var(--bleu-filet);
-  /* Hauteur fixe : c'est elle qui permet de calculer la tranche de lignes
-     à poser dans le DOM sans avoir à toutes les mesurer. */
-  height: var(--ligne-h);
+  /* Le navigateur saute le rendu des lignes hors écran : la virtualisation
+     verticale, sans une ligne de JavaScript. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--ligne-h);
 }
 
 .rail {
