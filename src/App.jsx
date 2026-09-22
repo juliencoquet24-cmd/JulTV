@@ -246,12 +246,23 @@ export default function App() {
         setBords({ debut: el.scrollLeft <= 2, fin: el.scrollLeft >= max - 2 });
       });
     };
+    /*
+     * Trackpad : `touch-action` ne concerne que le doigt. Un geste
+     * horizontal à deux doigts sur un Mac déplacerait encore la frise, ce
+     * qui contredirait les boutons. On le refuse, le vertical passe.
+     */
+    const molette = (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault();
+    };
+
     maj();
     el.addEventListener("scroll", maj, { passive: true });
+    el.addEventListener("wheel", molette, { passive: false });
     window.addEventListener("resize", maj);
     return () => {
       cancelAnimationFrame(raf);
       el.removeEventListener("scroll", maj);
+      el.removeEventListener("wheel", molette);
       window.removeEventListener("resize", maj);
     };
   }, [bornes, prete]);

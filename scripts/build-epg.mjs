@@ -921,6 +921,7 @@ async function traiterPays(code, conf, numerotation) {
   // Chaînes qui ont au moins un programme identifiable, tous jours confondus.
   const avecProgrammes = new Set(diffusions.map((d) => d.chaine));
   let vides = 0;
+  const videsListees = new Set();
 
   const meilleur = new Map();
   let differes = 0;
@@ -929,6 +930,12 @@ async function traiterPays(code, conf, numerotation) {
     // Rien à montrer : pas la peine de l'afficher, même si elle est listée.
     if (!avecProgrammes.has(id)) {
       vides++;
+      // Pour le diagnostic : seules comptent celles de ta liste.
+      const r = rangDe(c.nom, tCanaux).rang;
+      if (r !== null) {
+        const e = reglages.canaux[r - 1];
+        videsListees.add(typeof e === "string" ? e : e?.nom);
+      }
       continue;
     }
     const canal = rangDe(c.nom, tCanaux);
@@ -998,20 +1005,27 @@ async function traiterPays(code, conf, numerotation) {
    */
   {
     const trouves = new Set([...rangs.values()].map((r) => r.num).filter((n) => n !== null));
-    const manquantes = (reglages.canaux ?? [])
+    const absentes = (reglages.canaux ?? [])
       .map((e, k) => ({ rang: k + 1, nom: typeof e === "string" ? e : e?.nom }))
       .filter((x) => x.nom && !x.nom.startsWith("_") && !trouves.has(x.rang))
       .map((x) => x.nom);
+    // Deux raisons distinctes : présente dans un flux mais sans aucun
+    // programme identifiable, ou introuvable dans tous les flux.
+    const sansProgramme = absentes.filter((n) => videsListees.has(n));
+    const introuvables = absentes.filter((n) => !videsListees.has(n));
     const nomsDuFlux = [...new Set([...chaines.values()].map((c) => c.nom))].sort((a, b) =>
       a.localeCompare(b, "fr")
     );
     await mkdir(SORTIE, { recursive: true });
     await writeFile(
       path.join(SORTIE, `${code}.diagnostic.json`),
-      JSON.stringify({ manquantes, nomsDuFlux }, null, 1)
+      JSON.stringify({ sansProgramme, introuvables, nomsDuFlux }, null, 1)
     );
-    if (manquantes.length) {
-      log(`${code}: ${manquantes.length} chaînes de la liste introuvables dans les flux — voir data/${code}.diagnostic.json`);
+    if (sansProgramme.length) {
+      log(`${code}: ${sansProgramme.length} chaînes écartées faute de programme identifiable : ${sansProgramme.join(", ")}`);
+    }
+    if (introuvables.length) {
+      log(`${code}: ${introuvables.length} chaînes de la liste introuvables dans les flux : ${introuvables.join(", ")}`);
     }
   }
 

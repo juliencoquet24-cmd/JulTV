@@ -235,13 +235,19 @@ body {
 .planning {
   flex: 1;
   min-height: 0;
-  /* Vertical au doigt, horizontal par les boutons seulement : un geste ne
-     peut plus déplacer les deux axes à la fois. */
-  overflow-x: hidden;
-  overflow-y: auto;
+  /* Vertical au doigt, horizontal par les boutons seulement.
+     `touch-action: pan-y` interdit au doigt de déplacer l'axe horizontal,
+     mais laisse cet axe défilable par programme. Couper l'axe avec
+     `overflow-x: hidden` semblait équivalent, mais Safari ramène alors la
+     position horizontale à zéro dès qu'on touche le conteneur : la grille
+     repartait au début de la journée au moindre geste vertical. */
+  overflow: auto;
+  touch-action: pan-y pinch-zoom;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+.planning::-webkit-scrollbar:horizontal { display: none; height: 0; }
 
 .planning-corps {
   position: relative;
