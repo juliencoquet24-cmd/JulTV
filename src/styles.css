@@ -48,12 +48,12 @@
 
 [data-cat="Généralistes"]      { --teinte: var(--c-generalistes); }
 [data-cat="Information"]       { --teinte: var(--c-information); }
-[data-cat="Cinéma"]            { --teinte: var(--c-cinema); }
+[data-cat="Films"]             { --teinte: var(--c-cinema); }
 [data-cat="Séries"]            { --teinte: var(--c-series); }
 [data-cat="Sport"]             { --teinte: var(--c-sport); }
 [data-cat="Jeunesse"]          { --teinte: var(--c-jeunesse); }
 [data-cat="Documentaire"]      { --teinte: var(--c-documentaire); }
-[data-cat="Musique & Culture"] { --teinte: var(--c-musique); }
+[data-cat="Musique"]           { --teinte: var(--c-musique); }
 [data-cat="Divertissement"]    { --teinte: var(--c-divertissement); }
 [data-cat="Autres"]            { --teinte: var(--c-autres); }
 

@@ -435,12 +435,12 @@ function reglagesPays(brut) {
 const CATEGORIES_ORDRE = [
   "Généralistes",
   "Information",
-  "Cinéma",
+  "Films",
   "Séries",
   "Sport",
   "Jeunesse",
   "Documentaire",
-  "Musique & Culture",
+  "Musique",
   "Divertissement",
   "Autres",
 ];
@@ -449,7 +449,7 @@ const CATEGORIES_ORDRE = [
 // programme (en minuscules, accents conservés car ils diffèrent peu ici).
 const MOTS_CLES = {
   Information: ["info", "actualit", "journal", "news", "noticias", "meteo", "tiempo"],
-  Cinéma: ["film", "cinema", "cinéma", "cine", "movie", "largometraje", "long métrage"],
+  Films: ["film", "cinema", "cinéma", "cine", "movie", "largometraje", "long métrage"],
   Séries: ["serie", "série", "soap", "telenovela", "novela", "feuilleton"],
   Sport: [
     "sport", "deporte", "football", "fútbol", "futbol", "baloncesto", "basket",
@@ -458,7 +458,7 @@ const MOTS_CLES = {
   ],
   Jeunesse: ["jeunesse", "infantil", "enfant", "kids", "dessin anime", "dibujos", "animacion infantil"],
   Documentaire: ["documentaire", "documental", "decouverte", "reportage", "reportaje"],
-  "Musique & Culture": [
+  Musique: [
     "musique", "musica", "música", "concert", "clip", "culture", "cultura",
     "spectacle", "theatre", "théâtre", "teatro", "opera", "opéra", "danse",
   ],
