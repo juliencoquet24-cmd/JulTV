@@ -337,6 +337,35 @@ function nomDeBase(nom) {
 }
 
 /**
+ * Titres qui ne désignent aucun programme réel : les chaînes événementielles
+ * (beIN Sports Max, Ligue 1+ 3, Multisports…) remplissent leurs heures
+ * creuses avec ce genre de libellé, ou avec leur propre nom. Afficher la
+ * chaîne n'aurait aucun intérêt : on ne saurait pas quel match y passe.
+ */
+const TITRES_FICTIFS = [
+  /^(pas|aucun) (de )?programme/, /programme non (communique|disponible|defini)/,
+  /^programme (a venir|indetermine)/, /^fin des programmes/, /^(a suivre|prochainement)$/,
+  /^hors antenne/, /^(mire|ecran noir|boucle)$/, /^information non disponible/,
+  /^(sin programacion|programacion no disponible|no hay programacion|fin de emision)/,
+  /^(to be announced|tba|tbd|no programme|off air|closedown)$/,
+];
+
+const sansAccents = (t) =>
+  (t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+
+/**
+ * Un programme est fictif si son titre est un libellé de remplissage, ou
+ * s'il répète simplement le nom de la chaîne (« beIN SPORTS MAX 5 » de
+ * minuit à minuit ne dit rien de ce qui est diffusé).
+ */
+function estFictif(titre, nomChaine) {
+  const t = sansAccents(titre);
+  if (!t) return true;
+  if (TITRES_FICTIFS.some((r) => r.test(t))) return true;
+  return normaliser(titre) === normaliser(nomChaine);
+}
+
+/**
  * Pays admis dans chaque grille. Les départements et territoires d'outre-mer
  * ont leur propre code mais sont français : La 1ère Réunion reste chez elle.
  */
@@ -833,6 +862,19 @@ async function traiterPays(code, conf, numerotation) {
     log(`${code}: ${avant - w} diffusions en double écartées (même chaîne fournie par plusieurs sources)`);
   }
 
+  // Programmes de remplissage : écartés avant toute autre décision, pour
+  // qu'une chaîne qui n'a rien d'autre ne soit plus comptée comme fournie.
+  {
+    const avantFictifs = diffusions.length;
+    let k = 0;
+    for (const d of diffusions) {
+      const nom = chaines.get(d.chaine)?.nom ?? "";
+      if (!estFictif(d.titre, nom)) diffusions[k++] = d;
+    }
+    diffusions.length = k;
+    if (avantFictifs !== k) log(`${code}: ${avantFictifs - k} programmes sans contenu identifiable écartés`);
+  }
+
   if (!diffusions.length) {
     console.error(`[epg] ${code}: aucune donnée, pays ignoré`);
     return null;
@@ -876,10 +918,19 @@ async function traiterPays(code, conf, numerotation) {
    * Une chaîne listée est reconnue par son rang ; les autres par leur nom
    * de base, ce qui suffit à réunir « Chaîne X » et « Chaîne X HD ».
    */
+  // Chaînes qui ont au moins un programme identifiable, tous jours confondus.
+  const avecProgrammes = new Set(diffusions.map((d) => d.chaine));
+  let vides = 0;
+
   const meilleur = new Map();
   let differes = 0;
   let etrangeres = 0;
   for (const [id, c] of chaines) {
+    // Rien à montrer : pas la peine de l'afficher, même si elle est listée.
+    if (!avecProgrammes.has(id)) {
+      vides++;
+      continue;
+    }
     const canal = rangDe(c.nom, tCanaux);
     const prio = rangDe(c.nom, tPriorites);
     // Un différé (« +1 ») est un doublon de contenu, sauf si tu l'as mis
@@ -972,7 +1023,7 @@ async function traiterPays(code, conf, numerotation) {
   log(
     `${code}: ${gardees.size} chaînes après fusion des doublons, sur ${chaines.size} entrées reçues ` +
       `(${listees} reconnues dans la liste, ${gardees.size - listees} en plus, ` +
-      `${differes} différés écartés, ${etrangeres} hors liste ignorées)`
+      `${differes} différés écartés, ${etrangeres} hors liste ignorées, ${vides} sans programme identifiable)`
   );
 
   /**
