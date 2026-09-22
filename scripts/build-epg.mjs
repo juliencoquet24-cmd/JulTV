@@ -880,12 +880,14 @@ async function traiterPays(code, conf, numerotation) {
   let differes = 0;
   let etrangeres = 0;
   for (const [id, c] of chaines) {
-    if (estDiffere(c.nom)) {
+    const canal = rangDe(c.nom, tCanaux);
+    const prio = rangDe(c.nom, tPriorites);
+    // Un différé (« +1 ») est un doublon de contenu, sauf si tu l'as mis
+    // toi-même dans ta liste : c'est elle qui décide.
+    if (canal.rang === null && prio.rang === null && estDiffere(c.nom)) {
       differes++;
       continue;
     }
-    const canal = rangDe(c.nom, tCanaux);
-    const prio = rangDe(c.nom, tPriorites);
 
     // Une chaîne de ta liste passe toujours, même si son identifiant dit
     // autre chose : TV5Monde est suffixée .ch par certains flux, et TMC
@@ -934,6 +936,32 @@ async function traiterPays(code, conf, numerotation) {
     const canon = nomCanonique(m.c.nom, tNoms);
     gardees.set(m.id, { ...m.c, nom: canon ?? nomPropre(m.c.nom) });
     rangs.set(m.id, { num: m.num, pri: m.pri });
+  }
+
+  /**
+   * Diagnostic publié avec la grille : les chaînes de ta liste qu'aucun flux
+   * n'a fournies, et tous les noms que les flux emploient réellement. Les
+   * écarts viennent presque toujours d'une orthographe différente (« beIN
+   * SPORTS MAX 4 » contre « beIN Sports Max 4 »), et se corrigent en ajoutant
+   * le nom du flux dans les « aussi » de numerotation.json.
+   */
+  {
+    const trouves = new Set([...rangs.values()].map((r) => r.num).filter((n) => n !== null));
+    const manquantes = (reglages.canaux ?? [])
+      .map((e, k) => ({ rang: k + 1, nom: typeof e === "string" ? e : e?.nom }))
+      .filter((x) => x.nom && !x.nom.startsWith("_") && !trouves.has(x.rang))
+      .map((x) => x.nom);
+    const nomsDuFlux = [...new Set([...chaines.values()].map((c) => c.nom))].sort((a, b) =>
+      a.localeCompare(b, "fr")
+    );
+    await mkdir(SORTIE, { recursive: true });
+    await writeFile(
+      path.join(SORTIE, `${code}.diagnostic.json`),
+      JSON.stringify({ manquantes, nomsDuFlux }, null, 1)
+    );
+    if (manquantes.length) {
+      log(`${code}: ${manquantes.length} chaînes de la liste introuvables dans les flux — voir data/${code}.diagnostic.json`);
+    }
   }
 
   if (!gardees.size) {
