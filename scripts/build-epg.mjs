@@ -435,7 +435,7 @@ function reglagesPays(brut) {
 const CATEGORIES_ORDRE = [
   "Généralistes",
   "Information",
-  "Films",
+  "Cinéma",
   "Séries",
   "Sport",
   "Jeunesse",
@@ -449,7 +449,7 @@ const CATEGORIES_ORDRE = [
 // programme (en minuscules, accents conservés car ils diffèrent peu ici).
 const MOTS_CLES = {
   Information: ["info", "actualit", "journal", "news", "noticias", "meteo", "tiempo"],
-  Films: ["film", "cinema", "cinéma", "cine", "movie", "largometraje", "long métrage"],
+  Cinéma: ["film", "cinema", "cinéma", "cine", "movie", "largometraje", "long métrage"],
   Séries: ["serie", "série", "soap", "telenovela", "novela", "feuilleton"],
   Sport: [
     "sport", "deporte", "football", "fútbol", "futbol", "baloncesto", "basket",

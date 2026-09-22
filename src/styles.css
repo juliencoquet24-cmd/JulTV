@@ -48,7 +48,7 @@
 
 [data-cat="Généralistes"]      { --teinte: var(--c-generalistes); }
 [data-cat="Information"]       { --teinte: var(--c-information); }
-[data-cat="Films"]             { --teinte: var(--c-cinema); }
+[data-cat="Cinéma"]            { --teinte: var(--c-cinema); }
 [data-cat="Séries"]            { --teinte: var(--c-series); }
 [data-cat="Sport"]             { --teinte: var(--c-sport); }
 [data-cat="Jeunesse"]          { --teinte: var(--c-jeunesse); }

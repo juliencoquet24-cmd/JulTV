@@ -154,14 +154,14 @@
       },
       {
         "nom": "Canal+ Box Office",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "CANAL+ Box Office"
         ]
       },
       {
         "nom": "Canal+ Grand Écran",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "CANAL+ Grand Écran",
           "Canal+ Grand Ecran"
@@ -169,7 +169,7 @@
       },
       {
         "nom": "Canal+ Cinéma",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "CANAL+ Cinéma(s)",
           "Canal+ Cinéma(s)"
@@ -420,69 +420,69 @@
       },
       {
         "nom": "Ciné+ Premier",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "Ciné+ Frisson",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "Ciné+ Emotion",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "Ciné+ Émotion"
         ]
       },
       {
         "nom": "Ciné+ Family",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "Ciné+ Famiz"
         ]
       },
       {
         "nom": "Ciné+ Festival",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "Ciné+ Club"
         ]
       },
       {
         "nom": "Ciné+ Classic",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "OCS",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "Ciné+ OCS"
         ]
       },
       {
         "nom": "Polar+",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "TCM Cinéma",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "TCM"
         ]
       },
       {
         "nom": "Paramount Channel",
-        "categorie": "Films",
+        "categorie": "Cinéma",
         "aussi": [
           "Paramount Network"
         ]
       },
       {
         "nom": "Paramount Channel Décalé",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "Action",
-        "categorie": "Films"
+        "categorie": "Cinéma"
       },
       {
         "nom": "AB1",
