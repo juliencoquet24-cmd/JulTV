@@ -173,15 +173,20 @@ function estSportGenerique(genre, titre) {
  */
 function extraireAffiche(texte) {
   if (!texte) return null;
-  // Une compétition précède parfois les deux équipes (« LaLiga : Real
-  // Madrid - Barcelone », « Ligue 1 : PSG - OM ») : on l'ignore pour ne
-  // garder que l'affiche, sans quoi ce format entier passait au travers.
-  const sansPrefixe = texte.trim().replace(/^[^:–-]{2,30}[:]\s*/u, "");
+  // Une ou plusieurs compétitions précèdent parfois les deux équipes,
+  // séparées par « : » ou « | » (Ligue 1+ écrit par exemple « Football :
+  // Ligue 1 McDonald's | Auxerre / Brest », deux niveaux de préfixe) : seul
+  // le dernier segment nous intéresse.
+  const segments = texte.trim().split(/[:|]/);
+  const sansPrefixe = segments[segments.length - 1].trim();
+  // Les deux équipes sont séparées par un tiret, « vs », ou un « / »
+  // (autre forme employée par Ligue 1+, « Auxerre / Brest »).
   const m = sansPrefixe
-    .match(/^([\p{L}][\p{L}\d\s.'’-]{1,40}?)\s+(?:-|–|vs\.?|v\.)\s+([\p{L}][\p{L}\d\s.'’-]{1,40}?)(?:\s*[:(].*)?$/u);
+    .match(/^([\p{L}][\p{L}\d\s.'’-]{1,40}?)\s+(?:-|–|\/|vs\.?|v\.)\s+([\p{L}][\p{L}\d\s.'’-]{1,40}?)(?:\s*[:(].*)?$/u);
   if (!m) return null;
   const [, a, b] = m;
-  const generique = /^(ligue|liga|championnat|journ[ée]e|jornada|division|groupe|group|phase|saison|temporada)\b/i;
+  const generique =
+    /^(ligue|liga|championnat|journ[ée]e|jornada|division|groupe|group|phase|saison|temporada|football|f[uú]tbol)\b/i;
   if (generique.test(a.trim()) || generique.test(b.trim())) return null;
   if (a.trim().length < 2 || b.trim().length < 2) return null;
   return `${a.trim()} - ${b.trim()}`;

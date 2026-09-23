@@ -20,6 +20,12 @@
         "name": "xmltvfree",
         "url": "http://xmltvfree.free.fr/xmltv.xml.gz",
         "note": "Grille Freebox : complète les chaînes absentes de la source principale."
+      },
+      {
+        "type": "url",
+        "name": "epgshare01-fr",
+        "url": "https://epgshare01.online/epgshare01/epg_ripper_FR1.xml.gz",
+        "note": "Ajoutée pour tester si sa couverture des chaînes sport (beIN, DAZN) est meilleure que xmltvfr — sans certitude, à observer."
       }
     ]
   },
