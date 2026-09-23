@@ -173,8 +173,11 @@ function estSportGenerique(genre, titre) {
  */
 function extraireAffiche(texte) {
   if (!texte) return null;
-  const m = texte
-    .trim()
+  // Une compétition précède parfois les deux équipes (« LaLiga : Real
+  // Madrid - Barcelone », « Ligue 1 : PSG - OM ») : on l'ignore pour ne
+  // garder que l'affiche, sans quoi ce format entier passait au travers.
+  const sansPrefixe = texte.trim().replace(/^[^:–-]{2,30}[:]\s*/u, "");
+  const m = sansPrefixe
     .match(/^([\p{L}][\p{L}\d\s.'’-]{1,40}?)\s+(?:-|–|vs\.?|v\.)\s+([\p{L}][\p{L}\d\s.'’-]{1,40}?)(?:\s*[:(].*)?$/u);
   if (!m) return null;
   const [, a, b] = m;
