@@ -139,6 +139,51 @@ const analyseur = new XMLParser({
   },
 });
 
+/**
+ * Genres qui, seuls, ne disent jamais quel match est diffusé. Un flux
+ * annonce souvent « Football : Ligue 1 » en titre tout en glissant l'affiche
+ * réelle (« PSG - OM ») dans le sous-titre ou en tête du résumé — c'est
+ * l'écart classique entre les EPG grand public (repris tels quels) et les
+ * sites spécialisés (L'Équipe, Marca) qui, eux, déroulent l'affiche.
+ * Sans base de données sportive à interroger, on ne peut pas deviner un
+ * match que la source ne donne nulle part ; on peut seulement aller
+ * chercher, dans le même programme, un endroit où il est déjà écrit.
+ */
+const GENRES_SPORT_GENERIQUE = [
+  "sport", "sports", "deporte", "deportes", "esporte",
+  "football", "futbol", "fútbol", "soccer", "rugby", "basket", "baloncesto",
+  "tenis", "tennis", "handball", "balonmano", "volley", "voleibol",
+  "hipica", "hípica", "motor", "moto", "motogp", "ciclismo", "cyclisme",
+  "boxeo", "boxe", "formula", "fórmula",
+];
+
+const TITRE_SPORT_GENERIQUE =
+  /^(football|f[uú]tbol|soccer|rugby|basket(ball)?|baloncesto|tenis|tennis|hand ?ball|balonmano|volley(ball)?|voleibol|liga|laliga|ligue ?1|ligue ?2|champions ?league|europa ?league|premier ?league|serie ?a|bundesliga|primera ?divisi[oó]n|segunda ?divisi[oó]n|nba|f1|motogp|ciclismo|cyclisme)\b/i;
+
+function estSportGenerique(genre, titre) {
+  const g = (genre ?? "").toLowerCase();
+  if (GENRES_SPORT_GENERIQUE.some((s) => g.includes(s))) return true;
+  return TITRE_SPORT_GENERIQUE.test((titre ?? "").trim());
+}
+
+/**
+ * Repère une affiche du type « PSG - OM » ou « Real Madrid vs Barcelone »
+ * dans un texte. Les deux noms doivent ressembler à des noms propres, pas à
+ * des libellés génériques (« Ligue 1 - 5e journée » n'est pas un match).
+ */
+function extraireAffiche(texte) {
+  if (!texte) return null;
+  const m = texte
+    .trim()
+    .match(/^([\p{L}][\p{L}\d\s.'’-]{1,40}?)\s+(?:-|–|vs\.?|v\.)\s+([\p{L}][\p{L}\d\s.'’-]{1,40}?)(?:\s*[:(].*)?$/u);
+  if (!m) return null;
+  const [, a, b] = m;
+  const generique = /^(ligue|liga|championnat|journ[ée]e|jornada|division|groupe|group|phase|saison|temporada)\b/i;
+  if (generique.test(a.trim()) || generique.test(b.trim())) return null;
+  if (a.trim().length < 2 || b.trim().length < 2) return null;
+  return `${a.trim()} - ${b.trim()}`;
+}
+
 function lireXmltv(xml, chaines, diffusions, exclues, source) {
   const doc = analyseur.parse(xml);
   const tv = doc?.tv;
@@ -166,14 +211,32 @@ function lireXmltv(xml, chaines, diffusions, exclues, source) {
     const debut = dateXmltv(p["@start"]);
     if (!debut) continue;
     const fin = dateXmltv(p["@stop"]);
+    const titreBrut = texte(p.title) ?? "(sans titre)";
+    const sousTitreBrut = texte(p["sub-title"]);
+    const genreBrut = texte(p.category?.[0] ?? p.category);
+    const descBrut = texte(p.desc);
+
+    // Le générique reste affiché tel quel si aucune affiche n'est trouvée
+    // ailleurs dans le même programme — cette source n'a rien de plus.
+    let titre = titreBrut;
+    let sousTitre = sousTitreBrut;
+    if (estSportGenerique(genreBrut, titreBrut)) {
+      const affiche =
+        extraireAffiche(sousTitreBrut) ?? extraireAffiche(descBrut?.split(/[.\n]/)[0]);
+      if (affiche && normaliser(affiche) !== normaliser(titreBrut)) {
+        titre = affiche;
+        sousTitre = titreBrut; // le générique devient le contexte, pas le titre
+      }
+    }
+
     diffusions.push({
       source,
       chaine: p["@channel"],
       debut,
       fin,
-      titre: texte(p.title) ?? "(sans titre)",
-      sousTitre: texte(p["sub-title"]),
-      genre: texte(p.category?.[0] ?? p.category),
+      titre,
+      sousTitre,
+      genre: genreBrut,
       details: detailsDe(p),
     });
   }
