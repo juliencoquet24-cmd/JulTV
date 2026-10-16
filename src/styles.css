@@ -36,7 +36,7 @@
   --c-autres: #5c6a7d;
 
   --teinte: var(--c-autres);
-  --rail: 14rem;
+  --rail: 9.5rem;
   --ligne-h: 4rem;
 
   --pas-1: 0.25rem;
@@ -303,13 +303,16 @@ body {
 .graduation.demie { font-weight: 500; color: var(--encre-douce); }
 
 /* La barre d'antenne traverse toute la grille à l'heure qu'il est. */
+/* La barre est dessinée dans chaque ligne, sous le rail (z-index 2) :
+   en défilant vers la gauche, le rail la recouvre au lieu de la laisser
+   passer devant les logos. */
 .tally {
   position: absolute;
-  top: 2.75rem;
-  bottom: 0;
+  top: -1px;
+  bottom: -1px;
   width: 2px;
   background: var(--rouge);
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -393,8 +396,8 @@ body {
 
 .logo {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   background: var(--papier-creux);
   border: 1px solid var(--bleu-filet);
@@ -405,10 +408,14 @@ body {
 .logo-texte {
   display: grid;
   place-items: center;
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
   color: var(--encre-douce);
-  padding: 0;
+  padding: 2px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 /* Deux lignes plutôt qu'une coupure : « Canal+ Grand Écran » tient
@@ -538,20 +545,20 @@ body {
 /* ------------------------------------------------------------- iPad, iPhone */
 
 @media (max-width: 64rem) {
-  :root { --rail: 12rem; }
+  :root { --rail: 9rem; }
 }
 
 @media (max-width: 46rem) {
   :root {
     /* 9,5 rem ne laissaient que 56 px au nom : « L'Équipe » se coupait en
        plein mot. Seize pixels de plus suffisent, et la frise reste large. */
-    --rail: 10.5rem;
+    --rail: 7rem;
     --ligne-h: 3.75rem;
   }
   body { font-size: 15px; }
   .tete { padding: var(--pas-3); padding-top: calc(var(--pas-3) + env(safe-area-inset-top)); }
   .chaine { font-size: 0.8rem; }
-  .logo { width: 24px; height: 24px; }
+  .logo { width: 40px; height: 40px; }
   .canal { width: 1.2rem; font-size: 0.78rem; }
   .pastille { width: 3px; }
   .prog-titre { font-size: 0.82rem; }

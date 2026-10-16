@@ -414,12 +414,6 @@ export default function App() {
               </div>
             </div>
 
-            {dansLaJournee && (
-              <div className="tally" style={{ left: `calc(var(--rail) + ${xDe(maintenant)}px)` }}>
-                <span className="tally-tete" />
-              </div>
-            )}
-
             {groupes.map((g) => (
               <section key={g.categorie ?? "tout"}>
                 {g.categorie && (
@@ -487,14 +481,16 @@ function Ligne({ l, jour, tz, fenetre, maintenant, xDe, onOuvrir }) {
         <span className="pastille" aria-hidden="true" />
         {l.numero ? <span className="canal">{l.numero}</span> : <span className="canal vide" aria-hidden="true" />}
         {l.icone ? (
-          <img className="logo" src={l.icone} alt="" loading="lazy" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
+          <img className="logo" src={l.icone} alt={l.nom} title={l.nom} loading="lazy" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
         ) : (
-          <span className="logo logo-texte">{l.nom.slice(0, 2)}</span>
+          <span className="logo logo-texte" title={l.nom}>{l.nom}</span>
         )}
-        <span className="chaine">{l.nom}</span>
       </div>
 
       <div className="piste">
+        {maintenant >= fenetre.de && maintenant <= fenetre.a && (
+          <span className="tally" style={{ left: `${xDe(maintenant)}px` }} aria-hidden="true" />
+        )}
         {l.programmes.map((p) => {
           if (p.debut + p.duree <= fenetre.de || p.debut >= fenetre.a) return null;
           const largeur = p.duree * PX_PAR_MIN;
