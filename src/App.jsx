@@ -11,12 +11,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const BASE = `${import.meta.env.BASE_URL}data`;
 const RAFRAICHISSEMENT = 5 * 60 * 1000;
-const PX_PAR_MIN = 3.1; // 30 minutes ≈ 93 px
+const PX_PAR_MIN = 5; // 30 minutes = 150 px, une heure = 300 px
 const PAS = 30; // graduation de l'axe, en minutes
 
 // Paliers d'affichage d'un bloc : heure et titre, titre seul, ou rien.
-const LARGEUR_TEXTE = 92;
-const LARGEUR_TITRE = 34;
+const LARGEUR_TEXTE = 120;
+const LARGEUR_TITRE = 50;
 
 const REPERES = [
   { id: "matin", label: "Matin", heure: 8 },

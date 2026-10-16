@@ -36,8 +36,8 @@
   --c-autres: #5c6a7d;
 
   --teinte: var(--c-autres);
-  --rail: 9.5rem;
-  --ligne-h: 4rem;
+  --rail: 11rem;
+  --ligne-h: 6.5rem;
 
   --pas-1: 0.25rem;
   --pas-2: 0.5rem;
@@ -385,9 +385,9 @@ body {
 /* Le numéro est de l'information : c'est ce qu'on tape sur la télécommande. */
 .canal {
   flex: none;
-  width: 1.5rem;
+  width: 1.9rem;
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--bleu);
@@ -396,8 +396,8 @@ body {
 
 .logo {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   background: var(--papier-creux);
   border: 1px solid var(--bleu-filet);
@@ -408,7 +408,7 @@ body {
 .logo-texte {
   display: grid;
   place-items: center;
-  font-size: 0.6rem;
+  font-size: 0.68rem;
   font-weight: 700;
   line-height: 1.05;
   text-align: center;
@@ -475,7 +475,7 @@ body {
 }
 
 .prog-heure {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--bleu);
@@ -484,13 +484,18 @@ body {
 
 .prog.direct .prog-heure { color: var(--rouge); }
 
+/* Le titre passe à la ligne et se lit en entier (quatre lignes au plus) :
+   la ligne est assez haute pour ça, quitte à défiler davantage. */
 .prog-titre {
-  font-size: 0.88rem;
-  font-weight: 600;
-  line-height: 1.25;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .prog-sous {
@@ -545,23 +550,23 @@ body {
 /* ------------------------------------------------------------- iPad, iPhone */
 
 @media (max-width: 64rem) {
-  :root { --rail: 9rem; }
+  :root { --rail: 10rem; }
 }
 
 @media (max-width: 46rem) {
   :root {
     /* 9,5 rem ne laissaient que 56 px au nom : « L'Équipe » se coupait en
        plein mot. Seize pixels de plus suffisent, et la frise reste large. */
-    --rail: 7rem;
-    --ligne-h: 3.75rem;
+    --rail: 8.25rem;
+    --ligne-h: 6rem;
   }
   body { font-size: 15px; }
   .tete { padding: var(--pas-3); padding-top: calc(var(--pas-3) + env(safe-area-inset-top)); }
   .chaine { font-size: 0.8rem; }
-  .logo { width: 40px; height: 40px; }
-  .canal { width: 1.2rem; font-size: 0.78rem; }
+  .logo { width: 52px; height: 52px; }
+  .canal { width: 1.5rem; font-size: 0.95rem; }
   .pastille { width: 3px; }
-  .prog-titre { font-size: 0.82rem; }
+  .prog-titre { font-size: 0.98rem; }
   .prog-sous { display: none; }
 
   /* Sur un téléphone, la barre d'outils se repliait sur cinq lignes et
