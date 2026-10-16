@@ -1,1843 +1,2221 @@
 {
-  "_comment": [
-    "canaux    — ordre d'affichage, filtre ET classement. Une chaîne absente",
-    "            d'ici n'apparaît pas : les sources XMLTV livrent des centaines",
-    "            d'entrées, cette liste dit lesquelles retenir, et dans quel",
-    "            ordre. Chaque entrée porte sa catégorie.",
-    "            Catégories : Généralistes, Information, Films, Séries, Sport,",
-    "            Jeunesse, Documentaire, Musique, Divertissement.",
-    "aussi     — autres orthographes du même nom selon les sources.",
-    "priorites — chaînes remontées en tête de LEUR catégorie.",
-    "",
-    "Le rapprochement se fait sur le nom normalisé ; seuls les suffixes",
-    "techniques (HD, SD, TNT...) sont ignorés. Fichier relu à chaque build."
+ "_comment": [
+  "canaux    — ordre d'affichage, filtre ET classement. Une chaîne absente",
+  "            d'ici n'apparaît pas : les sources XMLTV livrent des centaines",
+  "            d'entrées, cette liste dit lesquelles retenir, et dans quel",
+  "            ordre. Chaque entrée porte sa catégorie.",
+  "            Catégories : Généralistes, Information, Films, Séries, Sport,",
+  "            Jeunesse, Documentaire, Musique, Divertissement.",
+  "aussi     — autres orthographes du même nom selon les sources.",
+  "priorites — chaînes remontées en tête de LEUR catégorie.",
+  "",
+  "Le rapprochement se fait sur le nom normalisé ; seuls les suffixes",
+  "techniques (HD, SD, TNT...) sont ignorés. Fichier relu à chaque build."
+ ],
+ "fr": {
+  "canaux": [
+   {
+    "nom": "TF1",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "France 2",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "France 3",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "Canal+",
+    "categorie": "Généralistes",
+    "aussi": [
+     "CANAL+"
+    ]
+   },
+   {
+    "nom": "France 5",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "M6",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "Arte",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "C8",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "W9",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "TMC",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "TFX",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "NRJ 12",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "LCP",
+    "categorie": "Information",
+    "aussi": [
+     "LCP / Public Sénat",
+     "LCP Assemblée nationale",
+     "Public Sénat",
+     "LCP-Public Sénat"
+    ]
+   },
+   {
+    "nom": "France 4",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Culturebox"
+    ]
+   },
+   {
+    "nom": "BFM TV",
+    "categorie": "Information",
+    "aussi": [
+     "BFMTV"
+    ]
+   },
+   {
+    "nom": "CNews",
+    "categorie": "Information",
+    "aussi": [
+     "CNEWS"
+    ]
+   },
+   {
+    "nom": "CStar",
+    "categorie": "Divertissement",
+    "aussi": [
+     "CSTAR"
+    ]
+   },
+   {
+    "nom": "Gulli",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "_case_19_vacante_",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "TF1 Séries Films",
+    "categorie": "Séries",
+    "aussi": [
+     "TF1 Series Films"
+    ]
+   },
+   {
+    "nom": "L'Équipe",
+    "categorie": "Sport",
+    "aussi": [
+     "La chaîne L'Équipe",
+     "La chaine l'Equipe",
+     "L'Equipe"
+    ]
+   },
+   {
+    "nom": "6ter",
+    "categorie": "Généralistes"
+   },
+   {
+    "nom": "RMC Story",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "RMC Découverte",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Chérie 25",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "RMC Life",
+    "categorie": "Documentaire",
+    "aussi": [
+     "RMC Life HD"
+    ]
+   },
+   {
+    "nom": "NOVO19",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Novo 19",
+     "Novo19"
+    ]
+   },
+   {
+    "nom": "BFM Business",
+    "categorie": "Information",
+    "aussi": [
+     "BFM Business TV",
+     "BFM Business HD"
+    ]
+   },
+   {
+    "nom": "Euronews",
+    "categorie": "Information",
+    "aussi": [
+     "Euronews Français",
+     "Euronews FR"
+    ]
+   },
+   {
+    "nom": "France 24",
+    "categorie": "Information",
+    "aussi": [
+     "France 24 Français",
+     "France24"
+    ]
+   },
+   {
+    "nom": "LCI",
+    "categorie": "Information",
+    "aussi": [
+     "La Chaîne Info"
+    ]
+   },
+   {
+    "nom": "Franceinfo",
+    "categorie": "Information",
+    "aussi": [
+     "France Info",
+     "franceinfo:"
+    ]
+   },
+   {
+    "nom": "Canal+ Box Office",
+    "categorie": "Cinéma",
+    "aussi": [
+     "CANAL+ Box Office",
+     "CANAL+ BOX OFFICE"
+    ]
+   },
+   {
+    "nom": "Canal+ Grand Écran",
+    "categorie": "Cinéma",
+    "aussi": [
+     "CANAL+ Grand Écran",
+     "Canal+ Grand Ecran",
+     "CANAL+ GRAND ECRAN"
+    ]
+   },
+   {
+    "nom": "Canal+ Cinéma",
+    "categorie": "Cinéma",
+    "aussi": [
+     "CANAL+ Cinéma(s)",
+     "Canal+ Cinéma(s)",
+     "CANAL+ CINEMA(S)",
+     "Canal+ Cinemas"
+    ]
+   },
+   {
+    "nom": "Canal+ Sport",
+    "categorie": "Sport",
+    "aussi": [
+     "CANAL+ Sport",
+     "CANAL+ SPORT"
+    ]
+   },
+   {
+    "nom": "Canal+ Sport 360",
+    "categorie": "Sport",
+    "aussi": [
+     "CANAL+ Sport 360",
+     "CANAL+ SPORT 360"
+    ]
+   },
+   {
+    "nom": "Canal+ Foot",
+    "categorie": "Sport",
+    "aussi": [
+     "CANAL+ Foot",
+     "CANAL+ FOOT"
+    ]
+   },
+   {
+    "nom": "Canal+ Séries",
+    "categorie": "Séries",
+    "aussi": [
+     "CANAL+ Séries",
+     "Canal+ Series",
+     "CANAL+ SERIES"
+    ]
+   },
+   {
+    "nom": "Canal+ Docs",
+    "categorie": "Documentaire",
+    "aussi": [
+     "CANAL+ Docs",
+     "CANAL+ DOCS"
+    ]
+   },
+   {
+    "nom": "Canal+ Kids",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "CANAL+ Kids",
+     "CANAL+ KIDS"
+    ]
+   },
+   {
+    "nom": "DAZN 1",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "DAZN 2",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "DAZN 3",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "DAZN 4",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "DAZN 5",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Ligue 1+",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus",
+     "Ligue1+"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 1"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 2"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 3",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 3"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 4",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 4"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 5",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 5"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 6",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 6"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 7",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 7"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 8",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 8"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 9",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 9"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ 10",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1 Plus 10"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ UHD 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Ligue 1+ 4K UHD",
+     "Ligue 1+ 4K"
+    ]
+   },
+   {
+    "nom": "Ligue 1+ UHD 2",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "beIN Sports 1",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS 1"
+    ]
+   },
+   {
+    "nom": "beIN Sports 2",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS 2"
+    ]
+   },
+   {
+    "nom": "beIN Sports 3",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS 3"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 4",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 4"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 5",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 5"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 6",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 6"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 7",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 7"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 8",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 8"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 9",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 9"
+    ]
+   },
+   {
+    "nom": "beIN Sports Max 10",
+    "categorie": "Sport",
+    "aussi": [
+     "beIN SPORTS MAX 10"
+    ]
+   },
+   {
+    "nom": "Eurosport 1",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Eurosport 2",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Eurosport 4K",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Golf+",
+    "categorie": "Sport",
+    "aussi": [
+     "Golf +"
+    ]
+   },
+   {
+    "nom": "Foot+ 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 1"
+    ]
+   },
+   {
+    "nom": "Foot+ 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 2"
+    ]
+   },
+   {
+    "nom": "Foot+ 3",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 3"
+    ]
+   },
+   {
+    "nom": "Foot+ 4",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 4"
+    ]
+   },
+   {
+    "nom": "Foot+ 5",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 5"
+    ]
+   },
+   {
+    "nom": "Foot+ 6",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 6"
+    ]
+   },
+   {
+    "nom": "Foot+ 7",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 7"
+    ]
+   },
+   {
+    "nom": "Foot+ 8",
+    "categorie": "Sport",
+    "aussi": [
+     "Foot + 8"
+    ]
+   },
+   {
+    "nom": "Rugby+ 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 1"
+    ]
+   },
+   {
+    "nom": "Rugby+ 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 2"
+    ]
+   },
+   {
+    "nom": "Rugby+ 3",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 3"
+    ]
+   },
+   {
+    "nom": "Rugby+ 4",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 4"
+    ]
+   },
+   {
+    "nom": "Rugby+ 5",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 5"
+    ]
+   },
+   {
+    "nom": "Rugby+ 6",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 6"
+    ]
+   },
+   {
+    "nom": "Rugby+ 7",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 7"
+    ]
+   },
+   {
+    "nom": "Rugby+ 8",
+    "categorie": "Sport",
+    "aussi": [
+     "Rugby + 8"
+    ]
+   },
+   {
+    "nom": "Multisports 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 1"
+    ]
+   },
+   {
+    "nom": "Multisports 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 2"
+    ]
+   },
+   {
+    "nom": "Multisports 3",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 3"
+    ]
+   },
+   {
+    "nom": "Multisports 4",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 4"
+    ]
+   },
+   {
+    "nom": "Multisports 5",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 5"
+    ]
+   },
+   {
+    "nom": "Multisports 6",
+    "categorie": "Sport",
+    "aussi": [
+     "Multisport 6"
+    ]
+   },
+   {
+    "nom": "Infosport+",
+    "categorie": "Sport",
+    "aussi": [
+     "Infosport +"
+    ]
+   },
+   {
+    "nom": "Automoto",
+    "categorie": "Sport",
+    "aussi": [
+     "Automoto La chaîne",
+     "Automoto La Chaîne"
+    ]
+   },
+   {
+    "nom": "Equidia",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Golf Channel",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "Ciné+ Premier",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "Ciné+ Frisson",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "Ciné+ Emotion",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Ciné+ Émotion"
+    ]
+   },
+   {
+    "nom": "Ciné+ Famiz",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Ciné+ Family"
+    ]
+   },
+   {
+    "nom": "Ciné+ Club",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Ciné+ Festival"
+    ]
+   },
+   {
+    "nom": "Ciné+ Classic",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "Ciné+ OCS Max",
+    "categorie": "Cinéma",
+    "aussi": [
+     "OCS Max",
+     "OCS Géants"
+    ]
+   },
+   {
+    "nom": "Ciné+ OCS Choc",
+    "categorie": "Cinéma",
+    "aussi": [
+     "OCS Choc"
+    ]
+   },
+   {
+    "nom": "Ciné+ OCS Pulp",
+    "categorie": "Cinéma",
+    "aussi": [
+     "OCS Pulp"
+    ]
+   },
+   {
+    "nom": "Polar+",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "TCM Cinéma",
+    "categorie": "Cinéma",
+    "aussi": [
+     "TCM"
+    ]
+   },
+   {
+    "nom": "Paramount Channel",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Paramount Network"
+    ]
+   },
+   {
+    "nom": "Paramount Channel Décalé",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "Action",
+    "categorie": "Cinéma"
+   },
+   {
+    "nom": "Warner TV",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "Warner TV Next",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "AB1",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "Comedy Central",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "RTL9",
+    "categorie": "Cinéma",
+    "aussi": [
+     "RTL 9"
+    ]
+   },
+   {
+    "nom": "Paris Première",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "Téva",
+    "categorie": "Séries",
+    "aussi": [
+     "Teva"
+    ]
+   },
+   {
+    "nom": "TV Breizh",
+    "categorie": "Séries"
+   },
+   {
+    "nom": "Mangas",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Game One",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "Piwi+",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Télétoon+",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Teletoon+"
+    ]
+   },
+   {
+    "nom": "Télétoon+1",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Teletoon+1",
+     "Télétoon +1"
+    ]
+   },
+   {
+    "nom": "Disney Channel",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Disney Channel +1",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Disney Channel+1"
+    ]
+   },
+   {
+    "nom": "Disney Junior",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Nickelodeon",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Nickelodeon +1",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Nickelodeon+1"
+    ]
+   },
+   {
+    "nom": "Nickelodeon Junior",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Nickelodeon Teen",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Cartoon Network",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Cartoonito",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Boomerang",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Boomerang +1",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Boomerang+1"
+    ]
+   },
+   {
+    "nom": "Canal J",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "TiJi",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "Discovery Channel",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Discovery Science",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Discovery Investigation",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Discovery Investigation (ID)",
+     "ID"
+    ]
+   },
+   {
+    "nom": "Planète+",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Planete+"
+    ]
+   },
+   {
+    "nom": "Planète+ Crime",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Planete+ Crime"
+    ]
+   },
+   {
+    "nom": "Planète+ Aventure",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Planete+ Aventure"
+    ]
+   },
+   {
+    "nom": "National Geographic",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "National Geographic Wild",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Nat Geo Wild"
+    ]
+   },
+   {
+    "nom": "Ushuaïa TV",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Ushuaia TV"
+    ]
+   },
+   {
+    "nom": "Histoire TV",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Toute l'Histoire",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Science & Vie TV",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Animaux",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Trek",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Chasse & Pêche",
+    "categorie": "Documentaire"
+   },
+   {
+    "nom": "Comédie+",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Comedie+"
+    ]
+   },
+   {
+    "nom": "MTV",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "MTV Hits",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "MCM",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "RFM TV",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Trace Urban",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Olympia TV",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Mezzo",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Mezzo Live HD",
+    "categorie": "Musique",
+    "aussi": [
+     "Mezzo Live"
+    ]
+   },
+   {
+    "nom": "13ème Rue",
+    "categorie": "Séries",
+    "aussi": [
+     "13eme Rue",
+     "13e Rue",
+     "13ème Rue HD"
+    ]
+   },
+   {
+    "nom": "Syfy",
+    "categorie": "Séries",
+    "aussi": [
+     "SyFy France",
+     "Syfy HD"
+    ]
+   },
+   {
+    "nom": "Série Club",
+    "categorie": "Séries",
+    "aussi": [
+     "Serie Club"
+    ]
+   },
+   {
+    "nom": "Crime District",
+    "categorie": "Séries",
+    "aussi": [
+     "Crime District HD"
+    ]
+   },
+   {
+    "nom": "E!",
+    "categorie": "Divertissement",
+    "aussi": [
+     "E! Entertainment",
+     "E ! "
+    ]
+   },
+   {
+    "nom": "Studio Canal",
+    "categorie": "Cinéma",
+    "aussi": [
+     "StudioCanal TV",
+     "Studiocanal"
+    ]
+   },
+   {
+    "nom": "Canal+ Live",
+    "categorie": "Sport",
+    "aussi": [
+     "CANAL+ Live",
+     "Canal+ Live 1"
+    ]
+   },
+   {
+    "nom": "Canal+ Décalé",
+    "categorie": "Cinéma",
+    "aussi": [
+     "CANAL+ Décalé",
+     "Canal+ Decale",
+     "CANAL+ DECALE"
+    ]
+   },
+   {
+    "nom": "Museum TV",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Museum",
+     "Museum TV HD"
+    ]
+   },
+   {
+    "nom": "Seasons",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Seasons HD"
+    ]
+   },
+   {
+    "nom": "Equidia Live",
+    "categorie": "Sport",
+    "aussi": [
+     "Equidia Live HD"
+    ]
+   },
+   {
+    "nom": "Equidia Life",
+    "categorie": "Sport",
+    "aussi": [
+     "Equidia Life HD"
+    ]
+   },
+   {
+    "nom": "Eurosport 360",
+    "categorie": "Sport",
+    "aussi": [
+     "Eurosport 360 1"
+    ]
+   },
+   {
+    "nom": "Sport en France",
+    "categorie": "Sport",
+    "aussi": [
+     "Sport en France HD"
+    ]
+   },
+   {
+    "nom": "M6 Music",
+    "categorie": "Musique",
+    "aussi": [
+     "M6 Music Hits"
+    ]
+   },
+   {
+    "nom": "NRJ Hits",
+    "categorie": "Musique",
+    "aussi": [
+     "NRJ Hits HD"
+    ]
+   },
+   {
+    "nom": "Clubbing TV",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Trace Latina",
+    "categorie": "Musique",
+    "aussi": [
+     "Trace Latina HD"
+    ]
+   },
+   {
+    "nom": "Trace Sport Stars",
+    "categorie": "Sport",
+    "aussi": [
+     "Trace Sports"
+    ]
+   },
+   {
+    "nom": "Nolife",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "Fashion TV",
+    "categorie": "Divertissement",
+    "aussi": [
+     "FashionTV"
+    ]
+   },
+   {
+    "nom": "MCM Top",
+    "categorie": "Musique",
+    "aussi": [
+     "MCM Top HD"
+    ]
+   },
+   {
+    "nom": "B-One",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Melody",
+    "categorie": "Musique",
+    "aussi": [
+     "Melody TV",
+     "Melody Classic"
+    ]
+   },
+   {
+    "nom": "Stingray Classica",
+    "categorie": "Musique",
+    "aussi": [
+     "Classica"
+    ]
+   },
+   {
+    "nom": "Stingray Djazz",
+    "categorie": "Musique",
+    "aussi": [
+     "Djazz"
+    ]
+   },
+   {
+    "nom": "Cstar Hits France",
+    "categorie": "Musique",
+    "aussi": [
+     "CStar Hits",
+     "C Star Hits"
+    ]
+   }
   ],
-  "fr": {
-    "canaux": [
-      {
-        "nom": "TF1",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "France 2",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "France 3",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "Canal+",
-        "categorie": "Généralistes",
-        "aussi": [
-          "CANAL+"
-        ]
-      },
-      {
-        "nom": "France 5",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "M6",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "Arte",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "C8",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "W9",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "TMC",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "TFX",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "NRJ 12",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "LCP",
-        "categorie": "Information",
-        "aussi": [
-          "LCP / Public Sénat",
-          "LCP Assemblée nationale",
-          "Public Sénat",
-          "LCP-Public Sénat"
-        ]
-      },
-      {
-        "nom": "France 4",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Culturebox"
-        ]
-      },
-      {
-        "nom": "BFM TV",
-        "categorie": "Information",
-        "aussi": [
-          "BFMTV"
-        ]
-      },
-      {
-        "nom": "CNews",
-        "categorie": "Information",
-        "aussi": [
-          "CNEWS"
-        ]
-      },
-      {
-        "nom": "CStar",
-        "categorie": "Divertissement",
-        "aussi": [
-          "CSTAR"
-        ]
-      },
-      {
-        "nom": "Gulli",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "_case_19_vacante_",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "TF1 Séries Films",
-        "categorie": "Séries",
-        "aussi": [
-          "TF1 Series Films"
-        ]
-      },
-      {
-        "nom": "L'Équipe",
-        "categorie": "Sport",
-        "aussi": [
-          "La chaîne L'Équipe",
-          "La chaine l'Equipe",
-          "L'Equipe"
-        ]
-      },
-      {
-        "nom": "6ter",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "RMC Story",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "RMC Découverte",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Chérie 25",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "LCI",
-        "categorie": "Information",
-        "aussi": [
-          "La Chaîne Info"
-        ]
-      },
-      {
-        "nom": "Franceinfo",
-        "categorie": "Information",
-        "aussi": [
-          "France Info",
-          "franceinfo:"
-        ]
-      },
-      {
-        "nom": "Canal+ Box Office",
-        "categorie": "Cinéma",
-        "aussi": [
-          "CANAL+ Box Office",
-          "CANAL+ BOX OFFICE"
-        ]
-      },
-      {
-        "nom": "Canal+ Grand Écran",
-        "categorie": "Cinéma",
-        "aussi": [
-          "CANAL+ Grand Écran",
-          "Canal+ Grand Ecran",
-          "CANAL+ GRAND ECRAN"
-        ]
-      },
-      {
-        "nom": "Canal+ Cinéma",
-        "categorie": "Cinéma",
-        "aussi": [
-          "CANAL+ Cinéma(s)",
-          "Canal+ Cinéma(s)",
-          "CANAL+ CINEMA(S)",
-          "Canal+ Cinemas"
-        ]
-      },
-      {
-        "nom": "Canal+ Sport",
-        "categorie": "Sport",
-        "aussi": [
-          "CANAL+ Sport",
-          "CANAL+ SPORT"
-        ]
-      },
-      {
-        "nom": "Canal+ Sport 360",
-        "categorie": "Sport",
-        "aussi": [
-          "CANAL+ Sport 360",
-          "CANAL+ SPORT 360"
-        ]
-      },
-      {
-        "nom": "Canal+ Foot",
-        "categorie": "Sport",
-        "aussi": [
-          "CANAL+ Foot",
-          "CANAL+ FOOT"
-        ]
-      },
-      {
-        "nom": "Canal+ Séries",
-        "categorie": "Séries",
-        "aussi": [
-          "CANAL+ Séries",
-          "Canal+ Series",
-          "CANAL+ SERIES"
-        ]
-      },
-      {
-        "nom": "Canal+ Docs",
-        "categorie": "Documentaire",
-        "aussi": [
-          "CANAL+ Docs",
-          "CANAL+ DOCS"
-        ]
-      },
-      {
-        "nom": "Canal+ Kids",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "CANAL+ Kids",
-          "CANAL+ KIDS"
-        ]
-      },
-      {
-        "nom": "DAZN 1",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 3",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 4",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 5",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Ligue 1+",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus",
-          "Ligue1+"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 1"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 2"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 3",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 3"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 4",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 4"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 5",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 5"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 6",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 6"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 7",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 7"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 8",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 8"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 9",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 9"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ 10",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1 Plus 10"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ UHD 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Ligue 1+ 4K UHD",
-          "Ligue 1+ 4K"
-        ]
-      },
-      {
-        "nom": "Ligue 1+ UHD 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "beIN Sports 1",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS 1"
-        ]
-      },
-      {
-        "nom": "beIN Sports 2",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS 2"
-        ]
-      },
-      {
-        "nom": "beIN Sports 3",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS 3"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 4",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 4"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 5",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 5"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 6",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 6"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 7",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 7"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 8",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 8"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 9",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 9"
-        ]
-      },
-      {
-        "nom": "beIN Sports Max 10",
-        "categorie": "Sport",
-        "aussi": [
-          "beIN SPORTS MAX 10"
-        ]
-      },
-      {
-        "nom": "Eurosport 1",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Eurosport 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Eurosport 4K",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Golf+",
-        "categorie": "Sport",
-        "aussi": [
-          "Golf +"
-        ]
-      },
-      {
-        "nom": "Foot+ 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 1"
-        ]
-      },
-      {
-        "nom": "Foot+ 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 2"
-        ]
-      },
-      {
-        "nom": "Foot+ 3",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 3"
-        ]
-      },
-      {
-        "nom": "Foot+ 4",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 4"
-        ]
-      },
-      {
-        "nom": "Foot+ 5",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 5"
-        ]
-      },
-      {
-        "nom": "Foot+ 6",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 6"
-        ]
-      },
-      {
-        "nom": "Foot+ 7",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 7"
-        ]
-      },
-      {
-        "nom": "Foot+ 8",
-        "categorie": "Sport",
-        "aussi": [
-          "Foot + 8"
-        ]
-      },
-      {
-        "nom": "Rugby+ 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 1"
-        ]
-      },
-      {
-        "nom": "Rugby+ 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 2"
-        ]
-      },
-      {
-        "nom": "Rugby+ 3",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 3"
-        ]
-      },
-      {
-        "nom": "Rugby+ 4",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 4"
-        ]
-      },
-      {
-        "nom": "Rugby+ 5",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 5"
-        ]
-      },
-      {
-        "nom": "Rugby+ 6",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 6"
-        ]
-      },
-      {
-        "nom": "Rugby+ 7",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 7"
-        ]
-      },
-      {
-        "nom": "Rugby+ 8",
-        "categorie": "Sport",
-        "aussi": [
-          "Rugby + 8"
-        ]
-      },
-      {
-        "nom": "Multisports 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 1"
-        ]
-      },
-      {
-        "nom": "Multisports 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 2"
-        ]
-      },
-      {
-        "nom": "Multisports 3",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 3"
-        ]
-      },
-      {
-        "nom": "Multisports 4",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 4"
-        ]
-      },
-      {
-        "nom": "Multisports 5",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 5"
-        ]
-      },
-      {
-        "nom": "Multisports 6",
-        "categorie": "Sport",
-        "aussi": [
-          "Multisport 6"
-        ]
-      },
-      {
-        "nom": "Infosport+",
-        "categorie": "Sport",
-        "aussi": [
-          "Infosport +"
-        ]
-      },
-      {
-        "nom": "Automoto",
-        "categorie": "Sport",
-        "aussi": [
-          "Automoto La chaîne",
-          "Automoto La Chaîne"
-        ]
-      },
-      {
-        "nom": "Equidia",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Golf Channel",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Ciné+ Premier",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Ciné+ Frisson",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Ciné+ Emotion",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Ciné+ Émotion"
-        ]
-      },
-      {
-        "nom": "Ciné+ Famiz",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Ciné+ Family"
-        ]
-      },
-      {
-        "nom": "Ciné+ Club",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Ciné+ Festival"
-        ]
-      },
-      {
-        "nom": "Ciné+ Classic",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "OCS",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Ciné+ OCS"
-        ]
-      },
-      {
-        "nom": "Polar+",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "TCM Cinéma",
-        "categorie": "Cinéma",
-        "aussi": [
-          "TCM"
-        ]
-      },
-      {
-        "nom": "Paramount Channel",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Paramount Network"
-        ]
-      },
-      {
-        "nom": "Paramount Channel Décalé",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Action",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Warner TV",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Warner TV Next",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "AB1",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Comedy Central",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "RTL9",
-        "categorie": "Cinéma",
-        "aussi": [
-          "RTL 9"
-        ]
-      },
-      {
-        "nom": "Paris Première",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "Téva",
-        "categorie": "Séries",
-        "aussi": [
-          "Teva"
-        ]
-      },
-      {
-        "nom": "TV Breizh",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Mangas",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Game One",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "Piwi+",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Télétoon+",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Teletoon+"
-        ]
-      },
-      {
-        "nom": "Télétoon+1",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Teletoon+1",
-          "Télétoon +1"
-        ]
-      },
-      {
-        "nom": "Disney Channel",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Disney Channel +1",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Disney Channel+1"
-        ]
-      },
-      {
-        "nom": "Disney Junior",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Nickelodeon",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Nickelodeon +1",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Nickelodeon+1"
-        ]
-      },
-      {
-        "nom": "Nickelodeon Junior",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Nickelodeon Teen",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Cartoon Network",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Cartoonito",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Boomerang",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Boomerang +1",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Boomerang+1"
-        ]
-      },
-      {
-        "nom": "Canal J",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "TiJi",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Discovery Channel",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Discovery Science",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Discovery Investigation",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Discovery Investigation (ID)",
-          "ID"
-        ]
-      },
-      {
-        "nom": "Planète+",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Planete+"
-        ]
-      },
-      {
-        "nom": "Planète+ Crime",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Planete+ Crime"
-        ]
-      },
-      {
-        "nom": "Planète+ Aventure",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Planete+ Aventure"
-        ]
-      },
-      {
-        "nom": "National Geographic",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "National Geographic Wild",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Nat Geo Wild"
-        ]
-      },
-      {
-        "nom": "Ushuaïa TV",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Ushuaia TV"
-        ]
-      },
-      {
-        "nom": "Histoire TV",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Toute l'Histoire",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Science & Vie TV",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Animaux",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Trek",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Chasse & Pêche",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Comédie+",
-        "categorie": "Divertissement",
-        "aussi": [
-          "Comedie+"
-        ]
-      },
-      {
-        "nom": "MTV",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "MTV Hits",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "MCM",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "RFM TV",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "Trace Urban",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "Olympia TV",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "Mezzo",
-        "categorie": "Musique"
-      },
-      {
-        "nom": "Mezzo Live HD",
-        "categorie": "Musique",
-        "aussi": [
-          "Mezzo Live"
-        ]
-      }
-    ],
-    "priorites": [
-      [
-        "Canal+ Foot",
-        "CANAL+ Foot"
-      ],
-      [
-        "Canal+ Sport",
-        "CANAL+ Sport"
-      ],
-      [
-        "Canal+ Sport 360",
-        "CANAL+ Sport 360"
-      ],
-      [
-        "Ligue 1+",
-        "Ligue 1 Plus"
-      ],
-      [
-        "DAZN 1"
-      ],
-      [
-        "DAZN 2"
-      ],
-      [
-        "beIN Sports 1",
-        "beIN SPORTS 1"
-      ],
-      [
-        "beIN Sports 2",
-        "beIN SPORTS 2"
-      ],
-      [
-        "beIN Sports 3",
-        "beIN SPORTS 3"
-      ],
-      [
-        "L'Équipe",
-        "La chaîne L'Équipe",
-        "La chaine l'Equipe"
-      ],
-      [
-        "Eurosport 1"
-      ],
-      [
-        "Eurosport 2"
-      ],
-      [
-        "Infosport+",
-        "Infosport +"
-      ]
+  "priorites": [
+   [
+    "Canal+ Foot",
+    "CANAL+ Foot"
+   ],
+   [
+    "Canal+ Sport",
+    "CANAL+ Sport"
+   ],
+   [
+    "Canal+ Sport 360",
+    "CANAL+ Sport 360"
+   ],
+   [
+    "Ligue 1+",
+    "Ligue 1 Plus"
+   ],
+   [
+    "DAZN 1"
+   ],
+   [
+    "DAZN 2"
+   ],
+   [
+    "beIN Sports 1",
+    "beIN SPORTS 1"
+   ],
+   [
+    "beIN Sports 2",
+    "beIN SPORTS 2"
+   ],
+   [
+    "beIN Sports 3",
+    "beIN SPORTS 3"
+   ],
+   [
+    "L'Équipe",
+    "La chaîne L'Équipe",
+    "La chaine l'Equipe"
+   ],
+   [
+    "Eurosport 1"
+   ],
+   [
+    "Eurosport 2"
+   ],
+   [
+    "Infosport+",
+    "Infosport +"
+   ]
+  ]
+ },
+ "es": {
+  "canaux": [
+   {
+    "nom": "La 1",
+    "categorie": "Généralistes",
+    "aussi": [
+     "La 1 HD",
+     "La 1 TVE",
+     "TVE 1",
+     "TVE1",
+     "La Uno"
     ]
-  },
-  "es": {
-    "canaux": [
-      {
-        "nom": "La 1",
-        "categorie": "Généralistes",
-        "aussi": [
-          "La 1 HD",
-          "TVE 1",
-          "La Uno"
-        ]
-      },
-      {
-        "nom": "La 2",
-        "categorie": "Documentaire",
-        "aussi": [
-          "La 2 HD",
-          "TVE 2"
-        ]
-      },
-      {
-        "nom": "Antena 3",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Antena 3 HD"
-        ]
-      },
-      {
-        "nom": "Cuatro",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Cuatro HD"
-        ]
-      },
-      {
-        "nom": "Telecinco",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Telecinco HD"
-        ]
-      },
-      {
-        "nom": "laSexta",
-        "categorie": "Généralistes",
-        "aussi": [
-          "La Sexta",
-          "laSexta HD"
-        ]
-      },
-      {
-        "nom": "Neox",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "Nova",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Mega",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Atreseries",
-        "categorie": "Séries",
-        "aussi": [
-          "A3Series",
-          "A3S"
-        ]
-      },
-      {
-        "nom": "Factoría de Ficción",
-        "categorie": "Séries",
-        "aussi": [
-          "FDF"
-        ]
-      },
-      {
-        "nom": "Divinity",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "Energy",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Be Mad",
-        "categorie": "Cinéma",
-        "aussi": [
-          "BeMad TV",
-          "BeMad"
-        ]
-      },
-      {
-        "nom": "DMAX",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "DKISS",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "TEN",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "TRECE",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "El Toro TV",
-        "categorie": "Information"
-      },
-      {
-        "nom": "Squirrel TV",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "BOM Cine",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "TV3",
-        "categorie": "Généralistes",
-        "aussi": [
-          "3Cat",
-          "TV3 Catalunya"
-        ]
-      },
-      {
-        "nom": "3/24",
-        "categorie": "Information",
-        "aussi": [
-          "324"
-        ]
-      },
-      {
-        "nom": "Esport3",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "SX3",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "El 33",
-          "Super3"
-        ]
-      },
-      {
-        "nom": "Telemadrid",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "LaOtra",
-        "categorie": "Généralistes",
-        "aussi": [
-          "La Otra"
-        ]
-      },
-      {
-        "nom": "Canal Sur",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Canal Sur 1"
-        ]
-      },
-      {
-        "nom": "Andalucía TV",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Andalucia TV"
-        ]
-      },
-      {
-        "nom": "ETB 1",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "ETB 2",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "ETB 3",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "ETB 4",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "TVG",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Televisión de Galicia",
-          "TVG1"
-        ]
-      },
-      {
-        "nom": "TVG2",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Aragón TV",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Aragon TV"
-        ]
-      },
-      {
-        "nom": "CMM",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Castilla-La Mancha Media",
-          "CMM TV"
-        ]
-      },
-      {
-        "nom": "À Punt",
-        "categorie": "Généralistes",
-        "aussi": [
-          "A Punt"
-        ]
-      },
-      {
-        "nom": "TPA",
-        "categorie": "Généralistes",
-        "aussi": [
-          "TPA A7",
-          "A7"
-        ]
-      },
-      {
-        "nom": "7RM",
-        "categorie": "Généralistes",
-        "aussi": [
-          "7 Televisión Región de Murcia"
-        ]
-      },
-      {
-        "nom": "TV Canaria",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Televisión Canaria"
-        ]
-      },
-      {
-        "nom": "IB3",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "CyL7",
-        "categorie": "Généralistes",
-        "aussi": [
-          "La 7 CyL",
-          "Castilla y León 7"
-        ]
-      },
-      {
-        "nom": "La 8",
-        "categorie": "Généralistes",
-        "aussi": [
-          "La 8 CyL"
-        ]
-      },
-      {
-        "nom": "Canal Extremadura",
-        "categorie": "Généralistes"
-      },
-      {
-        "nom": "Movistar Plus+",
-        "categorie": "Généralistes",
-        "aussi": [
-          "Movistar Plus"
-        ]
-      },
-      {
-        "nom": "Estrenos por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Estrenos"
-        ]
-      },
-      {
-        "nom": "Hits por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Hits"
-        ]
-      },
-      {
-        "nom": "Cine Español por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Cine Español"
-        ]
-      },
-      {
-        "nom": "Indie por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Indie"
-        ]
-      },
-      {
-        "nom": "Clásicos por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Clásicos"
-        ]
-      },
-      {
-        "nom": "Acción por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Acción"
-        ]
-      },
-      {
-        "nom": "Comedia por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Comedia"
-        ]
-      },
-      {
-        "nom": "Drama por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Drama"
-        ]
-      },
-      {
-        "nom": "Suspense por M+",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Movistar Suspense"
-        ]
-      },
-      {
-        "nom": "Documentales por M+",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Movistar Documentales"
-        ]
-      },
-      {
-        "nom": "Originales por M+",
-        "categorie": "Séries",
-        "aussi": [
-          "Movistar Originales"
-        ]
-      },
-      {
-        "nom": "Series por M+",
-        "categorie": "Séries",
-        "aussi": [
-          "Movistar Series",
-          "Movistar Series por M+"
-        ]
-      },
-      {
-        "nom": "Canal Hollywood",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "TCM España",
-        "categorie": "Cinéma",
-        "aussi": [
-          "TCM"
-        ]
-      },
-      {
-        "nom": "Somos",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Dark",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "XTRM",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "SundanceTV",
-        "categorie": "Cinéma",
-        "aussi": [
-          "SundanceTV España"
-        ]
-      },
-      {
-        "nom": "AXN",
-        "categorie": "Séries",
-        "aussi": [
-          "AXN España"
-        ]
-      },
-      {
-        "nom": "AXN Movies",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "Star Channel",
-        "categorie": "Séries",
-        "aussi": [
-          "Star Channel España"
-        ]
-      },
-      {
-        "nom": "Warner TV España",
-        "categorie": "Séries",
-        "aussi": [
-          "Warner TV"
-        ]
-      },
-      {
-        "nom": "Calle 13",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "SYFY",
-        "categorie": "Séries",
-        "aussi": [
-          "Syfy España",
-          "Syfy"
-        ]
-      },
-      {
-        "nom": "Cosmo",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Comedy Central",
-        "categorie": "Séries",
-        "aussi": [
-          "Comedy Central España"
-        ]
-      },
-      {
-        "nom": "SkyShowtime 1",
-        "categorie": "Cinéma"
-      },
-      {
-        "nom": "SkyShowtime 2",
-        "categorie": "Divertissement"
-      },
-      {
-        "nom": "BBC Series",
-        "categorie": "Séries"
-      },
-      {
-        "nom": "Paramount Network",
-        "categorie": "Cinéma",
-        "aussi": [
-          "Paramount Channel"
-        ]
-      },
-      {
-        "nom": "Movistar LALIGA",
-        "categorie": "Sport",
-        "aussi": [
-          "Movistar LaLiga TV",
-          "LALIGA TV"
-        ]
-      },
-      {
-        "nom": "Movistar LALIGA 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Movistar LaLiga TV 2"
-        ]
-      },
-      {
-        "nom": "DAZN LaLiga",
-        "categorie": "Sport",
-        "aussi": [
-          "DAZN La Liga"
-        ]
-      },
-      {
-        "nom": "DAZN LaLiga 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "LALIGA TV HYPERMOTION",
-        "categorie": "Sport",
-        "aussi": [
-          "LaLiga Hypermotion"
-        ]
-      },
-      {
-        "nom": "LALIGA TV HYPERMOTION 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Liga de Campeones",
-        "categorie": "Sport",
-        "aussi": [
-          "Movistar Champions"
-        ]
-      },
-      {
-        "nom": "Movistar Liga de Campeones 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Deportes",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Deportes 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Deportes 3",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Golf",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Movistar Golf 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Vamos por M+",
-        "categorie": "Sport",
-        "aussi": [
-          "Vamos",
-          "Movistar Vamos"
-        ]
-      },
-      {
-        "nom": "DAZN 1",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 2",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 3",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN 4",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN F1",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "DAZN MotoGP",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Eurosport 1",
-        "categorie": "Sport",
-        "aussi": [
-          "Eurosport 1 España"
-        ]
-      },
-      {
-        "nom": "Eurosport 2",
-        "categorie": "Sport",
-        "aussi": [
-          "Eurosport 2 España"
-        ]
-      },
-      {
-        "nom": "Teledeporte",
-        "categorie": "Sport",
-        "aussi": [
-          "TDP"
-        ]
-      },
-      {
-        "nom": "Real Madrid TV",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Betis TV",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Sevilla FC+",
-        "categorie": "Sport",
-        "aussi": [
-          "Sevilla FC TV"
-        ]
-      },
-      {
-        "nom": "Caza y Pesca",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Iberalia TV",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Garage TV",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "Ubeat",
-        "categorie": "Sport"
-      },
-      {
-        "nom": "National Geographic",
-        "categorie": "Documentaire",
-        "aussi": [
-          "National Geographic España"
-        ]
-      },
-      {
-        "nom": "Nat Geo Wild",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Historia",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Discovery Channel",
-        "categorie": "Documentaire",
-        "aussi": [
-          "Discovery Channel España"
-        ]
-      },
-      {
-        "nom": "BBC Earth",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Odisea",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "AMC CRIME",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "AMC BREAK",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Viajar",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Escapa TV",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Canal Cocina",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Decasa",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "BBC Food",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "BBC Lifestyle",
-        "categorie": "Documentaire"
-      },
-      {
-        "nom": "Clan",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Clan TVE"
-        ]
-      },
-      {
-        "nom": "Boing",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Disney Channel",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Disney Channel España"
-        ]
-      },
-      {
-        "nom": "Disney Junior",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Disney Junior España"
-        ]
-      },
-      {
-        "nom": "Nickelodeon",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Nickelodeon España"
-        ]
-      },
-      {
-        "nom": "Nick Jr.",
-        "categorie": "Jeunesse",
-        "aussi": [
-          "Nick Jr. España"
-        ]
-      },
-      {
-        "nom": "DreamWorks Channel",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Baby TV",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Enfamilia",
-        "categorie": "Jeunesse"
-      },
-      {
-        "nom": "Canal 24 Horas",
-        "categorie": "Information",
-        "aussi": [
-          "24 Horas",
-          "24h"
-        ]
-      },
-      {
-        "nom": "Euronews",
-        "categorie": "Information",
-        "aussi": [
-          "Euronews en español"
-        ]
-      },
-      {
-        "nom": "Negocios TV",
-        "categorie": "Information"
-      },
-      {
-        "nom": "CNN en Español",
-        "categorie": "Information"
-      },
-      {
-        "nom": "BBC News",
-        "categorie": "Information"
-      },
-      {
-        "nom": "France 24",
-        "categorie": "Information",
-        "aussi": [
-          "France 24 Español"
-        ]
-      },
-      {
-        "nom": "Al Jazeera",
-        "categorie": "Information",
-        "aussi": [
-          "Al Jazeera English"
-        ]
-      },
-      {
-        "nom": "CNBC",
-        "categorie": "Information",
-        "aussi": [
-          "CNBC Europe"
-        ]
-      },
-      {
-        "nom": "Bloomberg TV",
-        "categorie": "Information"
-      },
-      {
-        "nom": "TV5Monde",
-        "categorie": "Information",
-        "aussi": [
-          "TV5Monde Europe"
-        ]
-      },
-      {
-        "nom": "MTV España",
-        "categorie": "Musique & Culture",
-        "aussi": [
-          "MTV"
-        ]
-      },
-      {
-        "nom": "MTV 00s",
-        "categorie": "Musique & Culture"
-      },
-      {
-        "nom": "MTV Live",
-        "categorie": "Musique & Culture",
-        "aussi": [
-          "MTV Live HD"
-        ]
-      },
-      {
-        "nom": "Sol Música",
-        "categorie": "Musique & Culture"
-      },
-      {
-        "nom": "Mezzo",
-        "categorie": "Musique & Culture",
-        "aussi": [
-          "Mezzo España"
-        ]
-      },
-      {
-        "nom": "Mezzo Live",
-        "categorie": "Musique & Culture",
-        "aussi": [
-          "Mezzo Live HD"
-        ]
-      },
-      {
-        "nom": "Stingray Classica",
-        "categorie": "Musique & Culture"
-      }
-    ],
-    "priorites": [
-      [
-        "Movistar LALIGA",
-        "Movistar LaLiga TV",
-        "LALIGA TV"
-      ],
-      [
-        "Movistar Liga de Campeones",
-        "Movistar Champions"
-      ],
-      [
-        "Movistar Deportes"
-      ],
-      [
-        "Vamos por M+",
-        "Vamos",
-        "Movistar Vamos"
-      ],
-      [
-        "DAZN LaLiga",
-        "DAZN La Liga"
-      ],
-      [
-        "DAZN 1"
-      ],
-      [
-        "DAZN 2"
-      ],
-      [
-        "DAZN F1"
-      ],
-      [
-        "Eurosport 1",
-        "Eurosport 1 España"
-      ],
-      [
-        "Teledeporte",
-        "TDP"
-      ],
-      [
-        "Real Madrid TV"
-      ]
+   },
+   {
+    "nom": "La 2",
+    "categorie": "Généralistes",
+    "aussi": [
+     "La 2 HD",
+     "La 2 TVE",
+     "TVE 2",
+     "La Dos"
     ]
-  }
+   },
+   {
+    "nom": "Antena 3",
+    "categorie": "Généralistes",
+    "aussi": [
+     "Antena 3 HD",
+     "A3",
+     "Antena3"
+    ]
+   },
+   {
+    "nom": "Cuatro",
+    "categorie": "Généralistes",
+    "aussi": [
+     "Cuatro HD"
+    ]
+   },
+   {
+    "nom": "Telecinco",
+    "categorie": "Généralistes",
+    "aussi": [
+     "Telecinco HD",
+     "Tele 5"
+    ]
+   },
+   {
+    "nom": "laSexta",
+    "categorie": "Généralistes",
+    "aussi": [
+     "La Sexta",
+     "LaSexta HD",
+     "La Sexta HD"
+    ]
+   },
+   {
+    "nom": "Neox",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Neox HD"
+    ]
+   },
+   {
+    "nom": "Nova",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Nova HD"
+    ]
+   },
+   {
+    "nom": "Mega",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Mega HD"
+    ]
+   },
+   {
+    "nom": "Atreseries",
+    "categorie": "Séries",
+    "aussi": [
+     "Atreseries HD",
+     "Atres Series"
+    ]
+   },
+   {
+    "nom": "FDF",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Factoría de Ficción",
+     "Factoria de Ficcion",
+     "FDF HD"
+    ]
+   },
+   {
+    "nom": "Divinity",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Divinity HD"
+    ]
+   },
+   {
+    "nom": "Energy",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Energy HD"
+    ]
+   },
+   {
+    "nom": "Be Mad",
+    "categorie": "Divertissement",
+    "aussi": [
+     "BeMad",
+     "Be Mad TV",
+     "Be Mad HD"
+    ]
+   },
+   {
+    "nom": "DMAX",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Dmax",
+     "DMAX HD"
+    ]
+   },
+   {
+    "nom": "DKISS",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Dkiss",
+     "DKiss",
+     "DKISS HD"
+    ]
+   },
+   {
+    "nom": "Paramount Network",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Paramount Channel",
+     "Paramount Network HD"
+    ]
+   },
+   {
+    "nom": "TEN",
+    "categorie": "Généralistes",
+    "aussi": [
+     "TEN HD"
+    ]
+   },
+   {
+    "nom": "Trece",
+    "categorie": "Généralistes",
+    "aussi": [
+     "TRECE",
+     "13TV",
+     "Trece HD"
+    ]
+   },
+   {
+    "nom": "24 Horas",
+    "categorie": "Information",
+    "aussi": [
+     "24H",
+     "Canal 24 Horas",
+     "24 Horas HD",
+     "Canal 24h",
+     "24h"
+    ]
+   },
+   {
+    "nom": "Euronews",
+    "categorie": "Information",
+    "aussi": [
+     "Euronews Español",
+     "Euronews ES"
+    ]
+   },
+   {
+    "nom": "CNN en Español",
+    "categorie": "Information",
+    "aussi": [
+     "CNN International",
+     "CNN Internacional",
+     "CNN"
+    ]
+   },
+   {
+    "nom": "France 24",
+    "categorie": "Information",
+    "aussi": [
+     "France 24 Español",
+     "France 24 Español HD"
+    ]
+   },
+   {
+    "nom": "Movistar Plus+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Movistar Plus",
+     "M+",
+     "Canal+ 1",
+     "Movistar Plus+ HD"
+    ]
+   },
+   {
+    "nom": "Estrenos por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Estrenos",
+     "Estrenos M+",
+     "Movistar Estrenos"
+    ]
+   },
+   {
+    "nom": "Hits por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Hits",
+     "Hits M+",
+     "Movistar Hits"
+    ]
+   },
+   {
+    "nom": "Cine Español por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Cine Español",
+     "Cine Español M+"
+    ]
+   },
+   {
+    "nom": "Indie por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Indie",
+     "Cine Indie"
+    ]
+   },
+   {
+    "nom": "Clásicos por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Clásicos",
+     "Clasicos por M+",
+     "Cine Clásico"
+    ]
+   },
+   {
+    "nom": "Acción por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Acción",
+     "Accion por M+",
+     "Cine Acción"
+    ]
+   },
+   {
+    "nom": "Comedia por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Comedia",
+     "Cine Comedia"
+    ]
+   },
+   {
+    "nom": "Drama por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Drama",
+     "Cine Drama"
+    ]
+   },
+   {
+    "nom": "Suspense por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Suspense",
+     "Cine Suspense"
+    ]
+   },
+   {
+    "nom": "Documentales por M+",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Documentales",
+     "Documentales M+"
+    ]
+   },
+   {
+    "nom": "Series por M+",
+    "categorie": "Séries",
+    "aussi": [
+     "Series",
+     "Series M+",
+     "Movistar Series"
+    ]
+   },
+   {
+    "nom": "Originales por M+",
+    "categorie": "Séries",
+    "aussi": [
+     "Originales",
+     "Originales M+",
+     "Movistar Originales"
+    ]
+   },
+   {
+    "nom": "Canal Hollywood",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Hollywood",
+     "Canal Hollywood HD"
+    ]
+   },
+   {
+    "nom": "TCM",
+    "categorie": "Cinéma",
+    "aussi": [
+     "TCM España",
+     "TCM HD"
+    ]
+   },
+   {
+    "nom": "Somos",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Somos HD"
+    ]
+   },
+   {
+    "nom": "Dark",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Dark HD"
+    ]
+   },
+   {
+    "nom": "XTRM",
+    "categorie": "Cinéma",
+    "aussi": [
+     "Xtrm",
+     "XTRM HD"
+    ]
+   },
+   {
+    "nom": "AXN Movies",
+    "categorie": "Cinéma",
+    "aussi": [
+     "AXN White",
+     "AXN Movies HD"
+    ]
+   },
+   {
+    "nom": "Sundance TV",
+    "categorie": "Cinéma",
+    "aussi": [
+     "SundanceTV",
+     "Sundance TV HD"
+    ]
+   },
+   {
+    "nom": "AXN",
+    "categorie": "Séries",
+    "aussi": [
+     "AXN HD"
+    ]
+   },
+   {
+    "nom": "Star Channel",
+    "categorie": "Séries",
+    "aussi": [
+     "Star Channel HD"
+    ]
+   },
+   {
+    "nom": "Warner TV",
+    "categorie": "Séries",
+    "aussi": [
+     "Warner TV España",
+     "Warner TV HD",
+     "Warner"
+    ]
+   },
+   {
+    "nom": "Calle 13",
+    "categorie": "Séries",
+    "aussi": [
+     "Calle 13 HD"
+    ]
+   },
+   {
+    "nom": "SYFY",
+    "categorie": "Séries",
+    "aussi": [
+     "Syfy",
+     "Syfy HD",
+     "SyFy"
+    ]
+   },
+   {
+    "nom": "Cosmo",
+    "categorie": "Séries",
+    "aussi": [
+     "Cosmo HD"
+    ]
+   },
+   {
+    "nom": "Comedy Central",
+    "categorie": "Séries",
+    "aussi": [
+     "Comedy Central HD",
+     "Comedy Central España"
+    ]
+   },
+   {
+    "nom": "SkyShowtime 1",
+    "categorie": "Séries",
+    "aussi": [
+     "SkyShowtime",
+     "Sky Showtime 1"
+    ]
+   },
+   {
+    "nom": "SkyShowtime 2",
+    "categorie": "Séries",
+    "aussi": [
+     "Sky Showtime 2"
+    ]
+   },
+   {
+    "nom": "BBC Series",
+    "categorie": "Séries",
+    "aussi": [
+     "BBC Series HD"
+    ]
+   },
+   {
+    "nom": "AMC",
+    "categorie": "Séries",
+    "aussi": [
+     "AMC HD",
+     "AMC España"
+    ]
+   },
+   {
+    "nom": "AMC Break",
+    "categorie": "Séries",
+    "aussi": [
+     "AMC BREAK",
+     "AMC Break HD"
+    ]
+   },
+   {
+    "nom": "AMC Crime",
+    "categorie": "Séries",
+    "aussi": [
+     "AMC CRIME",
+     "AMC Crime HD"
+    ]
+   },
+   {
+    "nom": "Crimen & Investigación",
+    "categorie": "Séries",
+    "aussi": [
+     "Crimen y Investigación",
+     "Crime & Investigation",
+     "Crimen e Investigación"
+    ]
+   },
+   {
+    "nom": "Movistar LALIGA",
+    "categorie": "Sport",
+    "aussi": [
+     "Movistar La Liga",
+     "M+ LaLiga",
+     "LaLiga TV",
+     "LALIGA TV",
+     "LaLiga Movistar",
+     "Movistar LaLiga TV",
+     "LaLiga TV por M+",
+     "M+ LALIGA"
+    ]
+   },
+   {
+    "nom": "Movistar LALIGA 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Movistar La Liga 2",
+     "LaLiga TV 2",
+     "M+ LaLiga 2",
+     "LALIGA TV 2"
+    ]
+   },
+   {
+    "nom": "Movistar Liga de Campeones",
+    "categorie": "Sport",
+    "aussi": [
+     "Movistar Champions",
+     "M+ Liga de Campeones",
+     "Liga de Campeones",
+     "Champions League"
+    ]
+   },
+   {
+    "nom": "Movistar Liga de Campeones 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Movistar Champions 2",
+     "Liga de Campeones 2",
+     "M+ Liga de Campeones 2"
+    ]
+   },
+   {
+    "nom": "Movistar Deportes",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Deportes",
+     "Movistar Deportes HD",
+     "Deportes por M+"
+    ]
+   },
+   {
+    "nom": "Movistar Deportes 2",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Deportes 2"
+    ]
+   },
+   {
+    "nom": "Movistar Deportes 3",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Deportes 3"
+    ]
+   },
+   {
+    "nom": "Vamos por M+",
+    "categorie": "Sport",
+    "aussi": [
+     "Vamos",
+     "Movistar Vamos",
+     "Vamos M+"
+    ]
+   },
+   {
+    "nom": "Movistar Golf",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Golf",
+     "Golf por M+"
+    ]
+   },
+   {
+    "nom": "Movistar Golf 2",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Golf 2"
+    ]
+   },
+   {
+    "nom": "DAZN LaLiga",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN La Liga",
+     "DAZN LALIGA",
+     "DAZN LaLiga 1"
+    ]
+   },
+   {
+    "nom": "DAZN LaLiga 2",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN La Liga 2",
+     "DAZN LALIGA 2"
+    ]
+   },
+   {
+    "nom": "LALIGA HYPERMOTION",
+    "categorie": "Sport",
+    "aussi": [
+     "LALIGA TV HYPERMOTION",
+     "LaLiga Hypermotion",
+     "LALIGA TV Hypermotion",
+     "LaLiga TV Hypermotion"
+    ]
+   },
+   {
+    "nom": "LALIGA HYPERMOTION 2",
+    "categorie": "Sport",
+    "aussi": [
+     "LALIGA TV HYPERMOTION 2",
+     "LaLiga Hypermotion 2"
+    ]
+   },
+   {
+    "nom": "DAZN 1",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN 1 HD",
+     "DAZN 1 España"
+    ]
+   },
+   {
+    "nom": "DAZN 2",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN 2 HD"
+    ]
+   },
+   {
+    "nom": "DAZN 3",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN 3 HD"
+    ]
+   },
+   {
+    "nom": "DAZN 4",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN 4 HD"
+    ]
+   },
+   {
+    "nom": "DAZN F1",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN Fórmula 1",
+     "DAZN Formula 1",
+     "DAZN F1 HD"
+    ]
+   },
+   {
+    "nom": "DAZN MotoGP",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN Moto GP"
+    ]
+   },
+   {
+    "nom": "DAZN Baloncesto",
+    "categorie": "Sport",
+    "aussi": [
+     "Euroliga",
+     "DAZN Euroliga",
+     "Euroleague TV"
+    ]
+   },
+   {
+    "nom": "Eurosport 1",
+    "categorie": "Sport",
+    "aussi": [
+     "Eurosport 1 España",
+     "Eurosport",
+     "Eurosport 1 HD"
+    ]
+   },
+   {
+    "nom": "Eurosport 2",
+    "categorie": "Sport",
+    "aussi": [
+     "Eurosport 2 España",
+     "Eurosport 2 HD"
+    ]
+   },
+   {
+    "nom": "Teledeporte",
+    "categorie": "Sport",
+    "aussi": [
+     "TDP",
+     "Teledeporte HD"
+    ]
+   },
+   {
+    "nom": "Real Madrid TV",
+    "categorie": "Sport",
+    "aussi": [
+     "Real Madrid TV HD",
+     "RMTV"
+    ]
+   },
+   {
+    "nom": "GOL",
+    "categorie": "Sport",
+    "aussi": [
+     "Gol",
+     "GOL TV",
+     "GOLTV",
+     "Gol Play"
+    ]
+   },
+   {
+    "nom": "Caza y Pesca",
+    "categorie": "Sport",
+    "aussi": [
+     "Caza y Pesca HD"
+    ]
+   },
+   {
+    "nom": "National Geographic",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Nat Geo",
+     "National Geographic HD",
+     "NatGeo"
+    ]
+   },
+   {
+    "nom": "Nat Geo Wild",
+    "categorie": "Documentaire",
+    "aussi": [
+     "National Geographic Wild",
+     "Nat Geo Wild HD"
+    ]
+   },
+   {
+    "nom": "Historia",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Canal Historia",
+     "Historia HD",
+     "El Canal Historia"
+    ]
+   },
+   {
+    "nom": "Discovery Channel",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Discovery",
+     "Discovery Channel HD"
+    ]
+   },
+   {
+    "nom": "TLC",
+    "categorie": "Documentaire",
+    "aussi": [
+     "TLC HD",
+     "TLC España"
+    ]
+   },
+   {
+    "nom": "BBC Earth",
+    "categorie": "Documentaire",
+    "aussi": [
+     "BBC Earth HD"
+    ]
+   },
+   {
+    "nom": "Odisea",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Odisea HD"
+    ]
+   },
+   {
+    "nom": "Viajar",
+    "categorie": "Documentaire",
+    "aussi": [
+     "Canal Viajar"
+    ]
+   },
+   {
+    "nom": "Canal Cocina",
+    "categorie": "Divertissement",
+    "aussi": [
+     "Canal Cocina HD",
+     "Cocina"
+    ]
+   },
+   {
+    "nom": "Decasa",
+    "categorie": "Divertissement",
+    "aussi": [
+     "DeCasa",
+     "Decasa HD"
+    ]
+   },
+   {
+    "nom": "BBC Food",
+    "categorie": "Divertissement",
+    "aussi": [
+     "BBC Food HD"
+    ]
+   },
+   {
+    "nom": "BBC Lifestyle",
+    "categorie": "Divertissement",
+    "aussi": [
+     "BBC Lifestyle HD"
+    ]
+   },
+   {
+    "nom": "Bom Cine",
+    "categorie": "Divertissement",
+    "aussi": [
+     "BOM Cine",
+     "Bom Cine HD"
+    ]
+   },
+   {
+    "nom": "Clan",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Clan TVE",
+     "Clan HD",
+     "Clan TV"
+    ]
+   },
+   {
+    "nom": "Boing",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Boing HD"
+    ]
+   },
+   {
+    "nom": "Disney Channel",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Disney Channel HD",
+     "Disney Channel España"
+    ]
+   },
+   {
+    "nom": "Disney Junior",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Disney Junior HD"
+    ]
+   },
+   {
+    "nom": "Nickelodeon",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Nickelodeon HD",
+     "Nick"
+    ]
+   },
+   {
+    "nom": "Nick Jr.",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Nick Jr",
+     "Nick Jr. HD",
+     "Nickelodeon Junior"
+    ]
+   },
+   {
+    "nom": "DreamWorks",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "DreamWorks Channel",
+     "DreamWorks HD"
+    ]
+   },
+   {
+    "nom": "Baby TV",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "BabyTV",
+     "Baby TV HD"
+    ]
+   },
+   {
+    "nom": "Cartoon Network",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Cartoon Network HD"
+    ]
+   },
+   {
+    "nom": "Boomerang",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Boomerang HD"
+    ]
+   },
+   {
+    "nom": "Cartoonito",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "Cartoonito HD"
+    ]
+   },
+   {
+    "nom": "Enfamilia",
+    "categorie": "Jeunesse",
+    "aussi": [
+     "En Familia"
+    ]
+   },
+   {
+    "nom": "MTV España",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV",
+     "MTV Spain",
+     "MTV HD"
+    ]
+   },
+   {
+    "nom": "MTV 00s",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV 00's",
+     "MTV 00s HD"
+    ]
+   },
+   {
+    "nom": "MTV Live",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV Live HD"
+    ]
+   },
+   {
+    "nom": "Sol Música",
+    "categorie": "Musique",
+    "aussi": [
+     "Sol Musica"
+    ]
+   },
+   {
+    "nom": "Ubeat",
+    "categorie": "Musique",
+    "aussi": [
+     "UBEAT",
+     "Ubeat TV"
+    ]
+   },
+   {
+    "nom": "Mezzo",
+    "categorie": "Musique",
+    "aussi": [
+     "Mezzo HD"
+    ]
+   },
+   {
+    "nom": "Mezzo Live",
+    "categorie": "Musique",
+    "aussi": [
+     "Mezzo Live HD"
+    ]
+   },
+   {
+    "nom": "Stingray Classica",
+    "categorie": "Musique",
+    "aussi": [
+     "Classica"
+    ]
+   }
+  ],
+  "priorites": [
+   [
+    "Movistar LALIGA",
+    "Movistar La Liga",
+    "LaLiga TV"
+   ],
+   [
+    "Movistar Liga de Campeones",
+    "Movistar Champions"
+   ],
+   [
+    "Movistar Deportes"
+   ],
+   [
+    "Vamos por M+",
+    "Vamos"
+   ],
+   [
+    "DAZN LaLiga",
+    "DAZN La Liga"
+   ],
+   [
+    "DAZN 1"
+   ],
+   [
+    "DAZN 2"
+   ],
+   [
+    "DAZN F1"
+   ],
+   [
+    "Eurosport 1"
+   ],
+   [
+    "Teledeporte",
+    "TDP"
+   ],
+   [
+    "Real Madrid TV"
+   ],
+   [
+    "GOL"
+   ]
+  ]
+ }
 }
