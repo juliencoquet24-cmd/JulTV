@@ -474,17 +474,34 @@ export default function App() {
 
 // ------------------------------------------------------------------ ligne
 
+// Le logo vient de serveurs tiers (Movistar, Orange) qui refusent parfois les
+// requêtes portant un « referer » étranger : on n'en envoie pas. Si l'image
+// échoue quand même, le nom prend sa place plutôt que de laisser un trou.
+function Logo({ icone, nom }) {
+  const [erreur, setErreur] = useState(false);
+  if (!icone || erreur) {
+    return <span className="logo logo-texte" title={nom}>{nom}</span>;
+  }
+  return (
+    <img
+      className="logo"
+      src={icone}
+      alt={nom}
+      title={nom}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={() => setErreur(true)}
+    />
+  );
+}
+
 function Ligne({ l, jour, tz, fenetre, maintenant, xDe, onOuvrir }) {
   return (
     <div className={l.priorite ? "ligne en-avant" : "ligne"}>
       <div className="rail" data-cat={l.categorie}>
         <span className="pastille" aria-hidden="true" />
         {l.numero ? <span className="canal">{l.numero}</span> : <span className="canal vide" aria-hidden="true" />}
-        {l.icone ? (
-          <img className="logo" src={l.icone} alt={l.nom} title={l.nom} loading="lazy" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
-        ) : (
-          <span className="logo logo-texte" title={l.nom}>{l.nom}</span>
-        )}
+        <Logo icone={l.icone} nom={l.nom} />
       </div>
 
       <div className="piste">

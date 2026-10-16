@@ -192,6 +192,17 @@ function extraireAffiche(texte) {
   return `${a.trim()} - ${b.trim()}`;
 }
 
+// Wikimedia refuse les miniatures de taille non standard (« 1200px- ») : on
+// redemande la même image en 250 px, taille acceptée et largement suffisante
+// pour un logo de 44 px.
+function urlIcone(u) {
+  if (!u) return null;
+  if (u.includes("upload.wikimedia.org") && u.includes("/thumb/")) {
+    return u.replace(/\/(\d+)px-([^/]+)$/, "/250px-$2");
+  }
+  return u;
+}
+
 function lireXmltv(xml, chaines, diffusions, exclues, source) {
   const doc = analyseur.parse(xml);
   const tv = doc?.tv;
@@ -210,7 +221,7 @@ function lireXmltv(xml, chaines, diffusions, exclues, source) {
     chaines.set(id, {
       id,
       nom,
-      icone: c.icon?.[0]?.["@src"] ?? c.icon?.["@src"] ?? null,
+      icone: urlIcone(c.icon?.[0]?.["@src"] ?? c.icon?.["@src"] ?? null),
     });
   }
 
@@ -997,6 +1008,14 @@ async function traiterPays(code, conf, numerotation) {
   const meilleur = new Map();
   let differes = 0;
   let etrangeres = 0;
+  const iconesParRang = new Map();
+  // Première passe : toutes les icônes disponibles, y compris celles de
+  // chaînes sans programme dans cette source.
+  for (const [, c] of chaines) {
+    if (!c.icone) continue;
+    const r = rangDe(c.nom, tCanaux).rang;
+    if (r !== null && !iconesParRang.has(r)) iconesParRang.set(r, c.icone);
+  }
   for (const [id, c] of chaines) {
     // Rien à montrer : pas la peine de l'afficher, même si elle est listée.
     if (!avecProgrammes.has(id)) {
@@ -1028,6 +1047,12 @@ async function traiterPays(code, conf, numerotation) {
     if (!listee) {
       etrangeres++;
       continue;
+    }
+
+    // Une source peut ne pas fournir d'icône quand une autre l'a : on retient
+    // la première icône vue pour chaque entrée de la liste.
+    if (c.icone && canal.rang !== null && !iconesParRang.has(canal.rang)) {
+      iconesParRang.set(canal.rang, c.icone);
     }
 
     const cle =
@@ -1063,8 +1088,30 @@ async function traiterPays(code, conf, numerotation) {
     // « CANAL+ CINEMA(S) HD » ou « beIN SPORTS 1 Dolby », qui ne tiennent
     // pas dans la colonne et se retrouvent tronqués à l'affichage.
     const canon = nomCanonique(m.c.nom, tNoms);
-    gardees.set(m.id, { ...m.c, nom: canon ?? nomPropre(m.c.nom) });
+    gardees.set(m.id, {
+      ...m.c,
+      icone: m.c.icone ?? (m.num !== null ? iconesParRang.get(m.num) : null) ?? null,
+      nom: canon ?? nomPropre(m.c.nom),
+    });
     rangs.set(m.id, { num: m.num, pri: m.pri });
+  }
+  // Dernier recours : une chaîne numérotée (« Ligue 1+ 2 ») emprunte l'icône
+  // de sa famille (« Ligue 1+ », « Ligue 1+ 3 »…), qui est le même logo.
+  // Seulement des familles dont les membres partagent le même logo : les
+  // chaînes numérotées d'un même bouquet, pas « France 2 » et « France 3 ».
+  const FAMILLES = ["ligue1", "dazn", "beinsports", "rmcsport", "eurosport", "canalsport", "canallive", "mdeportes", "movistardeportes", "movistarligadecampeones", "movistarlaliga"];
+  const famille = (nom) => {
+    const n = normaliser(nom);
+    return FAMILLES.find((f) => n.startsWith(f)) ?? null;
+  };
+  const iconesFamille = new Map();
+  for (const c of gardees.values()) {
+    const f = famille(c.nom);
+    if (f && c.icone && !iconesFamille.has(f)) iconesFamille.set(f, c.icone);
+  }
+  for (const c of gardees.values()) {
+    const f = famille(c.nom);
+    if (!c.icone && f) c.icone = iconesFamille.get(f) ?? null;
   }
 
   /**
