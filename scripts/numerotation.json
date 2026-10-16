@@ -46,10 +46,6 @@
     "categorie": "Généralistes"
    },
    {
-    "nom": "C8",
-    "categorie": "Divertissement"
-   },
-   {
     "nom": "W9",
     "categorie": "Divertissement"
    },
@@ -138,10 +134,6 @@
    {
     "nom": "RMC Découverte",
     "categorie": "Documentaire"
-   },
-   {
-    "nom": "Chérie 25",
-    "categorie": "Séries"
    },
    {
     "nom": "RMC Life",
@@ -282,30 +274,11 @@
     "categorie": "Sport"
    },
    {
-    "nom": "DAZN 3",
-    "categorie": "Sport"
-   },
-   {
-    "nom": "DAZN 4",
-    "categorie": "Sport"
-   },
-   {
-    "nom": "DAZN 5",
-    "categorie": "Sport"
-   },
-   {
     "nom": "Ligue 1+",
     "categorie": "Sport",
     "aussi": [
      "Ligue 1 Plus",
      "Ligue1+"
-    ]
-   },
-   {
-    "nom": "Ligue 1+ 1",
-    "categorie": "Sport",
-    "aussi": [
-     "Ligue 1 Plus 1"
     ]
    },
    {
@@ -370,18 +343,6 @@
     "aussi": [
      "Ligue 1 Plus 10"
     ]
-   },
-   {
-    "nom": "Ligue 1+ UHD 1",
-    "categorie": "Sport",
-    "aussi": [
-     "Ligue 1+ 4K UHD",
-     "Ligue 1+ 4K"
-    ]
-   },
-   {
-    "nom": "Ligue 1+ UHD 2",
-    "categorie": "Sport"
    },
    {
     "nom": "beIN Sports 1",
@@ -462,8 +423,37 @@
     "categorie": "Sport"
    },
    {
-    "nom": "Eurosport 4K",
+    "nom": "RMC Sport 1",
     "categorie": "Sport"
+   },
+   {
+    "nom": "RMC Sport 2",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "RMC Sport Live 3",
+    "categorie": "Sport",
+    "aussi": [
+     "RMC Sport 3"
+    ]
+   },
+   {
+    "nom": "RMC Sport 4",
+    "categorie": "Sport",
+    "aussi": [
+     "RMCSport4.fr"
+    ]
+   },
+   {
+    "nom": "Canal+ Premier League",
+    "categorie": "Sport"
+   },
+   {
+    "nom": "CANAL+ Ligue 1 Uber Eats",
+    "categorie": "Sport",
+    "aussi": [
+     "Canal+ Ligue 1"
+    ]
    },
    {
     "nom": "Golf+",
@@ -473,164 +463,11 @@
     ]
    },
    {
-    "nom": "Foot+ 1",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 1"
-    ]
-   },
-   {
-    "nom": "Foot+ 2",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 2"
-    ]
-   },
-   {
-    "nom": "Foot+ 3",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 3"
-    ]
-   },
-   {
-    "nom": "Foot+ 4",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 4"
-    ]
-   },
-   {
-    "nom": "Foot+ 5",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 5"
-    ]
-   },
-   {
-    "nom": "Foot+ 6",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 6"
-    ]
-   },
-   {
-    "nom": "Foot+ 7",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 7"
-    ]
-   },
-   {
-    "nom": "Foot+ 8",
-    "categorie": "Sport",
-    "aussi": [
-     "Foot + 8"
-    ]
-   },
-   {
-    "nom": "Rugby+ 1",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 1"
-    ]
-   },
-   {
-    "nom": "Rugby+ 2",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 2"
-    ]
-   },
-   {
-    "nom": "Rugby+ 3",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 3"
-    ]
-   },
-   {
-    "nom": "Rugby+ 4",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 4"
-    ]
-   },
-   {
-    "nom": "Rugby+ 5",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 5"
-    ]
-   },
-   {
-    "nom": "Rugby+ 6",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 6"
-    ]
-   },
-   {
-    "nom": "Rugby+ 7",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 7"
-    ]
-   },
-   {
-    "nom": "Rugby+ 8",
-    "categorie": "Sport",
-    "aussi": [
-     "Rugby + 8"
-    ]
-   },
-   {
-    "nom": "Multisports 1",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 1"
-    ]
-   },
-   {
-    "nom": "Multisports 2",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 2"
-    ]
-   },
-   {
-    "nom": "Multisports 3",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 3"
-    ]
-   },
-   {
-    "nom": "Multisports 4",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 4"
-    ]
-   },
-   {
-    "nom": "Multisports 5",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 5"
-    ]
-   },
-   {
-    "nom": "Multisports 6",
-    "categorie": "Sport",
-    "aussi": [
-     "Multisport 6"
-    ]
-   },
-   {
     "nom": "Infosport+",
     "categorie": "Sport",
     "aussi": [
-     "Infosport +"
+     "Infosport +",
+     "InfosportPlus"
     ]
    },
    {
@@ -646,12 +483,11 @@
     "categorie": "Sport"
    },
    {
-    "nom": "Golf Channel",
-    "categorie": "Sport"
-   },
-   {
     "nom": "Ciné+ Premier",
-    "categorie": "Cinéma"
+    "categorie": "Cinéma",
+    "aussi": [
+     "Ciné+ Premier (Belgique)"
+    ]
    },
    {
     "nom": "Ciné+ Frisson",
@@ -683,25 +519,10 @@
     "categorie": "Cinéma"
    },
    {
-    "nom": "Ciné+ OCS Max",
+    "nom": "OCS",
     "categorie": "Cinéma",
     "aussi": [
-     "OCS Max",
-     "OCS Géants"
-    ]
-   },
-   {
-    "nom": "Ciné+ OCS Choc",
-    "categorie": "Cinéma",
-    "aussi": [
-     "OCS Choc"
-    ]
-   },
-   {
-    "nom": "Ciné+ OCS Pulp",
-    "categorie": "Cinéma",
-    "aussi": [
-     "OCS Pulp"
+     "OCS (Suisse)"
     ]
    },
    {
@@ -719,12 +540,16 @@
     "nom": "Paramount Channel",
     "categorie": "Cinéma",
     "aussi": [
-     "Paramount Network"
+     "Paramount Network",
+     "ParamountChannel.fr"
     ]
    },
    {
     "nom": "Paramount Channel Décalé",
-    "categorie": "Cinéma"
+    "categorie": "Cinéma",
+    "aussi": [
+     "ParamountChannelDecale.fr"
+    ]
    },
    {
     "nom": "Action",
@@ -774,7 +599,10 @@
    },
    {
     "nom": "Game One",
-    "categorie": "Divertissement"
+    "categorie": "Divertissement",
+    "aussi": [
+     "GameOne.fr"
+    ]
    },
    {
     "nom": "Piwi+",
@@ -803,7 +631,8 @@
     "nom": "Disney Channel +1",
     "categorie": "Jeunesse",
     "aussi": [
-     "Disney Channel+1"
+     "Disney Channel+1",
+     "DisneyChannelPlus1"
     ]
    },
    {
@@ -861,10 +690,6 @@
     "categorie": "Documentaire"
    },
    {
-    "nom": "Discovery Science",
-    "categorie": "Documentaire"
-   },
-   {
     "nom": "Discovery Investigation",
     "categorie": "Documentaire",
     "aussi": [
@@ -883,7 +708,8 @@
     "nom": "Planète+ Crime",
     "categorie": "Documentaire",
     "aussi": [
-     "Planete+ Crime"
+     "Planete+ Crime",
+     "Planète+ Crime Investigation"
     ]
    },
    {
@@ -913,7 +739,10 @@
    },
    {
     "nom": "Histoire TV",
-    "categorie": "Documentaire"
+    "categorie": "Documentaire",
+    "aussi": [
+     "Histoire"
+    ]
    },
    {
     "nom": "Toute l'Histoire",
@@ -921,7 +750,10 @@
    },
    {
     "nom": "Science & Vie TV",
-    "categorie": "Documentaire"
+    "categorie": "Documentaire",
+    "aussi": [
+     "Science et Vie TV"
+    ]
    },
    {
     "nom": "Animaux",
@@ -933,7 +765,10 @@
    },
    {
     "nom": "Chasse & Pêche",
-    "categorie": "Documentaire"
+    "categorie": "Documentaire",
+    "aussi": [
+     "Chasse et Pêche"
+    ]
    },
    {
     "nom": "Comédie+",
@@ -948,7 +783,10 @@
    },
    {
     "nom": "MTV Hits",
-    "categorie": "Musique"
+    "categorie": "Musique",
+    "aussi": [
+     "MTVHits.fr"
+    ]
    },
    {
     "nom": "MCM",
@@ -963,10 +801,6 @@
     "categorie": "Musique"
    },
    {
-    "nom": "Olympia TV",
-    "categorie": "Musique"
-   },
-   {
     "nom": "Mezzo",
     "categorie": "Musique"
    },
@@ -974,7 +808,8 @@
     "nom": "Mezzo Live HD",
     "categorie": "Musique",
     "aussi": [
-     "Mezzo Live"
+     "Mezzo Live",
+     "MezzoLiveHD"
     ]
    },
    {
@@ -1017,28 +852,11 @@
     ]
    },
    {
-    "nom": "Studio Canal",
-    "categorie": "Cinéma",
-    "aussi": [
-     "StudioCanal TV",
-     "Studiocanal"
-    ]
-   },
-   {
     "nom": "Canal+ Live",
     "categorie": "Sport",
     "aussi": [
      "CANAL+ Live",
      "Canal+ Live 1"
-    ]
-   },
-   {
-    "nom": "Canal+ Décalé",
-    "categorie": "Cinéma",
-    "aussi": [
-     "CANAL+ Décalé",
-     "Canal+ Decale",
-     "CANAL+ DECALE"
     ]
    },
    {
@@ -1054,20 +872,6 @@
     "categorie": "Documentaire",
     "aussi": [
      "Seasons HD"
-    ]
-   },
-   {
-    "nom": "Equidia Live",
-    "categorie": "Sport",
-    "aussi": [
-     "Equidia Live HD"
-    ]
-   },
-   {
-    "nom": "Equidia Life",
-    "categorie": "Sport",
-    "aussi": [
-     "Equidia Life HD"
     ]
    },
    {
@@ -1117,10 +921,6 @@
     ]
    },
    {
-    "nom": "Nolife",
-    "categorie": "Divertissement"
-   },
-   {
     "nom": "Fashion TV",
     "categorie": "Divertissement",
     "aussi": [
@@ -1167,6 +967,54 @@
      "CStar Hits",
      "C Star Hits"
     ]
+   },
+   {
+    "nom": "Disney XD",
+    "categorie": "Jeunesse"
+   },
+   {
+    "nom": "TLC",
+    "categorie": "Divertissement"
+   },
+   {
+    "nom": "MTV Rocks",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "MTV 80s",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV80s.fr"
+    ]
+   },
+   {
+    "nom": "MTV 90s",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV90’s.fr"
+    ]
+   },
+   {
+    "nom": "MTV 00s",
+    "categorie": "Musique",
+    "aussi": [
+     "MTV00s.fr"
+    ]
+   },
+   {
+    "nom": "MTV Dance",
+    "categorie": "Musique",
+    "aussi": [
+     "MTVDance.fr"
+    ]
+   },
+   {
+    "nom": "VH1",
+    "categorie": "Musique"
+   },
+   {
+    "nom": "Luxe TV",
+    "categorie": "Divertissement"
    }
   ],
   "priorites": [
@@ -1399,6 +1247,58 @@
     ]
    },
    {
+    "nom": "DW",
+    "categorie": "Information",
+    "aussi": [
+     "Deutsche Welle",
+     "DW Español"
+    ]
+   },
+   {
+    "nom": "Al Jazeera",
+    "categorie": "Information",
+    "aussi": [
+     "Al Jazeera English"
+    ]
+   },
+   {
+    "nom": "CNBC",
+    "categorie": "Information",
+    "aussi": [
+     "CNBC Europe"
+    ]
+   },
+   {
+    "nom": "Bloomberg TV",
+    "categorie": "Information",
+    "aussi": [
+     "Bloomberg",
+     "Bloomberg Europe TV"
+    ]
+   },
+   {
+    "nom": "TV5Monde",
+    "categorie": "Information",
+    "aussi": [
+     "TV5MONDE"
+    ]
+   },
+   {
+    "nom": "BBC News",
+    "categorie": "Information",
+    "aussi": [
+     "BBC World",
+     "BBC World News Europe HD"
+    ]
+   },
+   {
+    "nom": "Negocios TV",
+    "categorie": "Information",
+    "aussi": [
+     "Negocios.TV"
+    ]
+   },
+   {
     "nom": "CNN en Español",
     "categorie": "Information",
     "aussi": [
@@ -1431,6 +1331,8 @@
     "aussi": [
      "Estrenos",
      "Estrenos M+",
+     "M+ ESTRENOS HD",
+     "M+ Estrenos",
      "Movistar Estrenos"
     ]
    },
@@ -1440,6 +1342,8 @@
     "aussi": [
      "Hits",
      "Hits M+",
+     "M+ HITS HD",
+     "M+ Hits",
      "Movistar Hits"
     ]
    },
@@ -1448,57 +1352,82 @@
     "categorie": "Cinéma",
     "aussi": [
      "Cine Español",
-     "Cine Español M+"
+     "Cine Español M+",
+     "M+ Cine Español",
+     "M+Cine Español"
     ]
    },
    {
     "nom": "Indie por M+",
     "categorie": "Cinéma",
     "aussi": [
+     "Cine Indie",
      "Indie",
-     "Cine Indie"
+     "M+ Indie",
+     "M+ Indie HD"
     ]
    },
    {
     "nom": "Clásicos por M+",
     "categorie": "Cinéma",
     "aussi": [
-     "Clásicos",
+     "Cine Clásico",
      "Clasicos por M+",
-     "Cine Clásico"
+     "Clásicos",
+     "M+ CLÁSICOS HD",
+     "M+ Clásicos"
     ]
    },
    {
     "nom": "Acción por M+",
     "categorie": "Cinéma",
     "aussi": [
-     "Acción",
      "Accion por M+",
-     "Cine Acción"
+     "Acción",
+     "Cine Acción",
+     "M+ ACCIÓN HD",
+     "M+ Acción"
+    ]
+   },
+   {
+    "nom": "M+ Terror",
+    "categorie": "Cinéma",
+    "aussi": [
+     "M+ Terror.es"
+    ]
+   },
+   {
+    "nom": "M+ Romance",
+    "categorie": "Cinéma",
+    "aussi": [
+     "M+ Romance.es"
+    ]
+   },
+   {
+    "nom": "M+ Los 90",
+    "categorie": "Cinéma",
+    "aussi": [
+     "M+ Los 90"
     ]
    },
    {
     "nom": "Comedia por M+",
     "categorie": "Cinéma",
     "aussi": [
+     "Cine Comedia",
      "Comedia",
-     "Cine Comedia"
+     "M+ Comedia",
+     "M+COMEDIA HD"
     ]
    },
    {
     "nom": "Drama por M+",
     "categorie": "Cinéma",
     "aussi": [
+     "Cine Drama",
      "Drama",
-     "Cine Drama"
-    ]
-   },
-   {
-    "nom": "Suspense por M+",
-    "categorie": "Cinéma",
-    "aussi": [
-     "Suspense",
-     "Cine Suspense"
+     "M+ DRAMA HD",
+     "M+ Drama"
     ]
    },
    {
@@ -1506,25 +1435,54 @@
     "categorie": "Cinéma",
     "aussi": [
      "Documentales",
-     "Documentales M+"
+     "Documentales M+",
+     "M+ Documentales",
+     "M+Documentales HD"
     ]
    },
    {
     "nom": "Series por M+",
     "categorie": "Séries",
     "aussi": [
+     "M+ SERIES 2 HD",
+     "M+ SERIES HD",
+     "M+ Series",
+     "Movistar Series",
      "Series",
      "Series M+",
-     "Movistar Series"
+     "Series por M+"
     ]
    },
    {
     "nom": "Originales por M+",
     "categorie": "Séries",
     "aussi": [
+     "M+ Originales",
+     "M+ Originales HD",
+     "Movistar Originales",
      "Originales",
-     "Originales M+",
-     "Movistar Originales"
+     "Originales M+"
+    ]
+   },
+   {
+    "nom": "M+ La Resistencia",
+    "categorie": "Divertissement",
+    "aussi": [
+     "M+ La Resistencia"
+    ]
+   },
+   {
+    "nom": "M+ Ellas V",
+    "categorie": "Divertissement",
+    "aussi": [
+     "M+ Ellas V"
+    ]
+   },
+   {
+    "nom": "M+ Cero",
+    "categorie": "Divertissement",
+    "aussi": [
+     "M+ Cero"
     ]
    },
    {
@@ -1644,13 +1602,6 @@
     ]
    },
    {
-    "nom": "SkyShowtime 2",
-    "categorie": "Séries",
-    "aussi": [
-     "Sky Showtime 2"
-    ]
-   },
-   {
     "nom": "BBC Series",
     "categorie": "Séries",
     "aussi": [
@@ -1694,89 +1645,185 @@
     "nom": "Movistar LALIGA",
     "categorie": "Sport",
     "aussi": [
-     "Movistar La Liga",
-     "M+ LaLiga",
-     "LaLiga TV",
      "LALIGA TV",
      "LaLiga Movistar",
-     "Movistar LaLiga TV",
+     "LaLiga TV",
      "LaLiga TV por M+",
-     "M+ LALIGA"
+     "M+ LALIGA",
+     "M+ LALIGA HDR",
+     "M+ LALIGA TV",
+     "M+ LALIGA TV HD",
+     "M+ LaLiga",
+     "Movistar La Liga",
+     "Movistar LaLiga TV"
     ]
    },
    {
     "nom": "Movistar LALIGA 2",
     "categorie": "Sport",
     "aussi": [
-     "Movistar La Liga 2",
+     "LALIGA TV 2",
      "LaLiga TV 2",
+     "M+ LALIGA 2 HDR",
+     "M+ LALIGA TV 2",
+     "M+ LALIGA TV 2 HD",
      "M+ LaLiga 2",
-     "LALIGA TV 2"
+     "Movistar La Liga 2"
+    ]
+   },
+   {
+    "nom": "Movistar LALIGA 3",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ LALIGA TV 3",
+     "M+ LALIGA 3"
+    ]
+   },
+   {
+    "nom": "Movistar LALIGA 4",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ LALIGA TV 4",
+     "M+ LALIGA 4"
     ]
    },
    {
     "nom": "Movistar Liga de Campeones",
     "categorie": "Sport",
     "aussi": [
-     "Movistar Champions",
-     "M+ Liga de Campeones",
+     "Champions League",
      "Liga de Campeones",
-     "Champions League"
+     "M+ Liga de Campeones",
+     "M+ Liga de Campeones HDR",
+     "M+LCAMPEONES",
+     "Movistar Champions"
     ]
    },
    {
     "nom": "Movistar Liga de Campeones 2",
     "categorie": "Sport",
     "aussi": [
-     "Movistar Champions 2",
      "Liga de Campeones 2",
-     "M+ Liga de Campeones 2"
+     "M+ Liga de Campeones 2",
+     "M+LCAMPEON2",
+     "Movistar Champions 2"
+    ]
+   },
+   {
+    "nom": "Movistar Liga de Campeones 3",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Liga de Campeones 3",
+     "M+LCAMPEON3"
+    ]
+   },
+   {
+    "nom": "Movistar Liga de Campeones 4",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Liga de Campeones 4",
+     "M+LCAMPEON4"
+    ]
+   },
+   {
+    "nom": "Movistar Liga de Campeones 5",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Liga de Campeones 5",
+     "M+LCAMPEON5"
     ]
    },
    {
     "nom": "Movistar Deportes",
     "categorie": "Sport",
     "aussi": [
+     "Deportes por M+",
      "M+ Deportes",
-     "Movistar Deportes HD",
-     "Deportes por M+"
+     "M+DEPORTESHD",
+     "Movistar Deportes 1",
+     "Movistar Deportes HD"
     ]
    },
    {
     "nom": "Movistar Deportes 2",
     "categorie": "Sport",
     "aussi": [
-     "M+ Deportes 2"
+     "M+ Deportes 2",
+     "M+DEPORTES2HD"
     ]
    },
    {
     "nom": "Movistar Deportes 3",
     "categorie": "Sport",
     "aussi": [
-     "M+ Deportes 3"
+     "M+ Deportes 3",
+     "M+DEPORTES3"
+    ]
+   },
+   {
+    "nom": "Movistar Deportes 4",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Deportes 4",
+     "M+DEPORTES4"
+    ]
+   },
+   {
+    "nom": "Movistar Deportes 5",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Deportes 5",
+     "M+DEPORTES5"
+    ]
+   },
+   {
+    "nom": "Movistar Copa del Rey",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Copa del Rey"
+    ]
+   },
+   {
+    "nom": "Movistar Baloncesto",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Baloncesto"
     ]
    },
    {
     "nom": "Vamos por M+",
     "categorie": "Sport",
     "aussi": [
-     "Vamos",
+     "#Vamos",
+     "M+ VAMOSHD",
+     "M+ Vamos",
      "Movistar Vamos",
+     "Vamos",
      "Vamos M+"
+    ]
+   },
+   {
+    "nom": "Vamos 2 por M+",
+    "categorie": "Sport",
+    "aussi": [
+     "M+ Vamos 2",
+     "M+ VAMOS 2 HD"
     ]
    },
    {
     "nom": "Movistar Golf",
     "categorie": "Sport",
     "aussi": [
-     "M+ Golf",
-     "Golf por M+"
+     "Golf por M+",
+     "M+ GOLF HD",
+     "M+ Golf"
     ]
    },
    {
     "nom": "Movistar Golf 2",
     "categorie": "Sport",
     "aussi": [
+     "M+ GOLF 2 HD",
      "M+ Golf 2"
     ]
    },
@@ -1798,12 +1845,19 @@
     ]
    },
    {
+    "nom": "DAZN LaLiga 3",
+    "categorie": "Sport",
+    "aussi": [
+     "DAZN LALIGA 3"
+    ]
+   },
+   {
     "nom": "LALIGA HYPERMOTION",
     "categorie": "Sport",
     "aussi": [
      "LALIGA TV HYPERMOTION",
-     "LaLiga Hypermotion",
      "LALIGA TV Hypermotion",
+     "LaLiga Hypermotion",
      "LaLiga TV Hypermotion"
     ]
    },
@@ -1887,6 +1941,44 @@
     ]
    },
    {
+    "nom": "Betis TV",
+    "categorie": "Sport",
+    "aussi": [
+     "BetisTV",
+     "Betis.TV"
+    ]
+   },
+   {
+    "nom": "Iberalia TV",
+    "categorie": "Sport",
+    "aussi": [
+     "IBERALIA TV",
+     "Iberalia"
+    ]
+   },
+   {
+    "nom": "El Toro TV",
+    "categorie": "Sport",
+    "aussi": [
+     "El Toro TV.es"
+    ]
+   },
+   {
+    "nom": "Cazavisión",
+    "categorie": "Sport",
+    "aussi": [
+     "Cazavision"
+    ]
+   },
+   {
+    "nom": "Squirrel",
+    "categorie": "Sport",
+    "aussi": [
+     "SQUIRREL",
+     "Squirrel TV"
+    ]
+   },
+   {
     "nom": "Teledeporte",
     "categorie": "Sport",
     "aussi": [
@@ -1954,14 +2046,6 @@
     ]
    },
    {
-    "nom": "TLC",
-    "categorie": "Documentaire",
-    "aussi": [
-     "TLC HD",
-     "TLC España"
-    ]
-   },
-   {
     "nom": "BBC Earth",
     "categorie": "Documentaire",
     "aussi": [
@@ -1976,10 +2060,10 @@
     ]
    },
    {
-    "nom": "Viajar",
+    "nom": "Discovery MAX",
     "categorie": "Documentaire",
     "aussi": [
-     "Canal Viajar"
+     "Discovery Max"
     ]
    },
    {
@@ -2048,6 +2132,7 @@
     "nom": "Disney Junior",
     "categorie": "Jeunesse",
     "aussi": [
+     "DISNEY JR",
      "Disney Junior HD"
     ]
    },
@@ -2085,27 +2170,6 @@
     ]
    },
    {
-    "nom": "Cartoon Network",
-    "categorie": "Jeunesse",
-    "aussi": [
-     "Cartoon Network HD"
-    ]
-   },
-   {
-    "nom": "Boomerang",
-    "categorie": "Jeunesse",
-    "aussi": [
-     "Boomerang HD"
-    ]
-   },
-   {
-    "nom": "Cartoonito",
-    "categorie": "Jeunesse",
-    "aussi": [
-     "Cartoonito HD"
-    ]
-   },
-   {
     "nom": "Enfamilia",
     "categorie": "Jeunesse",
     "aussi": [
@@ -2119,21 +2183,6 @@
      "MTV",
      "MTV Spain",
      "MTV HD"
-    ]
-   },
-   {
-    "nom": "MTV 00s",
-    "categorie": "Musique",
-    "aussi": [
-     "MTV 00's",
-     "MTV 00s HD"
-    ]
-   },
-   {
-    "nom": "MTV Live",
-    "categorie": "Musique",
-    "aussi": [
-     "MTV Live HD"
     ]
    },
    {
@@ -2215,6 +2264,15 @@
    ],
    [
     "GOL"
+   ],
+   [
+    "Movistar LALIGA 2"
+   ],
+   [
+    "Movistar Copa del Rey"
+   ],
+   [
+    "Movistar Baloncesto"
    ]
   ]
  }
